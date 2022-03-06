@@ -13,6 +13,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumping structure for table space_tycoon.d_class
+DROP TABLE IF EXISTS `d_class`;
 CREATE TABLE IF NOT EXISTS `d_class` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
@@ -25,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_class: ~6 rows (approximately)
+-- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
 REPLACE INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price`) VALUES
 	(1, 'mothership', 'Y', 10, 0, 1000, 50, NULL),
@@ -38,21 +39,22 @@ REPLACE INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `dam
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_resource
+DROP TABLE IF EXISTS `d_resource`;
 CREATE TABLE IF NOT EXISTS `d_resource` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_resource: ~4 rows (approximately)
+-- Dumping data for table space_tycoon.d_resource: ~23 rows (approximately)
 /*!40000 ALTER TABLE `d_resource` DISABLE KEYS */;
 REPLACE INTO `d_resource` (`id`, `name`) VALUES
 	(1, 'Spice Melange'),
-	(2, 'Kyber Crystals'),
+	(2, 'Kyber Crystals For Red Sabers'),
 	(3, 'Collective Hive Mind Thougts'),
 	(4, 'Intellectual Property Rights'),
 	(5, 'Pokéballs'),
-	(6, 'Human Body Parts'),
+	(6, 'Human Body Replacement Parts'),
 	(7, 'Significant Other\'s Barks'),
 	(8, 'Parallel Timelines'),
 	(9, 'Sex Toys'),
@@ -63,38 +65,70 @@ REPLACE INTO `d_resource` (`id`, `name`) VALUES
 	(14, 'Super Hero Landings'),
 	(15, 'Forbidden Knowledge Scrolls'),
 	(16, 'Powerfull Psychic Abilities'),
-	(17, 'Shadows'),
+	(17, 'Shadow of Your Future Pasts'),
 	(18, 'The Things That Must Not Be Named'),
-	(19, 'Galaxies'),
+	(19, 'Galaxies (Size Does Not Matter)'),
 	(20, 'Nazi Scalps'),
-	(21, 'Toilet Paper Rolls');
+	(21, 'Toilet Paper Rolls'),
+	(22, 'NFT'),
+	(23, 'Comic Magazine Critiques');
 /*!40000 ALTER TABLE `d_resource` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_user
+DROP TABLE IF EXISTS `d_user`;
 CREATE TABLE IF NOT EXISTS `d_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
   `password` tinytext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user: ~4 rows (approximately)
+-- Dumping data for table space_tycoon.d_user: ~5 rows (approximately)
 /*!40000 ALTER TABLE `d_user` DISABLE KEYS */;
 REPLACE INTO `d_user` (`id`, `name`, `password`) VALUES
 	(1, 'opice', NULL),
 	(2, 'kokot', NULL),
 	(3, 'orangutan', NULL),
-	(4, 'lolitka', NULL);
+	(4, 'lolitka', NULL),
+	(5, 'rasputin', NULL);
 /*!40000 ALTER TABLE `d_user` ENABLE KEYS */;
 
+-- Dumping structure for table space_tycoon.d_user_score
+DROP TABLE IF EXISTS `d_user_score`;
+CREATE TABLE IF NOT EXISTS `d_user_score` (
+  `season` int(11) NOT NULL,
+  `user` int(11) NOT NULL,
+  `score` int(11) NOT NULL,
+  PRIMARY KEY (`season`,`user`),
+  KEY `FK_d_user_score_d_user` (`user`),
+  CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.d_user_score: ~5 rows (approximately)
+/*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
+REPLACE INTO `d_user_score` (`season`, `user`, `score`) VALUES
+	(41, 1, 3),
+	(41, 2, 4),
+	(41, 3, 1),
+	(41, 4, 5),
+	(41, 5, 2),
+	(42, 1, 1),
+	(42, 2, 4),
+	(42, 3, 2),
+	(42, 4, 3),
+	(42, 5, 5);
+/*!40000 ALTER TABLE `d_user_score` ENABLE KEYS */;
+
 -- Dumping structure for event space_tycoon.e_update_all
+DROP EVENT IF EXISTS `e_update_all`;
 DELIMITER //
-CREATE EVENT `e_update_all` ON SCHEDULE EVERY 1 SECOND STARTS '2022-02-21 17:33:03' ON COMPLETION PRESERVE DISABLE DO BEGIN
+CREATE EVENT `e_update_all` ON SCHEDULE EVERY 1 SECOND STARTS '2022-02-21 17:33:03' ON COMPLETION PRESERVE ENABLE DO BEGIN
 CALL p_update_all;
 END//
 DELIMITER ;
 
 -- Dumping structure for function space_tycoon.f_distance
+DROP FUNCTION IF EXISTS `f_distance`;
 DELIMITER //
 CREATE FUNCTION `f_distance`(`id_a` INT,
 	`id_b` INT
@@ -109,6 +143,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for function space_tycoon.f_sqr
+DROP FUNCTION IF EXISTS `f_sqr`;
 DELIMITER //
 CREATE FUNCTION `f_sqr`(`a` INT
 ) RETURNS int(11)
@@ -121,6 +156,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_clear_all
+DROP PROCEDURE IF EXISTS `p_clear_all`;
 DELIMITER //
 CREATE PROCEDURE `p_clear_all`()
     SQL SECURITY INVOKER
@@ -142,6 +178,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_generate_planets
+DROP PROCEDURE IF EXISTS `p_generate_planets`;
 DELIMITER //
 CREATE PROCEDURE `p_generate_planets`()
     SQL SECURITY INVOKER
@@ -176,6 +213,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_generate_prices
+DROP PROCEDURE IF EXISTS `p_generate_prices`;
 DELIMITER //
 CREATE PROCEDURE `p_generate_prices`()
     SQL SECURITY INVOKER
@@ -214,6 +252,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_generate_random_players
+DROP PROCEDURE IF EXISTS `p_generate_random_players`;
 DELIMITER //
 CREATE PROCEDURE `p_generate_random_players`()
     SQL SECURITY INVOKER
@@ -266,18 +305,61 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_generate_resources
+DROP PROCEDURE IF EXISTS `p_generate_resources`;
 DELIMITER //
 CREATE PROCEDURE `p_generate_resources`()
     SQL SECURITY INVOKER
 BEGIN
 
-INSERT INTO t_commodity (object, resource, amount) SELECT t_planet.id, d_resource.id, RAND() * 1000 + 100 FROM t_planet JOIN d_resource WHERE RAND() < 0.2;
-INSERT INTO t_recipe (planet, resource, production) SELECT t_planet.id, d_resource.id, (RAND() * 20 + 1) * if(RAND() < 0.45, -1, 1) FROM t_planet JOIN d_resource WHERE RAND() < 0.1;
+DROP TEMPORARY TABLE IF EXISTS t_factory;
+CREATE TEMPORARY TABLE t_factory
+(id INT NOT NULL AUTO_INCREMENT,
+PRIMARY KEY (id))
+SELECT NULL AS id
+FROM d_resource AS a
+JOIN d_resource AS b;
+
+DROP TEMPORARY TABLE IF EXISTS t_factory_recipe;
+CREATE TEMPORARY TABLE t_factory_recipe
+(factory INT NOT NULL,
+resource INT NOT NULL,
+production INT NOT NULL)
+SELECT t_factory.id AS factory, d_resource.id AS resource, (RAND() * RAND() * 100 + 5) * if(RAND() < 0.45, -1, 1) AS production
+FROM t_factory
+JOIN d_resource
+WHERE RAND() < 0.1;
+
+DELETE FROM t_factory
+WHERE id IN (
+SELECT t_factory.id
+FROM t_factory
+LEFT JOIN t_factory_recipe ON t_factory_recipe.factory = t_factory.id
+GROUP BY t_factory.id
+HAVING SUM(if(t_factory_recipe.production < 0, 1, 0)) = 0 OR SUM(if(t_factory_recipe.production > 0, 1, 0)) = 0
+);
+
+DROP TEMPORARY TABLE IF EXISTS t_planet_factory;
+CREATE TEMPORARY TABLE t_planet_factory
+SELECT t_planet.id AS planet, (SELECT id FROM t_factory ORDER BY RAND() LIMIT 1) AS factory
+FROM t_planet;
+
+INSERT INTO t_recipe (planet, resource, production)
+SELECT t_planet.id, t_factory_recipe.resource, t_factory_recipe.production * (RAND() + 1)
+FROM t_planet
+JOIN t_planet_factory ON t_planet_factory.planet = t_planet.id
+JOIN t_factory_recipe ON t_factory_recipe.factory = t_planet_factory.factory;
+
+INSERT INTO t_commodity (object, resource, amount)
+SELECT t_planet.id, t_recipe.resource, t_recipe.production * (RAND() * 10 + 1)
+FROM t_planet
+JOIN t_recipe ON t_recipe.planet = t_planet.id
+WHERE production > 0;
 
 END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_move_ships
+DROP PROCEDURE IF EXISTS `p_move_ships`;
 DELIMITER //
 CREATE PROCEDURE `p_move_ships`()
     SQL SECURITY INVOKER
@@ -304,6 +386,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_process_attacks
+DROP PROCEDURE IF EXISTS `p_process_attacks`;
 DELIMITER //
 CREATE PROCEDURE `p_process_attacks`()
     SQL SECURITY INVOKER
@@ -337,6 +420,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_process_constructions
+DROP PROCEDURE IF EXISTS `p_process_constructions`;
 DELIMITER //
 CREATE PROCEDURE `p_process_constructions`()
     SQL SECURITY INVOKER
@@ -346,6 +430,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_process_recipes
+DROP PROCEDURE IF EXISTS `p_process_recipes`;
 DELIMITER //
 CREATE PROCEDURE `p_process_recipes`()
     SQL SECURITY INVOKER
@@ -378,6 +463,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_process_trades
+DROP PROCEDURE IF EXISTS `p_process_trades`;
 DELIMITER //
 CREATE PROCEDURE `p_process_trades`()
     SQL SECURITY INVOKER
@@ -471,6 +557,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_purge_commands
+DROP PROCEDURE IF EXISTS `p_purge_commands`;
 DELIMITER //
 CREATE PROCEDURE `p_purge_commands`()
     SQL SECURITY INVOKER
@@ -486,12 +573,17 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_reset_all
+DROP PROCEDURE IF EXISTS `p_reset_all`;
 DELIMITER //
 CREATE PROCEDURE `p_reset_all`()
     SQL SECURITY INVOKER
 BEGIN
 
 START TRANSACTION READ WRITE;
+
+INSERT INTO d_user_score (season, user, score)
+SELECT (SELECT season FROM t_game LIMIT 1), user, score
+FROM v_user_score;
 
 CALL p_clear_all;
 UPDATE t_game SET season = season + 1, tick = 0;
@@ -510,6 +602,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_update_all
+DROP PROCEDURE IF EXISTS `p_update_all`;
 DELIMITER //
 CREATE PROCEDURE `p_update_all`()
     SQL SECURITY INVOKER
@@ -536,6 +629,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for procedure space_tycoon.p_update_prices
+DROP PROCEDURE IF EXISTS `p_update_prices`;
 DELIMITER //
 CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
@@ -545,6 +639,7 @@ END//
 DELIMITER ;
 
 -- Dumping structure for table space_tycoon.t_command
+DROP TABLE IF EXISTS `t_command`;
 CREATE TABLE IF NOT EXISTS `t_command` (
   `ship` int(11) NOT NULL,
   `type` enum('stop','move','attack','trade','construct') NOT NULL DEFAULT 'stop',
@@ -569,11 +664,12 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_command: ~4 769 rows (approximately)
+-- Dumping data for table space_tycoon.t_command: ~3 rows (approximately)
 /*!40000 ALTER TABLE `t_command` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_command` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_commodity
+DROP TABLE IF EXISTS `t_commodity`;
 CREATE TABLE IF NOT EXISTS `t_commodity` (
   `object` int(11) NOT NULL,
   `resource` int(11) NOT NULL,
@@ -585,11 +681,12 @@ CREATE TABLE IF NOT EXISTS `t_commodity` (
   CONSTRAINT `commodity_amount_not_negative` CHECK (`amount` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_commodity: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_commodity: ~14 638 rows (approximately)
 /*!40000 ALTER TABLE `t_commodity` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_commodity` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_game
+DROP TABLE IF EXISTS `t_game`;
 CREATE TABLE IF NOT EXISTS `t_game` (
   `season` int(10) NOT NULL,
   `tick` int(10) NOT NULL
@@ -598,10 +695,11 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
 REPLACE INTO `t_game` (`season`, `tick`) VALUES
-	(39, 425);
+	(43, 0);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
+DROP TABLE IF EXISTS `t_object`;
 CREATE TABLE IF NOT EXISTS `t_object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL DEFAULT '',
@@ -610,24 +708,26 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=627358 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=685108 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_object: ~14 430 rows (approximately)
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_object` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_planet
+DROP TABLE IF EXISTS `t_planet`;
 CREATE TABLE IF NOT EXISTS `t_planet` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `FK__object_id` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_planet: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_planet: ~8 882 rows (approximately)
 /*!40000 ALTER TABLE `t_planet` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_planet` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_player
+DROP TABLE IF EXISTS `t_player`;
 CREATE TABLE IF NOT EXISTS `t_player` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) NOT NULL,
@@ -638,13 +738,14 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=2225 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=2441 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_player: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_player: ~54 rows (approximately)
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_player` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_price
+DROP TABLE IF EXISTS `t_price`;
 CREATE TABLE IF NOT EXISTS `t_price` (
   `planet` int(11) NOT NULL,
   `resource` int(11) NOT NULL,
@@ -659,11 +760,12 @@ CREATE TABLE IF NOT EXISTS `t_price` (
   CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` >= `sell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_price: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_price: ~20 797 rows (approximately)
 /*!40000 ALTER TABLE `t_price` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_price` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_recipe
+DROP TABLE IF EXISTS `t_recipe`;
 CREATE TABLE IF NOT EXISTS `t_recipe` (
   `planet` int(11) NOT NULL,
   `resource` int(11) NOT NULL,
@@ -675,11 +777,12 @@ CREATE TABLE IF NOT EXISTS `t_recipe` (
   CONSTRAINT `production_not_zero` CHECK (`production` <> 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_recipe: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_recipe: ~28 745 rows (approximately)
 /*!40000 ALTER TABLE `t_recipe` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_recipe` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_report_combat
+DROP TABLE IF EXISTS `t_report_combat`;
 CREATE TABLE IF NOT EXISTS `t_report_combat` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tick` int(11) NOT NULL,
@@ -692,13 +795,14 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   KEY `Index 4` (`tick`),
   CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=576689 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=655501 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_combat: ~264 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_combat` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_report_trade
+DROP TABLE IF EXISTS `t_report_trade`;
 CREATE TABLE IF NOT EXISTS `t_report_trade` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tick` int(11) NOT NULL,
@@ -715,13 +819,14 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5876 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=9314 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_trade: ~51 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_trade` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_ship
+DROP TABLE IF EXISTS `t_ship`;
 CREATE TABLE IF NOT EXISTS `t_ship` (
   `id` int(11) NOT NULL,
   `class` int(11) NOT NULL,
@@ -736,11 +841,12 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
   CONSTRAINT `life_is_not_negative` CHECK (`life` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_ship: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_ship: ~5 548 rows (approximately)
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_waypoint
+DROP TABLE IF EXISTS `t_waypoint`;
 CREATE TABLE IF NOT EXISTS `t_waypoint` (
   `id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -752,6 +858,7 @@ CREATE TABLE IF NOT EXISTS `t_waypoint` (
 /*!40000 ALTER TABLE `t_waypoint` ENABLE KEYS */;
 
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
+DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_commodities_worth` (
 	`player` INT(11) NOT NULL,
@@ -759,6 +866,7 @@ CREATE TABLE `v_player_commodities_worth` (
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_score
+DROP VIEW IF EXISTS `v_player_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_score` (
 	`player` INT(11) NOT NULL,
@@ -767,6 +875,7 @@ CREATE TABLE `v_player_score` (
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_ships_worth
+DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_ships_worth` (
 	`player` INT(11) NOT NULL,
@@ -774,6 +883,7 @@ CREATE TABLE `v_player_ships_worth` (
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_total_worth
+DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_total_worth` (
 	`player` INT(11) NOT NULL,
@@ -781,6 +891,7 @@ CREATE TABLE `v_player_total_worth` (
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_resource_price
+DROP VIEW IF EXISTS `v_resource_price`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_resource_price` (
 	`resource` INT(11) NOT NULL,
@@ -788,7 +899,25 @@ CREATE TABLE `v_resource_price` (
 	`sell` DECIMAL(14,4) NOT NULL
 ) ENGINE=MyISAM;
 
+-- Dumping structure for view space_tycoon.v_user_best_worth
+DROP VIEW IF EXISTS `v_user_best_worth`;
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `v_user_best_worth` (
+	`user` INT(11) NOT NULL,
+	`price` DECIMAL(48,4) NULL
+) ENGINE=MyISAM;
+
+-- Dumping structure for view space_tycoon.v_user_score
+DROP VIEW IF EXISTS `v_user_score`;
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `v_user_score` (
+	`user` INT(11) NOT NULL,
+	`price` DECIMAL(48,4) NULL,
+	`score` BIGINT(21) NOT NULL
+) ENGINE=MyISAM;
+
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
+DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS price
@@ -799,15 +928,17 @@ LEFT JOIN v_resource_price ON v_resource_price.resource = t_commodity.resource
 GROUP BY t_player.id ;
 
 -- Dumping structure for view space_tycoon.v_player_score
+DROP VIEW IF EXISTS `v_player_score`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_score`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_score` AS SELECT a.player AS player, a.price AS price, COUNT(1) AS score
 FROM v_player_total_worth AS a
 JOIN v_player_total_worth AS b ON a.price >= b.price
-GROUP BY a.player 
+GROUP BY a.player
 ORDER BY a.price desc ;
 
 -- Dumping structure for view space_tycoon.v_player_ships_worth
+DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_ships_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, SUM(ifnull(d_class.price, 0)) AS price
@@ -817,6 +948,7 @@ LEFT JOIN d_class ON d_class.id = t_ship.class
 GROUP BY t_player.id ;
 
 -- Dumping structure for view space_tycoon.v_player_total_worth
+DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_total_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_total_worth` AS SELECT t_player.id AS player, v_player_commodities_worth.price + v_player_ships_worth.price + t_player.money AS price
@@ -825,12 +957,33 @@ JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.
 JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id ;
 
 -- Dumping structure for view space_tycoon.v_resource_price
+DROP VIEW IF EXISTS `v_resource_price`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_resource_price`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELECT d_resource.id AS resource, ifnull(AVG(buy), 0) AS buy, ifnull(AVG(sell), 0) AS sell
 FROM d_resource
 left JOIN t_price ON t_price.resource = d_resource.id
 GROUP BY d_resource.id ;
+
+-- Dumping structure for view space_tycoon.v_user_best_worth
+DROP VIEW IF EXISTS `v_user_best_worth`;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `v_user_best_worth`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.price) AS price
+FROM v_player_total_worth
+JOIN t_player ON t_player.id = v_player_total_worth.player
+GROUP BY t_player.user
+ORDER BY price desc ;
+
+-- Dumping structure for view space_tycoon.v_user_score
+DROP VIEW IF EXISTS `v_user_score`;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `v_user_score`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.price AS price, COUNT(1) AS score
+FROM v_user_best_worth AS a
+JOIN v_user_best_worth AS b ON a.price >= b.price
+GROUP BY a.user
+ORDER BY a.price desc ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
