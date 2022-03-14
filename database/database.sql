@@ -27,8 +27,9 @@ CREATE TABLE IF NOT EXISTS `d_class` (
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
+DELETE FROM `d_class`;
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
-REPLACE INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price`) VALUES
+INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price`) VALUES
 	(1, 'mothership', 'Y', 10, 0, 1000, 50, NULL),
 	(2, 'hauler', 'N', 13, 200, 200, 0, 500000),
 	(3, 'shipper', 'N', 18, 50, 100, 0, 300000),
@@ -46,9 +47,10 @@ CREATE TABLE IF NOT EXISTS `d_resource` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_resource: ~23 rows (approximately)
+-- Dumping data for table space_tycoon.d_resource: ~21 rows (approximately)
+DELETE FROM `d_resource`;
 /*!40000 ALTER TABLE `d_resource` DISABLE KEYS */;
-REPLACE INTO `d_resource` (`id`, `name`) VALUES
+INSERT INTO `d_resource` (`id`, `name`) VALUES
 	(1, 'Spice Melange'),
 	(2, 'Kyber Crystals For Red Sabers'),
 	(3, 'Collective Hive Mind Thougts'),
@@ -83,9 +85,10 @@ CREATE TABLE IF NOT EXISTS `d_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user: ~5 rows (approximately)
+-- Dumping data for table space_tycoon.d_user: ~4 rows (approximately)
+DELETE FROM `d_user`;
 /*!40000 ALTER TABLE `d_user` DISABLE KEYS */;
-REPLACE INTO `d_user` (`id`, `name`, `password`) VALUES
+INSERT INTO `d_user` (`id`, `name`, `password`) VALUES
 	(1, 'opice', NULL),
 	(2, 'kokot', NULL),
 	(3, 'orangutan', NULL),
@@ -104,9 +107,10 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user_score: ~5 rows (approximately)
+-- Dumping data for table space_tycoon.d_user_score: ~0 rows (approximately)
+DELETE FROM `d_user_score`;
 /*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
-REPLACE INTO `d_user_score` (`season`, `user`, `score`) VALUES
+INSERT INTO `d_user_score` (`season`, `user`, `score`) VALUES
 	(41, 1, 3),
 	(41, 2, 4),
 	(41, 3, 1),
@@ -426,6 +430,66 @@ CREATE PROCEDURE `p_process_constructions`()
     SQL SECURITY INVOKER
 BEGIN
 
+DECLARE n INT DEFAULT 0;
+DECLARE i INT DEFAULT 0;
+DECLARE id INT;
+
+# pick suitable construction commands
+DROP TEMPORARY TABLE IF EXISTS t_constructions;
+CREATE TEMPORARY TABLE t_constructions
+SELECT t_command.ship, t_ship.player, t_command.class, d_class.price
+FROM t_command
+JOIN t_ship ON t_ship.id = t_command.ship
+JOIN t_player ON t_player.id = t_ship.player
+JOIN d_class ON d_class.id = t_command.class
+WHERE t_command.`type` = 'construct';
+
+# players with insufficient money shall construct no ships
+DELETE a
+FROM t_constructions AS a
+WHERE a.player IN
+(
+	SELECT player FROM
+	(
+		SELECT b.player, t_player.money
+		FROM t_constructions AS b
+		JOIN t_player ON t_player.id = b.player
+		GROUP BY t_player.id
+		HAVING SUM(b.price) > t_player.money
+	) AS subquery
+);
+
+# subtract players money
+UPDATE t_player
+SET t_player.money = t_player.money - IFNULL(
+(
+	SELECT SUM(t_constructions.price)
+	FROM t_constructions
+	WHERE t_constructions.player = t_player.id
+), 0);
+
+# create ships, one by one, so that the auto-incremented t_object.id can be used to insert into t_ship
+SELECT COUNT(*) INTO n FROM t_constructions;
+WHILE i < n DO
+	INSERT INTO t_object (pos_x, pos_y, pos_x_prev, pos_y_prev)
+	SELECT pos_x, pos_y, pos_x, pos_y
+	FROM t_constructions
+	JOIN t_object ON t_object.id = t_constructions.ship
+	LIMIT i,1;
+	SET id = LAST_INSERT_ID();
+	INSERT INTO t_ship (id, class, player, life)
+	SELECT id, t_constructions.class, t_constructions.player, d_class.life
+	FROM t_constructions
+	JOIN d_class ON d_class.id = t_constructions.class
+	LIMIT i,1;
+	SET i = i + 1;
+END WHILE;
+
+# delete fulfilled commands
+DELETE t_command
+FROM t_command
+JOIN t_constructions ON t_constructions.ship = t_command.ship;
+
 END//
 DELIMITER ;
 
@@ -664,7 +728,8 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_command: ~3 rows (approximately)
+-- Dumping data for table space_tycoon.t_command: ~4 777 rows (approximately)
+DELETE FROM `t_command`;
 /*!40000 ALTER TABLE `t_command` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_command` ENABLE KEYS */;
 
@@ -681,7 +746,8 @@ CREATE TABLE IF NOT EXISTS `t_commodity` (
   CONSTRAINT `commodity_amount_not_negative` CHECK (`amount` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_commodity: ~14 638 rows (approximately)
+-- Dumping data for table space_tycoon.t_commodity: ~41 908 rows (approximately)
+DELETE FROM `t_commodity`;
 /*!40000 ALTER TABLE `t_commodity` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_commodity` ENABLE KEYS */;
 
@@ -693,9 +759,10 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
+DELETE FROM `t_game`;
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
-REPLACE INTO `t_game` (`season`, `tick`) VALUES
-	(43, 0);
+INSERT INTO `t_game` (`season`, `tick`) VALUES
+	(44, 1);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
@@ -708,9 +775,10 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=685108 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=700197 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_object: ~14 430 rows (approximately)
+-- Dumping data for table space_tycoon.t_object: ~13 754 rows (approximately)
+DELETE FROM `t_object`;
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_object` ENABLE KEYS */;
 
@@ -722,7 +790,8 @@ CREATE TABLE IF NOT EXISTS `t_planet` (
   CONSTRAINT `FK__object_id` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_planet: ~8 882 rows (approximately)
+-- Dumping data for table space_tycoon.t_planet: ~0 rows (approximately)
+DELETE FROM `t_planet`;
 /*!40000 ALTER TABLE `t_planet` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_planet` ENABLE KEYS */;
 
@@ -738,9 +807,10 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=2441 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=2497 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_player: ~54 rows (approximately)
+-- Dumping data for table space_tycoon.t_player: ~50 rows (approximately)
+DELETE FROM `t_player`;
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_player` ENABLE KEYS */;
 
@@ -760,7 +830,8 @@ CREATE TABLE IF NOT EXISTS `t_price` (
   CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` >= `sell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_price: ~20 797 rows (approximately)
+-- Dumping data for table space_tycoon.t_price: ~18 570 rows (approximately)
+DELETE FROM `t_price`;
 /*!40000 ALTER TABLE `t_price` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_price` ENABLE KEYS */;
 
@@ -777,7 +848,8 @@ CREATE TABLE IF NOT EXISTS `t_recipe` (
   CONSTRAINT `production_not_zero` CHECK (`production` <> 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_recipe: ~28 745 rows (approximately)
+-- Dumping data for table space_tycoon.t_recipe: ~18 570 rows (approximately)
+DELETE FROM `t_recipe`;
 /*!40000 ALTER TABLE `t_recipe` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_recipe` ENABLE KEYS */;
 
@@ -797,7 +869,8 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=655501 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_combat: ~226 rows (approximately)
+DELETE FROM `t_report_combat`;
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_combat` ENABLE KEYS */;
 
@@ -819,9 +892,10 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9314 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=9317 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_trade: ~41 rows (approximately)
+DELETE FROM `t_report_trade`;
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_trade` ENABLE KEYS */;
 
@@ -841,7 +915,8 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
   CONSTRAINT `life_is_not_negative` CHECK (`life` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_ship: ~5 548 rows (approximately)
+-- Dumping data for table space_tycoon.t_ship: ~5 107 rows (approximately)
+DELETE FROM `t_ship`;
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
 
@@ -854,6 +929,7 @@ CREATE TABLE IF NOT EXISTS `t_waypoint` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_waypoint: ~0 rows (approximately)
+DELETE FROM `t_waypoint`;
 /*!40000 ALTER TABLE `t_waypoint` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_waypoint` ENABLE KEYS */;
 
