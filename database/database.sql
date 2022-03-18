@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `d_resource` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_resource: ~23 rows (approximately)
+-- Dumping data for table space_tycoon.d_resource: ~21 rows (approximately)
 /*!40000 ALTER TABLE `d_resource` DISABLE KEYS */;
 INSERT INTO `d_resource` (`id`, `name`) VALUES
 	(1, 'Spice Melange'),
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `d_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user: ~5 rows (approximately)
+-- Dumping data for table space_tycoon.d_user: ~4 rows (approximately)
 /*!40000 ALTER TABLE `d_user` DISABLE KEYS */;
 INSERT INTO `d_user` (`id`, `name`, `password`) VALUES
 	(1, 'opice', NULL),
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user_score: ~25 rows (approximately)
+-- Dumping data for table space_tycoon.d_user_score: ~38 rows (approximately)
 /*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
 INSERT INTO `d_user_score` (`season`, `user`, `score`) VALUES
 	(41, 1, 3),
@@ -131,7 +131,20 @@ INSERT INTO `d_user_score` (`season`, `user`, `score`) VALUES
 	(47, 2, 4),
 	(47, 3, 5),
 	(47, 4, 3),
-	(47, 5, 2);
+	(47, 5, 2),
+	(51, 1, 4),
+	(51, 2, 5),
+	(51, 3, 2),
+	(51, 4, 1),
+	(51, 5, 3),
+	(52, 1, 1),
+	(52, 2, 3),
+	(52, 4, 4),
+	(52, 5, 2),
+	(53, 2, 1),
+	(53, 3, 4),
+	(53, 4, 3),
+	(53, 5, 2);
 /*!40000 ALTER TABLE `d_user_score` ENABLE KEYS */;
 
 -- Dumping structure for event space_tycoon.e_update_all
@@ -189,6 +202,8 @@ DELETE FROM t_ship;
 DELETE FROM t_waypoint;
 DELETE FROM t_object;
 DELETE FROM t_player;
+
+UPDATE t_game SET season = season + 1, tick = 0;
 
 END//
 DELIMITER ;
@@ -527,16 +542,18 @@ DELETE t_recipe_planets
 FROM t_recipe_planets
 JOIN t_recipe ON t_recipe.planet = t_recipe_planets.planet AND t_recipe.production < 0
 LEFT JOIN t_commodity ON t_recipe_planets.planet = t_commodity.object AND t_commodity.resource = t_recipe.resource
-WHERE IFNULL(t_commodity.amount, 0) <= -LEAST(t_recipe.production, 0);
+WHERE IFNULL(t_commodity.amount, 0) <= -t_recipe.production;
 
-INSERT IGNORE INTO t_commodity (object, resource, amount)
-SELECT planet, resource, 0
-FROM t_recipe;
+DROP TEMPORARY TABLE IF EXISTS t_recipe_result;
+CREATE TEMPORARY TABLE t_recipe_result
+(PRIMARY KEY(planet, resource))
+SELECT t_recipe.planet, t_recipe.resource, IFNULL(t_commodity.amount, 0) + t_recipe.production AS amount
+FROM t_recipe
+JOIN t_recipe_planets ON t_recipe_planets.planet = t_recipe.planet
+left JOIN t_commodity ON t_commodity.object = t_recipe.planet AND t_commodity.resource = t_recipe.resource;
 
-UPDATE t_commodity
-JOIN t_recipe ON t_recipe.planet = t_commodity.object AND t_recipe.resource = t_commodity.resource
-JOIN t_recipe_planets ON t_recipe_planets.planet = t_commodity.object
-SET t_commodity.amount = t_commodity.amount + t_recipe.production;
+REPLACE INTO t_commodity
+SELECT * FROM t_recipe_result;
 
 DELETE FROM t_commodity WHERE amount = 0;
 
@@ -670,7 +687,6 @@ SELECT (SELECT season FROM t_game LIMIT 1), user, score
 FROM v_user_score;
 
 CALL p_clear_all;
-UPDATE t_game SET season = season + 1, tick = 0;
 CALL p_generate_planets;
 CALL p_generate_resources;
 CALL p_process_recipes;
@@ -785,7 +801,7 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_command: ~1 178 rows (approximately)
+-- Dumping data for table space_tycoon.t_command: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_command` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_command` ENABLE KEYS */;
 
@@ -802,7 +818,7 @@ CREATE TABLE IF NOT EXISTS `t_commodity` (
   CONSTRAINT `commodity_amount_not_negative` CHECK (`amount` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_commodity: ~17 046 rows (approximately)
+-- Dumping data for table space_tycoon.t_commodity: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_commodity` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_commodity` ENABLE KEYS */;
 
@@ -816,7 +832,7 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
 INSERT INTO `t_game` (`season`, `tick`) VALUES
-	(50, 216);
+	(55, 0);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
@@ -829,9 +845,9 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=787884 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=835704 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_object: ~14 743 rows (approximately)
+-- Dumping data for table space_tycoon.t_object: ~155 rows (approximately)
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_object` ENABLE KEYS */;
 
@@ -843,7 +859,7 @@ CREATE TABLE IF NOT EXISTS `t_planet` (
   CONSTRAINT `FK__object_id` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_planet: ~8 796 rows (approximately)
+-- Dumping data for table space_tycoon.t_planet: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_planet` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_planet` ENABLE KEYS */;
 
@@ -859,9 +875,9 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=2831 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=2960 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_player: ~58 rows (approximately)
+-- Dumping data for table space_tycoon.t_player: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_player` ENABLE KEYS */;
 
@@ -881,7 +897,7 @@ CREATE TABLE IF NOT EXISTS `t_price` (
   CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` >= `sell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_price: ~28 880 rows (approximately)
+-- Dumping data for table space_tycoon.t_price: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_price` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_price` ENABLE KEYS */;
 
@@ -898,7 +914,7 @@ CREATE TABLE IF NOT EXISTS `t_recipe` (
   CONSTRAINT `production_not_zero` CHECK (`production` <> 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_recipe: ~28 880 rows (approximately)
+-- Dumping data for table space_tycoon.t_recipe: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_recipe` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_recipe` ENABLE KEYS */;
 
@@ -916,9 +932,9 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   KEY `Index 4` (`tick`),
   CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1078456 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1111228 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_combat: ~903 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_combat` ENABLE KEYS */;
 
@@ -938,7 +954,7 @@ CREATE TABLE IF NOT EXISTS `t_report_timing` (
   PRIMARY KEY (`tick`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_timing: ~216 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_timing: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_timing` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_timing` ENABLE KEYS */;
 
@@ -960,9 +976,9 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22602 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=24370 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_trade: ~11 rows (approximately)
+-- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_trade` ENABLE KEYS */;
 
@@ -982,7 +998,7 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
   CONSTRAINT `life_is_not_negative` CHECK (`life` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_ship: ~5 947 rows (approximately)
+-- Dumping data for table space_tycoon.t_ship: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
 
