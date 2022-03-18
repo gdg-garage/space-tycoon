@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `d_resource` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_resource: ~21 rows (approximately)
+-- Dumping data for table space_tycoon.d_resource: ~23 rows (approximately)
 /*!40000 ALTER TABLE `d_resource` DISABLE KEYS */;
 INSERT INTO `d_resource` (`id`, `name`) VALUES
 	(1, 'Spice Melange'),
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `d_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user: ~4 rows (approximately)
+-- Dumping data for table space_tycoon.d_user: ~5 rows (approximately)
 /*!40000 ALTER TABLE `d_user` DISABLE KEYS */;
 INSERT INTO `d_user` (`id`, `name`, `password`) VALUES
 	(1, 'opice', NULL),
@@ -104,47 +104,8 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user_score: ~38 rows (approximately)
+-- Dumping data for table space_tycoon.d_user_score: ~0 rows (approximately)
 /*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
-INSERT INTO `d_user_score` (`season`, `user`, `score`) VALUES
-	(41, 1, 3),
-	(41, 2, 4),
-	(41, 3, 1),
-	(41, 4, 5),
-	(41, 5, 2),
-	(42, 1, 1),
-	(42, 2, 4),
-	(42, 3, 2),
-	(42, 4, 3),
-	(42, 5, 5),
-	(45, 1, 4),
-	(45, 2, 2),
-	(45, 3, 3),
-	(45, 4, 1),
-	(45, 5, 5),
-	(46, 1, 5),
-	(46, 2, 4),
-	(46, 3, 3),
-	(46, 4, 2),
-	(46, 5, 1),
-	(47, 1, 1),
-	(47, 2, 4),
-	(47, 3, 5),
-	(47, 4, 3),
-	(47, 5, 2),
-	(51, 1, 4),
-	(51, 2, 5),
-	(51, 3, 2),
-	(51, 4, 1),
-	(51, 5, 3),
-	(52, 1, 1),
-	(52, 2, 3),
-	(52, 4, 4),
-	(52, 5, 2),
-	(53, 2, 1),
-	(53, 3, 4),
-	(53, 4, 3),
-	(53, 5, 2);
 /*!40000 ALTER TABLE `d_user_score` ENABLE KEYS */;
 
 -- Dumping structure for event space_tycoon.e_update_all
@@ -190,6 +151,7 @@ CREATE PROCEDURE `p_clear_all`()
     SQL SECURITY INVOKER
 BEGIN
 
+DELETE FROM t_report_player_score;
 DELETE FROM t_report_timing;
 DELETE FROM t_report_combat;
 DELETE FROM t_report_trade;
@@ -202,8 +164,6 @@ DELETE FROM t_ship;
 DELETE FROM t_waypoint;
 DELETE FROM t_object;
 DELETE FROM t_player;
-
-UPDATE t_game SET season = season + 1, tick = 0;
 
 END//
 DELIMITER ;
@@ -222,7 +182,7 @@ DECLARE planet_index INT;
 DECLARE star_x INT;
 DECLARE star_y INT;
 DECLARE id INT;
-SET num_stars = RAND() * 20 + 4000;
+SET num_stars = RAND() * 100 + 200;
 SET star_index = 0;
 WHILE star_index < num_stars DO
 	SET star_x = (RAND() - 0.5) * 3000;
@@ -299,14 +259,14 @@ DECLARE player_y INT;
 DECLARE ship_count INT;
 DECLARE ship_index INT;
 DECLARE ship_id INT;
-SET player_count = RAND() * 10 + 50;
+SET player_count = RAND() * 5 + 5;
 SET player_index = 0;
 WHILE player_index < player_count DO
 	SET player_x = (RAND() - 0.5) * 3000;
 	SET player_y = (RAND() - 0.5) * 3000;
 	INSERT INTO t_player (name, USER, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
 	SET player_id = LAST_INSERT_ID();
-	SET ship_count = RAND() * 5 + 100;
+	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
 	WHILE ship_index < ship_count DO
 		INSERT INTO t_object (name, pos_x, pos_y) VALUES (CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
@@ -567,13 +527,22 @@ CREATE PROCEDURE `p_process_trades`()
     SQL SECURITY INVOKER
 BEGIN
 
+# create a temporary player to represent all the planets which allows to simplify the other queries related to money
+# it has A LOT of money from the beginning to ensure that the planets pass the 'available money' filter
+INSERT IGNORE INTO d_user (id, name) VALUES (-1, '<planets>');
+INSERT IGNORE INTO t_player (id, user, NAME, money) VALUES (-1, -1, '<planets>', 1000000000000000);
+
 # filter by commands
 
 DROP TEMPORARY TABLE IF EXISTS t_trades;
 CREATE TEMPORARY TABLE t_trades
-(INDEX(buyer), INDEX(seller), INDEX(resource), PRIMARY KEY(buyer, seller, resource))
-SELECT if(amount > 0, ship, target) AS buyer, if(amount > 0, target, ship) AS seller, resource, ABS(amount) AS amount
+(price int NULL, INDEX(buyer), INDEX(seller), INDEX(resource), PRIMARY KEY(buyer, seller, resource), INDEX(buyer_player), INDEX(seller_player))
+SELECT if(amount > 0, ship, target) AS buyer , IFNULL(if(amount > 0, a.player, b.player), -1) AS buyer_player,
+       if(amount > 0, target, ship) AS seller, IFNULL(if(amount > 0, b.player, a.player), -1) AS seller_player,
+	   resource, ABS(amount) AS amount, NULL AS price
 FROM t_command
+LEFT JOIN t_ship AS a ON a.id = t_command.ship
+LEFT JOIN t_ship AS b ON b.id = t_command.target
 WHERE t_command.type = 'trade';
 
 # filter by positions
@@ -583,6 +552,24 @@ FROM t_trades
 JOIN t_object AS a ON a.id = t_trades.buyer
 JOIN t_object AS b ON b.id = t_trades.seller
 WHERE a.pos_x != a.pos_x OR a.pos_y != b.pos_y;
+
+# filter by price
+
+UPDATE t_trades
+SET t_trades.price = 0
+WHERE t_trades.seller_player = t_trades.buyer_player;
+
+UPDATE t_trades
+JOIN t_price ON t_price.planet = t_trades.seller AND t_price.resource = t_trades.resource
+SET t_trades.price = t_price.buy;
+
+UPDATE t_trades
+JOIN t_price ON t_price.planet = t_trades.buyer AND t_price.resource = t_trades.resource
+SET t_trades.price = t_price.sell;
+
+DELETE FROM t_trades WHERE price IS NULL;
+
+UPDATE t_trades SET price = amount * price;
 
 # filter by available cargo space
 
@@ -602,6 +589,28 @@ JOIN d_class ON d_class.id = t_ship.class
 WHERE t_ship_cargo_used.used + t_trades.amount > d_class.cargo;
 
 # filter by available money
+# filtering by money before goods prevents players interfering (screwing) with each other without actually buying the goods afterwards due to insufficient money
+
+DELETE FROM t_trades
+WHERE t_trades.buyer_player IN
+(
+ SELECT player
+ FROM
+ (
+  SELECT buyer_player AS player, SUM(price) AS required
+  FROM
+  (
+   SELECT buyer_player, price
+   FROM t_trades
+   UNION ALL
+   SELECT id, 0
+   FROM t_player
+  ) AS subquery
+  GROUP BY player
+ ) AS players
+ JOIN t_player ON t_player.id = players.player
+ WHERE t_player.money < required
+);
 
 # filter by available goods
 
@@ -615,8 +624,18 @@ GROUP BY seller, resource;
 DELETE t_trades
 FROM t_trades
 JOIN t_trade_goods_requested ON t_trade_goods_requested.object = t_trades.seller AND t_trade_goods_requested.resource = t_trades.resource
-JOIN t_commodity ON t_commodity.object = t_trades.seller AND t_commodity.resource = t_trades.resource
-WHERE t_trade_goods_requested.request > t_commodity.amount;
+left JOIN t_commodity ON t_commodity.object = t_trades.seller AND t_commodity.resource = t_trades.resource
+WHERE t_trade_goods_requested.request > IFNULL(t_commodity.amount, 0);
+
+# transfer money
+
+UPDATE t_player
+JOIN t_trades ON t_trades.seller_player = t_player.id
+SET t_player.money = t_player.money + t_trades.price;
+
+UPDATE t_player
+JOIN t_trades ON t_trades.buyer_player = t_player.id
+SET t_player.money = t_player.money - t_trades.price;
 
 # transfer goods
 
@@ -632,12 +651,10 @@ UPDATE t_commodity
 JOIN t_trades ON t_trades.buyer = t_commodity.object AND t_trades.resource = t_commodity.resource
 SET t_commodity.amount = t_commodity.amount + t_trades.amount;
 
-# transfer money
-
 # generate reports
 
 INSERT INTO t_report_trade (tick, buyer, seller, resource, amount, price)
-SELECT (SELECT tick FROM t_game), buyer, seller, resource, amount, 0
+SELECT (SELECT tick FROM t_game), buyer, seller, resource, amount, price
 FROM t_trades;
 
 # remove fulfilled commands
@@ -653,6 +670,8 @@ JOIN t_trades ON t_trades.seller = t_command.ship AND t_command.amount < 0;
 # clean up
 
 DELETE FROM t_commodity WHERE amount = 0;
+DELETE FROM t_player WHERE id = -1;
+DELETE FROM d_user WHERE id = -1;
 
 END//
 DELIMITER ;
@@ -673,6 +692,24 @@ DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHER
 END//
 DELIMITER ;
 
+-- Dumping structure for procedure space_tycoon.p_report_player_score
+DROP PROCEDURE IF EXISTS `p_report_player_score`;
+DELIMITER //
+CREATE PROCEDURE `p_report_player_score`()
+    SQL SECURITY INVOKER
+BEGIN
+
+INSERT INTO t_report_player_score
+SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1),
+t_player.money, v_player_commodities_worth.price, v_player_ships_worth.price,
+t_player.money + v_player_commodities_worth.price + v_player_ships_worth.price
+FROM t_player
+JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
+JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_reset_all
 DROP PROCEDURE IF EXISTS `p_reset_all`;
 DELIMITER //
@@ -685,6 +722,8 @@ START TRANSACTION READ WRITE;
 INSERT INTO d_user_score (season, user, score)
 SELECT (SELECT season FROM t_game LIMIT 1), user, score
 FROM v_user_score;
+
+UPDATE t_game SET season = season + 1, tick = 0;
 
 CALL p_clear_all;
 CALL p_generate_planets;
@@ -716,6 +755,7 @@ DECLARE ts_trades TIMESTAMP(6);
 DECLARE ts_recipes TIMESTAMP(6);
 DECLARE ts_prices TIMESTAMP(6);
 DECLARE ts_constructions TIMESTAMP(6);
+DECLARE ts_report TIMESTAMP(6);
 DECLARE ts_overall TIMESTAMP(6);
 DECLARE my_tick INT;
 
@@ -724,8 +764,6 @@ SET ts_entry = SYSDATE(6);
 START TRANSACTION READ WRITE;
 
 SELECT tick FROM t_game INTO my_tick;
-DELETE FROM t_report_combat WHERE tick + 5 < my_tick;
-DELETE FROM t_report_trade WHERE tick + 5 < my_tick;
 
 SET ts_begin = SYSDATE(6);
 CALL p_purge_commands;
@@ -742,6 +780,8 @@ CALL p_update_prices;
 SET ts_prices = SYSDATE(6);
 CALL p_process_constructions;
 SET ts_constructions = SYSDATE(6);
+CALL p_report_player_score;
+SET ts_report = SYSDATE(6);
 
 UPDATE t_game SET tick = tick + 1;
 
@@ -757,7 +797,8 @@ TIMESTAMPDIFF(MICROSECOND, ts_attacks, ts_trades),
 TIMESTAMPDIFF(MICROSECOND, ts_trades, ts_recipes),
 TIMESTAMPDIFF(MICROSECOND, ts_recipes, ts_prices),
 TIMESTAMPDIFF(MICROSECOND, ts_prices, ts_constructions),
-TIMESTAMPDIFF(MICROSECOND, ts_begin, ts_constructions),
+TIMESTAMPDIFF(MICROSECOND, ts_constructions, ts_report),
+TIMESTAMPDIFF(MICROSECOND, ts_begin, ts_report),
 TIMESTAMPDIFF(MICROSECOND, ts_entry, ts_overall),
 SYSDATE(6)
 );
@@ -832,7 +873,7 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
 INSERT INTO `t_game` (`season`, `tick`) VALUES
-	(55, 0);
+	(63, 0);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
@@ -845,9 +886,9 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=835704 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=910494 DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_object: ~155 rows (approximately)
+-- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_object` ENABLE KEYS */;
 
@@ -875,7 +916,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=2960 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=3258 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_player: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
@@ -932,11 +973,28 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   KEY `Index 4` (`tick`),
   CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1111228 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1306388 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_combat` ENABLE KEYS */;
+
+-- Dumping structure for table space_tycoon.t_report_player_score
+DROP TABLE IF EXISTS `t_report_player_score`;
+CREATE TABLE IF NOT EXISTS `t_report_player_score` (
+  `player` int(11) NOT NULL,
+  `tick` int(11) NOT NULL,
+  `money` bigint(20) NOT NULL,
+  `commodities` bigint(20) NOT NULL,
+  `ships` bigint(20) NOT NULL,
+  `total` bigint(20) NOT NULL,
+  PRIMARY KEY (`player`,`tick`) USING BTREE,
+  CONSTRAINT `FK_t_report_player_score_t_player` FOREIGN KEY (`player`) REFERENCES `t_player` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.t_report_player_score: ~0 rows (approximately)
+/*!40000 ALTER TABLE `t_report_player_score` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_report_player_score` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_report_timing
 DROP TABLE IF EXISTS `t_report_timing`;
@@ -948,6 +1006,7 @@ CREATE TABLE IF NOT EXISTS `t_report_timing` (
   `recipes` bigint(20) NOT NULL,
   `prices` bigint(20) NOT NULL,
   `constructions` bigint(20) NOT NULL,
+  `report` bigint(20) NOT NULL,
   `total` bigint(20) NOT NULL COMMENT 'total duration of processing tasks',
   `overall` bigint(20) NOT NULL COMMENT 'includes transaction start and other overhead',
   `at` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),
@@ -976,7 +1035,7 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24370 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=24789 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
