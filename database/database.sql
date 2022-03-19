@@ -151,6 +151,7 @@ CREATE PROCEDURE `p_clear_all`()
     SQL SECURITY INVOKER
 BEGIN
 
+DELETE FROM t_report_resource_price;
 DELETE FROM t_report_player_score;
 DELETE FROM t_report_timing;
 DELETE FROM t_report_combat;
@@ -707,6 +708,10 @@ FROM t_player
 JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
 JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id;
 
+INSERT INTO t_report_resource_price
+SELECT resource, (SELECT tick FROM t_game LIMIT 1), sell
+FROM v_resource_price;
+
 END//
 DELIMITER ;
 
@@ -873,7 +878,7 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
 INSERT INTO `t_game` (`season`, `tick`) VALUES
-	(63, 0);
+	(65, 55);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
@@ -886,7 +891,7 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=910494 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=912445 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
@@ -916,7 +921,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=3258 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=3274 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_player: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
@@ -973,7 +978,7 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   KEY `Index 4` (`tick`),
   CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1306388 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1306679 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
@@ -995,6 +1000,20 @@ CREATE TABLE IF NOT EXISTS `t_report_player_score` (
 -- Dumping data for table space_tycoon.t_report_player_score: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_player_score` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_player_score` ENABLE KEYS */;
+
+-- Dumping structure for table space_tycoon.t_report_resource_price
+DROP TABLE IF EXISTS `t_report_resource_price`;
+CREATE TABLE IF NOT EXISTS `t_report_resource_price` (
+  `resource` int(11) NOT NULL,
+  `tick` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
+  PRIMARY KEY (`resource`,`tick`),
+  CONSTRAINT `FK_t_report_resource_price_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.t_report_resource_price: ~0 rows (approximately)
+/*!40000 ALTER TABLE `t_report_resource_price` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_report_resource_price` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_report_timing
 DROP TABLE IF EXISTS `t_report_timing`;
@@ -1035,7 +1054,7 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24789 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=24791 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
