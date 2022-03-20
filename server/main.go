@@ -1,34 +1,23 @@
 package main
 
 import (
-	"encoding/json"
+	"database/sql"
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
 	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"net/http"
 )
 
-func rootHandler(w http.ResponseWriter, req *http.Request) {
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		log.Warningf("Error reading body: %v\n", err)
-		http.Error(w, "can't read request body", http.StatusBadRequest)
-		return
-	}
-	r, err := json.Marshal(map[string]string{"greeting": "hello", "body": string(body)})
-	if err != nil {
-		log.Warningf("Json marshall failed %v\n", err)
-		http.Error(w, "response failed", http.StatusInternalServerError)
-		return
-	}
-	_, err = w.Write(r)
-	if err != nil {
-		log.Warningf("response write failed %v\n", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
+var db *sql.DB
 
 func main() {
-	http.HandleFunc("/", rootHandler)
+	db = database.ConnectDB()
+	defer database.CloseDB(db)
+
+	http.HandleFunc("/", handlers.Root)
+	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
+		handlers.PlayerScores(db, w, r)
+	})
 
 	port := ":80"
 	log.Infof("Listening on %s", port)
