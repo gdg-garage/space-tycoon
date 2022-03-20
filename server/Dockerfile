@@ -8,16 +8,16 @@ RUN go mod download
 
 COPY database/ ./database
 COPY handlers/ ./handlers
-COPY space-tycoon ./space-tycoon
+COPY stycoon ./stycoon
 COPY *.go ./
 
-RUN go build -o space-tycoon-server
+RUN go build -o space-tycoon
 
 FROM alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/space-tycoon-server ./space-tycoon
+COPY --from=builder /app/space-tycoon ./
 
 ENTRYPOINT ["/app/space-tycoon"]
 
