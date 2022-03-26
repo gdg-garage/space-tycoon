@@ -26,5 +26,6 @@ services:
     image: mariadb:10
     environment:
       MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: space_tycoon
     volumes:
       - ./database:/docker-entrypoint-initdb.d

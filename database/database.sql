@@ -12,10 +12,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP DATABASE IF EXISTS space_tycoon;
-CREATE DATABASE space_tycoon;
-USE space_tycoon;
-
 -- Dumping structure for table space_tycoon.d_class
 DROP TABLE IF EXISTS `d_class`;
 CREATE TABLE IF NOT EXISTS `d_class` (
