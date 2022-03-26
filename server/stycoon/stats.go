@@ -2,7 +2,7 @@ package stycoon
 
 import (
 	"database/sql"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type PlayerScore struct {
@@ -15,7 +15,7 @@ func GetPlayerScores(db *sql.DB) []PlayerScore {
 	var scores = make([]PlayerScore, 0)
 	rows, err := db.Query("select * from v_player_score;")
 	if err != nil {
-		log.Errorf("Query failed %v", err)
+		log.Error().Err(err).Msg("Query failed")
 		return scores
 	}
 
@@ -23,13 +23,13 @@ func GetPlayerScores(db *sql.DB) []PlayerScore {
 	for rows.Next() {
 		err = rows.Scan(&score.Player, &score.Price, &score.Score)
 		if err != nil {
-			log.Warningf("Row read failed %v", err)
+			log.Error().Err(err).Msg("Row read failed")
 			continue
 		}
 		scores = append(scores, score)
 	}
 	if err = rows.Err(); err != nil {
-		log.Warningf("Rows read failed %v", err)
+		log.Error().Err(err).Msg("Rows read failed")
 		return scores
 	}
 	return scores

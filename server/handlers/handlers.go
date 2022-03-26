@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
@@ -12,19 +12,19 @@ import (
 func Root(w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		log.Warningf("Error reading body: %v", err)
+		log.Warn().Err(err).Msg("Error reading body")
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
 	r, err := json.Marshal(map[string]string{"greeting": "hello", "body": string(body)})
 	if err != nil {
-		log.Warningf("Json marshall failed %v", err)
+		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(r)
 	if err != nil {
-		log.Warningf("response write failed %v", err)
+		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
@@ -33,13 +33,13 @@ func PlayerScores(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	playerScores := stycoon.GetPlayerScores(db)
 	scores, err := json.Marshal(playerScores)
 	if err != nil {
-		log.Warningf("Json marshall failed %v", err)
+		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(scores)
 	if err != nil {
-		log.Warningf("response write failed %v", err)
+		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }

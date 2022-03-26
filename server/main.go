@@ -6,7 +6,7 @@ import (
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/handlers"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,7 +19,7 @@ var db *sql.DB
 
 func serve(ctx context.Context, wg *sync.WaitGroup) {
 	address := ":80"
-	log.Infof("Listening on %s", address)
+	log.Info().Msgf("Listening on %s", address)
 	server := &http.Server{Addr: address, Handler: nil}
 
 	wg.Add(1)
@@ -31,14 +31,14 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 			defer cancel()
 			err := server.Shutdown(ctxShutDown)
 			if err != nil {
-				log.Error(err)
+				log.Error().Err(err)
 			}
 		}
 	}(ctx, server, wg)
 
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
-		log.Fatal(err)
+		log.Fatal().Err(err)
 	}
 }
 
