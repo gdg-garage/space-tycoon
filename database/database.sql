@@ -12,7 +12,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
 -- Dumping database structure for space_tycoon
 DROP DATABASE IF EXISTS `space_tycoon`;
 CREATE DATABASE IF NOT EXISTS `space_tycoon` /*!40100 DEFAULT CHARACTER SET utf8mb3 */;

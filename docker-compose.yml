@@ -29,3 +29,5 @@ services:
       MYSQL_DATABASE: space_tycoon
     volumes:
       - ./database:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"

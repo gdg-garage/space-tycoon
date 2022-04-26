@@ -6,6 +6,9 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
+COPY database/ ./database
+COPY handlers/ ./handlers
+COPY stycoon ./stycoon
 COPY *.go ./
 
 RUN go build -o space-tycoon
