@@ -12,6 +12,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+
 -- Dumping database structure for space_tycoon
 DROP DATABASE IF EXISTS `space_tycoon`;
 CREATE DATABASE IF NOT EXISTS `space_tycoon` /*!40100 DEFAULT CHARACTER SET utf8mb3 */;
@@ -50,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `d_names` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_names: ~1 768 rows (approximately)
+-- Dumping data for table space_tycoon.d_names: ~1 767 rows (approximately)
 /*!40000 ALTER TABLE `d_names` DISABLE KEYS */;
 INSERT INTO `d_names` (`name`) VALUES
 	('177'),
@@ -1933,6 +1934,7 @@ DROP PROCEDURE IF EXISTS `p_clear_all`;
 DELIMITER //
 CREATE PROCEDURE `p_clear_all`()
     SQL SECURITY INVOKER
+    COMMENT 'deletes all data from all runtime tables - used when starting a new season'
 BEGIN
 
 DELETE FROM t_report_resource_price;
@@ -2471,6 +2473,36 @@ DELETE FROM d_user WHERE id = -1;
 END//
 DELIMITER ;
 
+-- Dumping structure for procedure space_tycoon.p_purge_all
+DROP PROCEDURE IF EXISTS `p_purge_all`;
+DELIMITER //
+CREATE PROCEDURE `p_purge_all`()
+    SQL SECURITY INVOKER
+    COMMENT 'clears all tables and resets autoincrement values - use before commiting changes in git'
+BEGIN
+
+CALL p_clear_all;
+
+ALTER TABLE t_report_resource_price AUTO_INCREMENT = 1;
+ALTER TABLE t_report_player_score AUTO_INCREMENT = 1;
+ALTER TABLE t_report_timing AUTO_INCREMENT = 1;
+ALTER TABLE t_report_combat AUTO_INCREMENT = 1;
+ALTER TABLE t_report_trade AUTO_INCREMENT = 1;
+ALTER TABLE t_commodity AUTO_INCREMENT = 1;
+ALTER TABLE t_price AUTO_INCREMENT = 1;
+ALTER TABLE t_recipe AUTO_INCREMENT = 1;
+ALTER TABLE t_planet AUTO_INCREMENT = 1;
+ALTER TABLE t_command AUTO_INCREMENT = 1;
+ALTER TABLE t_ship AUTO_INCREMENT = 1;
+ALTER TABLE t_waypoint AUTO_INCREMENT = 1;
+ALTER TABLE t_object AUTO_INCREMENT = 1;
+ALTER TABLE t_player AUTO_INCREMENT = 1;
+
+UPDATE t_game SET season = 0, tick = 0;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_purge_commands
 DROP PROCEDURE IF EXISTS `p_purge_commands`;
 DELIMITER //
@@ -2514,6 +2546,7 @@ DROP PROCEDURE IF EXISTS `p_reset_all`;
 DELIMITER //
 CREATE PROCEDURE `p_reset_all`()
     SQL SECURITY INVOKER
+    COMMENT 'reset all runtime data and initialize for next season'
 BEGIN
 
 START TRANSACTION READ WRITE;
@@ -2544,6 +2577,7 @@ DROP PROCEDURE IF EXISTS `p_update_all`;
 DELIMITER //
 CREATE PROCEDURE `p_update_all`()
     SQL SECURITY INVOKER
+    COMMENT 'evaluate all players commands and progress time'
 BEGIN
 
 DECLARE ts_entry TIMESTAMP(6);
@@ -2672,7 +2706,7 @@ CREATE TABLE IF NOT EXISTS `t_game` (
 -- Dumping data for table space_tycoon.t_game: ~1 rows (approximately)
 /*!40000 ALTER TABLE `t_game` DISABLE KEYS */;
 INSERT INTO `t_game` (`season`, `tick`) VALUES
-	(66, 0);
+	(0, 0);
 /*!40000 ALTER TABLE `t_game` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_object
@@ -2685,7 +2719,7 @@ CREATE TABLE IF NOT EXISTS `t_object` (
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=913534 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_object` DISABLE KEYS */;
@@ -2715,7 +2749,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
-) ENGINE=InnoDB AUTO_INCREMENT=3283 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_player: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_player` DISABLE KEYS */;
@@ -2772,7 +2806,7 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   KEY `Index 4` (`tick`),
   CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
   CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1306665 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_combat` DISABLE KEYS */;
@@ -2848,7 +2882,7 @@ CREATE TABLE IF NOT EXISTS `t_report_trade` (
   CONSTRAINT `FK_report_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object` FOREIGN KEY (`buyer`) REFERENCES `t_object` (`id`),
   CONSTRAINT `FK_t_report_trade_t_object_2` FOREIGN KEY (`seller`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24791 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_trade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_report_trade` DISABLE KEYS */;
@@ -2891,7 +2925,7 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_commodities_worth` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(46,4) NULL
+	`price` DECIMAL(51,0) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_score
@@ -2899,7 +2933,7 @@ DROP VIEW IF EXISTS `v_player_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_score` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(48,4) NULL,
+	`price` DECIMAL(53,0) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -2916,7 +2950,7 @@ DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_total_worth` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(48,4) NULL
+	`price` DECIMAL(53,0) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_resource_price
@@ -2924,8 +2958,8 @@ DROP VIEW IF EXISTS `v_resource_price`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_resource_price` (
 	`resource` INT(11) NOT NULL,
-	`buy` DECIMAL(14,4) NOT NULL,
-	`sell` DECIMAL(14,4) NOT NULL
+	`buy` BIGINT(16) NOT NULL,
+	`sell` BIGINT(16) NOT NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_ship_cargo
@@ -2942,7 +2976,7 @@ DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_best_worth` (
 	`user` INT(11) NOT NULL,
-	`price` DECIMAL(48,4) NULL
+	`price` DECIMAL(53,0) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_user_score
@@ -2950,7 +2984,7 @@ DROP VIEW IF EXISTS `v_user_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_score` (
 	`user` INT(11) NOT NULL,
-	`price` DECIMAL(48,4) NULL,
+	`price` DECIMAL(53,0) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -2998,7 +3032,7 @@ JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id ;
 DROP VIEW IF EXISTS `v_resource_price`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_resource_price`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELECT d_resource.id AS resource, ifnull(AVG(buy), 0) AS buy, ifnull(AVG(sell), 0) AS sell
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELECT d_resource.id AS resource, CAST(ifnull(AVG(buy), 0) AS integer) AS buy, CAST(ifnull(AVG(sell), 0) AS integer) AS sell
 FROM d_resource
 left JOIN t_price ON t_price.resource = d_resource.id
 GROUP BY d_resource.id ;
