@@ -6,9 +6,9 @@ import (
 )
 
 type PlayerScore struct {
-	Player int     `json:"player"`
-	Price  float64 `json:"price"`
-	Score  int64   `json:"score"`
+	Player int32 `json:"player"`
+	Price  int64 `json:"price"`
+	Score  int64 `json:"score"`
 }
 
 func GetPlayerScores(db *sql.DB) ([]PlayerScore, error) {
