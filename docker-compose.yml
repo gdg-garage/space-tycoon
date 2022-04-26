@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  server:
+    build: server
+    ports:
+      - "80:80"
+
+  server-tidy:
+    image: golang:1.18-alpine
+    working_dir: /app
+    command: go mod tidy
+    volumes:
+      - ./server:/app
