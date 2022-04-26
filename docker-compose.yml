@@ -5,6 +5,8 @@ services:
     build: server
     ports:
       - "80:80"
+    depends_on:
+      - db
 
   server-tidy:
     image: golang:1.18-alpine
@@ -12,3 +14,18 @@ services:
     command: go mod tidy
     volumes:
       - ./server:/app
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: space_tycoon
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
