@@ -2798,7 +2798,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `t_command`;
 CREATE TABLE IF NOT EXISTS `t_command` (
   `ship` int(11) NOT NULL,
-  `type` enum('stop','move','attack','trade','construct') NOT NULL DEFAULT 'stop',
+  `type` enum('move','attack','trade','construct') NOT NULL,
   `target` int(11) DEFAULT NULL,
   `resource` int(11) DEFAULT NULL,
   `amount` int(11) DEFAULT NULL COMMENT 'positive = buy, negative = sell',
@@ -2813,7 +2813,6 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `FK_t_command_t_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `ships_command_target_not_self` CHECK (`ship` <> `target`),
   CONSTRAINT `command_trade_amount_not_zero` CHECK (`amount` <> 0),
-  CONSTRAINT `stop command` CHECK (`type` <> 'stop' or `target` is null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `move command` CHECK (`type` <> 'move' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `attack command` CHECK (`type` <> 'attack' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null),
