@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `d_names` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_names: ~1 917 rows (approximately)
+-- Dumping data for table space_tycoon.d_names: ~1 912 rows (approximately)
 /*!40000 ALTER TABLE `d_names` DISABLE KEYS */;
 INSERT INTO `d_names` (`name`) VALUES
 	('177'),
@@ -1994,7 +1994,7 @@ INSERT INTO `d_resource` (`id`, `name`) VALUES
 	(13, 'T-virus Samples'),
 	(14, 'Super Hero Landings'),
 	(15, 'Forbidden Knowledge Scrolls'),
-	(16, 'Powerfull Psychic Abilities'),
+	(16, 'Powerful Psychic Abilities'),
 	(17, 'Shadow of Your Future Pasts'),
 	(18, 'The Things That Must Not Be Named'),
 	(19, 'Galaxies (Size Does Not Matter)'),
@@ -2816,8 +2816,8 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `stop command` CHECK (`type` <> 'stop' or `target` is null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `move command` CHECK (`type` <> 'move' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `attack command` CHECK (`type` <> 'attack' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
-  CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `amount` <> 0 and `class` is null),
-  CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null)
+  CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null),
+  CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `class` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_command: ~0 rows (approximately)
