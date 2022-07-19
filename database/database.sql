@@ -2011,16 +2011,10 @@ CREATE TABLE IF NOT EXISTS `d_user` (
   `name` tinytext NOT NULL,
   `password` tinytext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.d_user: ~5 rows (approximately)
+-- Dumping data for table space_tycoon.d_user: ~0 rows (approximately)
 /*!40000 ALTER TABLE `d_user` DISABLE KEYS */;
-INSERT INTO `d_user` (`id`, `name`, `password`) VALUES
-	(1, 'opice', NULL),
-	(2, 'kokot', NULL),
-	(3, 'orangutan', NULL),
-	(4, 'lolitka', NULL),
-	(5, 'rasputin', NULL);
 /*!40000 ALTER TABLE `d_user` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_user_score
@@ -2201,12 +2195,17 @@ DECLARE player_y INT;
 DECLARE ship_count INT;
 DECLARE ship_index INT;
 DECLARE ship_id INT;
+
+DELETE FROM d_user_score;
+DELETE FROM d_user;
+INSERT INTO d_user (name) VALUES ("tamagochi"), ("hu"), ("spaceman"), ("minecraft"), ("dragonborn");
+
 SET player_count = RAND() * 5 + 5;
 SET player_index = 0;
 WHILE player_index < player_count DO
 	SET player_x = (RAND() - 0.5) * 3000;
 	SET player_y = (RAND() - 0.5) * 3000;
-	INSERT INTO t_player (name, USER, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
+	INSERT INTO t_player (name, user, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
 	SET player_id = LAST_INSERT_ID();
 	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
@@ -2627,6 +2626,11 @@ CREATE PROCEDURE `p_purge_all`()
 BEGIN
 
 CALL p_clear_all;
+
+DELETE FROM d_user_score;
+DELETE FROM d_user;
+
+ALTER TABLE d_user AUTO_INCREMENT = 1;
 
 ALTER TABLE t_report_resource_price AUTO_INCREMENT = 1;
 ALTER TABLE t_report_player_score AUTO_INCREMENT = 1;
