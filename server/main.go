@@ -47,6 +47,13 @@ func main() {
 	defer database.CloseDB(db)
 
 	http.HandleFunc("/", handlers.Root)
+	// TODO: disable based on config
+	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
+		handlers.CreateUser(db, w, r)
+	})
+	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		handlers.Login(db, w, r)
+	})
 	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
 		handlers.PlayerScores(db, w, r)
 	})
