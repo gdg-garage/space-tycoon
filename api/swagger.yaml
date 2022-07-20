@@ -173,9 +173,8 @@ components:
           id:
             type: integer
             format: int64
-          where:
-            type: integer
-            format: int64
+          destination:
+            $ref: "#/components/schemas/Destination"
     StopCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
@@ -259,6 +258,17 @@ components:
           where:
             type: integer
             format: int64
+
+    Destination:
+      oneOf:
+      - $ref: "#/components/schemas/Coordinates"
+      - $ref: "#/components/schemas/Waypoint"
+
+    Waypoint:
+      type: integer
+      format: int64
+      example: 234
+
     Commands:
       type: object
       properties:
