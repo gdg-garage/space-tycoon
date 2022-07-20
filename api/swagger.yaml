@@ -307,7 +307,7 @@ components:
     StaticData:
       type: object
       properties:
-        classes:
+        ship-classes:
           type: object
           additionalProperties:
             type: object
@@ -328,12 +328,12 @@ components:
               damage:
                 type: integer
                 format: int64
-        resources:
+        resource-names:
           type: object
           additionalProperties:
             type: string
       example:
-        classes: {
+        ship-classes: {
           "1": {
             name: "mothership",
             shipyard: true,
@@ -352,7 +352,7 @@ components:
             price: 500000
           }
         }
-        resources: {
+        resource-names: {
          "1": "spice melange",
          "2": "pokeballs"
         }
@@ -647,7 +647,7 @@ components:
       additionalProperties:
         type: object
         properties:
-          class:
+          ship-class:
             type: integer
             format: int64
           life:
@@ -685,7 +685,7 @@ components:
               amount: 7
             },
           },
-          class: 2,
+          ship-class: 2,
           player: 3,
           life: 189,
           command: {
@@ -706,7 +706,7 @@ components:
             y: 27
           },
           resources: {},
-          class: 1,
+          ship-class: 1,
           player: 1,
           life: 1000,
         },
@@ -721,7 +721,7 @@ components:
             y: 5
           },
           resources: {},
-          class: 2,
+          ship-class: 2,
           player: 3,
           life: 200,
           command: {
@@ -743,7 +743,7 @@ components:
             y: 0
           },
           resources: {},
-          class: 2,
+          ship-class: 2,
           player: 3,
           life: 200,
           command: {
