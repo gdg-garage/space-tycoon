@@ -26,6 +26,8 @@ tags:
   description: Returns the current tick and the approximate time until the next tick.
 - name: end-turn
   description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
+- name: reports
+  description: Fetch statistical data about all players.
 paths:
   /login:
     post:
@@ -130,6 +132,17 @@ paths:
         "405":
           description: Invalid input
           content: {}
+  /reports:
+    post:
+      tags:
+      - reports
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reports"
 components:
   schemas:
     Command:
@@ -789,8 +802,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RivalPlayer'
-        reports:
-            $ref: '#/components/schemas/Reports'
         ships:
           $ref: '#/components/schemas/Ships'
         # objects:
