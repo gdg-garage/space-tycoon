@@ -17,7 +17,7 @@ tags:
 - name: login
   description: Get user session
 - name: staticdata
-  description: Static game state (planets)
+  description: Data that do not change during entire season, such as ships classes.
 - name: data
   description: "Dynamic game data (scores, prices, spaceship positions)"
 - name: commands
