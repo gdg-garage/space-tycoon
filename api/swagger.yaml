@@ -356,35 +356,7 @@ components:
          "1": "spice melange",
          "2": "pokeballs"
         }
-              
-    GameObject:
-      required:
-      - id
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-        id:
-          type: integer
-          format: int64
-      example:
-        id: 0
-        type: type
-      # discriminator:
-      #   propertyName: Type_
-      # oneOf:
-      # - $ref: '#/components/schemas/Ship'
-      # - $ref: '#/components/schemas/MyShip'
-    CargoItem:
-      type: object
-      properties:
-        resource:
-          type: integer
-          format: int64
-        amount:
-          type: integer
-          format: int64
+
     Color:
       type: object
       properties:
@@ -641,8 +613,6 @@ components:
         stats:
           $ref: '#/components/schemas/Stats'    
     Ships:
-      # allOf:
-      # - $ref: '#/components/schemas/GameObject'
       type: object
       additionalProperties:
         type: object
@@ -752,8 +722,7 @@ components:
           }
         }
       }
-      
-      
+
     Stats:
       type: object
       properties:
@@ -769,24 +738,7 @@ components:
         total:
           type: integer
           format: int64
-    MyShip:
-      allOf:
-      # - $ref: '#/components/schemas/Ship'
-      - type: object
-        properties:
-          currCommand:
-            $ref: '#/components/schemas/Command'
-          cargo:
-            type: array
-            items:
-              $ref: '#/components/schemas/CargoItem'
-          capacity:
-            type: integer
-            format: int64
-          hp:
-            type: integer
-            format: int64
-            
+
     Data:
       type: object
       properties:
@@ -804,11 +756,6 @@ components:
             $ref: '#/components/schemas/RivalPlayer'
         ships:
           $ref: '#/components/schemas/Ships'
-        # objects:
-          
-        #   type: array
-        #   items:
-        #     $ref: '#/components/schemas/GameObject'
 
     CurrentTick:
       type: object
