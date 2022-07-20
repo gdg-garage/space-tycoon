@@ -12,7 +12,7 @@ externalDocs:
   description: Find out more about Space Tycoon game
   url: https://github.com/gdg-garage/space-tycoon
 servers:
-- url: https://space-tycoon.garage-trip.cz/
+- url: https://space-tycoon.garage-trip.cz/api/
 tags:
 - name: login
   description: Get user session
