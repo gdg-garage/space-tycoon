@@ -22,8 +22,10 @@ tags:
   description: "Dynamic game data (scores, prices, spaceship positions)"
 - name: commands
   description: Specify commands for your ships
-- name: tick
-  description: Signal that your turn is over for the current tick
+- name: current-tick
+  description: Returns the current tick and the approximate time until the next tick.
+- name: end-turn
+  description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
 paths:
   /login:
     post:
@@ -93,20 +95,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /tick:
+  /end-turn:
     post:
       tags:
-      - tick
+      - end-turn
       requestBody:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/Tick'
+              $ref: '#/components/schemas/EndTurn'
         required: true
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentTick'
+        "405":
+          description: Invalid input
           content: {}
+
+  /current-tick:
+    post:
+      tags:
+      - current-tick
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentTick'
         "405":
           description: Invalid input
           content: {}
@@ -778,6 +798,32 @@ components:
         #   type: array
         #   items:
         #     $ref: '#/components/schemas/GameObject'
+
+    CurrentTick:
+      type: object
+      properties:
+        currentTick:
+          type: integer
+          format: int64
+        timeLeftMs:
+          type: integer
+          format: int64
+      required:
+      - currentTick
+      - timeLeftMs
+      example:
+        "currentTick": 165
+        "timeLeftMs": 350
+    EndTurn:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+      required:
+      - tick
+      example:
+        "tick": 3600
 
     Error:
       required:
