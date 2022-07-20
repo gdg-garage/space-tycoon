@@ -1,5 +1,7 @@
 # Space Tycoon
 
+## Observe the API in Swagger
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/gdg-garage/space-tycoon/tree/master/api/swagger.yaml
 
 ## Dev
 

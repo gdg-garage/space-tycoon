@@ -3,9 +3,10 @@ package stycoon
 import (
 	"context"
 	"database/sql"
-	"github.com/rs/zerolog/log"
 	"sync"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func callUpdate(db *sql.DB) {

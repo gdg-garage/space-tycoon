@@ -3,10 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/rs/zerolog/log"
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
@@ -32,7 +33,7 @@ func Root(w http.ResponseWriter, req *http.Request) {
 func PlayerScores(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	playerScores, err := stycoon.GetPlayerScores(db)
 	if err != nil {
-		log.Error(err)
+		log.Error().Err(err)
 		http.Error(w, "db call failed", http.StatusInternalServerError)
 		return
 	}
