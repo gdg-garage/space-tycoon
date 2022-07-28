@@ -12,7 +12,7 @@ func InsertUser(db *sql.DB, username string, password string) error {
 
 func GetUserPassword(db *sql.DB, username string) (string, error) {
 	var password sql.NullString
-	err := db.QueryRow("select password from d_user where name = ? limit 1;", username).Scan(&password)
+	err := db.QueryRow("select password from d_user where name = ? limit 1", username).Scan(&password)
 	if err != nil {
 		return "", err
 	}
