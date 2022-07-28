@@ -9,6 +9,6 @@ func HashPassword(password string) (string, error) {
 	return string(hash), err
 }
 
-func IsPasswordValid(hash []byte, pass []byte) error {
-	return bcrypt.CompareHashAndPassword(hash, pass)
+func IsPasswordValid(hash string, pass string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
 }

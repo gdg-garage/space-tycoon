@@ -75,7 +75,7 @@ func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
-	err = stycoon.IsPasswordValid([]byte(hash), []byte(loginUser.Password))
+	err = stycoon.IsPasswordValid(hash, loginUser.Password)
 	if err != nil {
 		log.Warn().Err(err).Str("username", loginUser.Username).Msg("invalid password")
 		w.WriteHeader(http.StatusForbidden)
