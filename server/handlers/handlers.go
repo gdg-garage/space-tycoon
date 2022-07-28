@@ -32,7 +32,7 @@ func Root(w http.ResponseWriter, req *http.Request) {
 func PlayerScores(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	playerScores, err := stycoon.GetPlayerScores(db)
 	if err != nil {
-		log.Error(err)
+		log.Warn().Err(err)
 		http.Error(w, "db call failed", http.StatusInternalServerError)
 		return
 	}
