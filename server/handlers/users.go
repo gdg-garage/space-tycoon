@@ -72,7 +72,7 @@ func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	hash, err := database.GetUserPassword(db, loginUser.Username)
 	if err != nil {
 		log.Warn().Err(err).Str("username", loginUser.Username).Msg("user search failed")
-		http.Error(w, "", http.StatusBadRequest)
+		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	err = stycoon.IsPasswordValid(hash, loginUser.Password)
