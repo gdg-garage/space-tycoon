@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   `life` int(11) NOT NULL,
   `damage` int(11) NOT NULL,
   `price` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Index 2` (`name`(255))
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
@@ -1973,7 +1974,8 @@ DROP TABLE IF EXISTS `d_resource`;
 CREATE TABLE IF NOT EXISTS `d_resource` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` tinytext NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Index 2` (`name`(255))
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.d_resource: ~23 rows (approximately)
@@ -2107,6 +2109,8 @@ DECLARE star_index INT;
 DECLARE num_planets INT;
 DECLARE planet_index INT;
 DECLARE name_index INT;
+DECLARE star_a FLOAT;
+DECLARE star_d FLOAT;
 DECLARE star_x INT;
 DECLARE star_y INT;
 DECLARE id INT;
@@ -2121,8 +2125,10 @@ SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
-	SET star_x = (RAND() - 0.5) * 3000;
-	SET star_y = (RAND() - 0.5) * 3000;
+	SET star_a = RAND() * 2 * PI();
+	SET star_d = RAND() * RAND() * 3000 + 250; # averages at 1000
+	SET star_x = COS(star_a) * star_d;
+	SET star_y = SIN(star_a) * star_d;
 	SET num_planets = RAND() * RAND() * 5 + 1;
 	SET planet_index = 0;
 	WHILE planet_index < num_planets DO
@@ -2351,6 +2357,9 @@ JOIN t_ship_damages ON t_ship_damages.ship = t_ship_attacks.defender
 JOIN t_ship ON t_ship.id = t_ship_attacks.defender;
 
 UPDATE t_ship JOIN t_ship_damages ON t_ship_damages.ship = t_ship.id SET life = GREATEST(life - damage, 0);
+
+# decommissions
+UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
 
 END//
 DELIMITER ;
@@ -2803,7 +2812,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `t_command`;
 CREATE TABLE IF NOT EXISTS `t_command` (
   `ship` int(11) NOT NULL,
-  `type` enum('move','attack','trade','construct') NOT NULL,
+  `type` enum('move','attack','trade','construct','decommission') NOT NULL,
   `target` int(11) DEFAULT NULL,
   `resource` int(11) DEFAULT NULL,
   `amount` int(11) DEFAULT NULL COMMENT 'positive = buy, negative = sell',
@@ -2821,7 +2830,8 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `move command` CHECK (`type` <> 'move' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `attack command` CHECK (`type` <> 'attack' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null),
-  CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `class` is null)
+  CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `class` is null),
+  CONSTRAINT `decommission command` CHECK (`type` <> 'decommission' or `target` is null and `resource` is null and `amount` is null and `class` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_command: ~0 rows (approximately)
@@ -2895,6 +2905,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   `money` bigint(20) NOT NULL DEFAULT 0,
   `color` tinytext NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `Index 3` (`name`(255)),
   KEY `FK_t_player_t_user` (`user`),
   CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
