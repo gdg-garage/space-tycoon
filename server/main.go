@@ -61,6 +61,9 @@ func main() {
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
 	})
+	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
+		handlers.EndTurn(game, w, r)
+	})
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
