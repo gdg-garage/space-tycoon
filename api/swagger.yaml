@@ -295,7 +295,7 @@ components:
               speed:
                 type: number
                 format: double
-              cargo:
+              cargo-capacity:
                 type: integer
                 format: int64
                 description: "maximum number of resources the ship can carry - sum over all types of resources"
@@ -315,7 +315,7 @@ components:
             name: "mothership",
             shipyard: true,
             speed: 10,
-            cargo: 100,
+            cargo-capacity: 100,
             life: 360,
             damage: 30,
           },
@@ -323,7 +323,7 @@ components:
             name: "hauler",
             shipyard: false,
             speed: 13,
-            cargo: 200,
+            cargo-capacity: 200,
             life: 200,
             damage: 0,
             price: 500000
