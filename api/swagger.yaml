@@ -16,7 +16,7 @@ servers:
 tags:
 - name: login
   description: Get user session
-- name: staticdata
+- name: static-data
   description: Data that do not change during entire season, such as ships classes.
 - name: data
   description: "Dynamic game data (scores, prices, spaceship positions)"
@@ -55,10 +55,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /staticdata:
+  /static-data:
     post:
       tags:
-      - staticdata
+      - static-data
       responses:
         "200":
           description: OK
@@ -348,7 +348,7 @@ components:
             $ref: '#/components/schemas/TradingResources'
         position:
           $ref: '#/components/schemas/Coordinates'
-        prevPosition:
+        prev-position:
           $ref: '#/components/schemas/Coordinates'
     PlayerId:
       type: object
@@ -621,7 +621,7 @@ components:
             format: int64
           position:
             $ref: '#/components/schemas/Coordinates'
-          prevPosition:
+          prev-position:
             $ref: '#/components/schemas/Coordinates'
           resources:
             $ref: '#/components/schemas/Resources'
@@ -634,7 +634,7 @@ components:
             x: -13,
             y: 25,
           },
-          prevPosition: {
+          prev-position: {
             x: -12,
             y: 27,
           },
@@ -662,7 +662,7 @@ components:
             x: -13,
             y: 25
           },
-          prevPosition: {
+          prev-position: {
             x: -12,
             y: 27
           },
@@ -699,7 +699,7 @@ components:
             x: 5,
             y: 5
           },
-          prevPosition: {
+          prev-position: {
             x: 0,
             y: 0
           },
@@ -751,22 +751,22 @@ components:
     CurrentTick:
       type: object
       properties:
-        currentTick:
+        tick:
           type: integer
           format: int64
-        timeLeftMs:
+        time-left-ms:
           type: integer
           format: int64
         season:
           type: integer
           format: int64
       required:
-      - currentTick
-      - timeLeftMs
+      - current-tick
+      - time-left-ms
       - season
       example:
-        "currentTick": 165
-        "timeLeftMs": 350
+        "tick": 165
+        "time-left-ms": 350
         "season": 13
     EndTurn:
       type: object
