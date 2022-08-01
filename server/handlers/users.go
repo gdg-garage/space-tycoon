@@ -5,15 +5,11 @@ import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
-
-type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
 
 func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
@@ -22,7 +18,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var createUser User
+	var createUser stycoon.User
 	err = json.Unmarshal(body, &createUser)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
@@ -56,14 +52,14 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var loginUser User
+	var loginUser stycoon.User
 	err = json.Unmarshal(body, &loginUser)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
@@ -82,7 +78,17 @@ func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	// TODO create session
+	session, _ := sessionManager.Get(req, stycoon.SessionKey)
+	session.Values["username"] = loginUser.Username
+	// TODO check if player is connected to the user.
+	session.Values["player"] = loginUser.Player
+	err = session.Save(req, w)
+	if err != nil {
+		log.Warn().Err(err).Msg("Session store failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
 	r, err := json.Marshal(map[string]string{"loggedUser": loginUser.Username})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
