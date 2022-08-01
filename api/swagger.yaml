@@ -344,6 +344,8 @@ components:
         id: 
           type: integer
           format: int64
+        resources:
+            $ref: '#/components/schemas/TradingResources'
         position:
           $ref: '#/components/schemas/Coordinates'
         prevPosition:
@@ -553,14 +555,43 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Trade'
+
+    Resource:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: integer
+          format: int64
+
+    TradingResource:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - oneOf: # TODO onef sell-price/buy-price or support both
+        - properties:
+            buy-price:
+              type: number
+              format: double
+          required:
+          - buy-price
+        - properties:
+            sell-price:
+              type: number
+              format: double
+          required:
+          - sell-price
+
     Resources:
       type: object
       additionalProperties:
-        type: object
-        properties:
-          amount:
-            type: integer
-            format: int64
+        $ref: '#/components/schemas/Resource'
+
+    TradingResources:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TradingResource'
+
     Player:
       type: object
       properties:
