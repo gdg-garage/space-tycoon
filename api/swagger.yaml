@@ -396,7 +396,7 @@ components:
           defender: 12,
           killed: false
         }
-    Debug:
+    Profiling:
       type: object
       properties:
         tick:
@@ -556,10 +556,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Combat'
-        debug:
+        profiling:
           type: array
           items:
-            $ref: '#/components/schemas/Debug'
+            $ref: '#/components/schemas/Profiling'
         prices:
           type: array
           items:
