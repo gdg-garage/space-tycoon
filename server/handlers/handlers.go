@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -31,8 +30,8 @@ func Root(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func PlayerScores(db *sql.DB, w http.ResponseWriter, req *http.Request) {
-	playerScores, err := stycoon.GetPlayerScores(db)
+func PlayerScores(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	playerScores, err := game.GetPlayerScores()
 	if err != nil {
 		log.Warn().Err(err)
 		http.Error(w, "db call failed", http.StatusInternalServerError)

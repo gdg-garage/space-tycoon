@@ -1,7 +1,6 @@
 package stycoon
 
 import (
-	"database/sql"
 	"fmt"
 )
 
@@ -11,9 +10,9 @@ type PlayerScore struct {
 	Score  int64 `json:"score"`
 }
 
-func GetPlayerScores(db *sql.DB) ([]PlayerScore, error) {
+func (game *Game) GetPlayerScores() ([]PlayerScore, error) {
 	var scores = make([]PlayerScore, 0)
-	rows, err := db.Query("select * from v_player_score")
+	rows, err := game.db.Query("select * from v_player_score")
 	if err != nil {
 
 		return scores, fmt.Errorf("query failed %v", err)
