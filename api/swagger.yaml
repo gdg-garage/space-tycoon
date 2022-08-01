@@ -172,22 +172,23 @@ components:
           destination:
             $ref: "#/components/schemas/Destination"
     StopCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
+      $ref: '#/components/schemas/Command'
 
     ConstructCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - where
+        - class
         type: object
         properties:
-          where:
+          class:
             type: integer
             format: int64
+          name:
+            type: string
+
     DecommissionCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
+      $ref: '#/components/schemas/Command'
 
     RenameCommand:
       allOf:
