@@ -4,24 +4,68 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/rs/zerolog/log"
 	"strconv"
 	"time"
 )
 
 type Game struct {
-	Tick     CurrentTick
-	db       *sql.DB
-	lastTick time.Time
-	players  map[string]PlayersValue
+	Tick                 CurrentTick
+	db                   *sql.DB
+	lastTick             time.Time
+	ResourceNames        map[string]string
+	ShipClasses          map[string]StaticDataShipClassesValue
+	SerializedStaticData []byte
+	players              map[string]PlayersValue
 }
 
-func NewGame(db *sql.DB) *Game {
+func NewGame(db *sql.DB) (*Game, error) {
 	game := Game{
 		db:       db,
 		lastTick: time.Now(),
 	}
 	game.setGameTick()
-	return &game
+	err := game.SetShipClasses()
+	if err != nil {
+		return &game, err
+	}
+	err = game.SetResourceNames()
+	if err != nil {
+		return &game, err
+	}
+	staticData := StaticData{
+		ShipClasses:   game.ShipClasses,
+		ResourceNames: game.ResourceNames,
+	}
+	game.SerializedStaticData, err = json.Marshal(staticData)
+	if err != nil {
+		log.Warn().Err(err).Msg("Json marshall failed")
+		return &game, err
+	}
+
+	return &game, nil
+}
+
+func (game *Game) SetResourceNames() error {
+	names := make(map[string]string)
+	rows, err := game.db.Query("select `id`, `name` from d_resource")
+	if err != nil {
+		return fmt.Errorf("query failed %v", err)
+	}
+	var id int
+	var name string
+	for rows.Next() {
+		err = rows.Scan(&id, &name)
+		if err != nil {
+			return fmt.Errorf("row read failed %v", err)
+		}
+		names[strconv.Itoa(id)] = name
+	}
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows read failed: %v", err)
+	}
+	game.ResourceNames = names
+	return nil
 }
 
 func (game *Game) GetData(playerId *int64) (Data, error) {

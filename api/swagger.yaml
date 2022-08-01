@@ -318,6 +318,14 @@ components:
           type: object
           additionalProperties:
             type: object
+            required:
+              - name
+              - shipyard
+              - speed
+              - cargo-capacity
+              - life
+              - damage
+              - price
             properties:
               name:
                 type: string
@@ -335,6 +343,9 @@ components:
                 type: integer
                 format: int64
               damage:
+                type: integer
+                format: int64
+              price:
                 type: integer
                 format: int64
         resource-names:
