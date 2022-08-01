@@ -749,9 +749,11 @@ components:
       required:
       - currentTick
       - timeLeftMs
+      - season
       example:
         "currentTick": 165
         "timeLeftMs": 350
+        "season": 13
     EndTurn:
       type: object
       properties:
