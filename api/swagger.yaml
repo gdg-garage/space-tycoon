@@ -335,15 +335,7 @@ components:
         b:
           type: integer
           format: int64
-    Game:
-      type: object
-      properties:
-        season:
-          type: integer
-          format: int64
-        tick:
-          type: integer
-          format: int64
+
     Planet:
       type: object
       properties:
@@ -708,8 +700,8 @@ components:
     Data:
       type: object
       properties:
-        game: 
-          $ref: '#/components/schemas/Game'
+        current-tick:
+          $ref: '#/components/schemas/CurrentTick'
         planets:
           type: array
           items:
