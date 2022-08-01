@@ -293,8 +293,8 @@ components:
                 type: boolean
                 description: "whether ships of this class are allowed to construct new ships"
               speed:
-                type: integer
-                format: int64
+                type: number
+                format: double
               cargo:
                 type: integer
                 format: int64
