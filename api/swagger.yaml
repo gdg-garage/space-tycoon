@@ -540,10 +540,12 @@ components:
           items:
             $ref: '#/components/schemas/Combat'
         profiling:
+          description: Profiling information about the game. Used by the visualization website.
           type: array
           items:
             $ref: '#/components/schemas/Profiling'
         prices:
+          description: Prices are average across all planets.
           type: array
           items:
             $ref: '#/components/schemas/Price'
