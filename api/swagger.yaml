@@ -291,12 +291,14 @@ components:
                 type: string
               shipyard:
                 type: boolean
+                description: "whether ships of this class are allowed to construct new ships"
               speed:
                 type: integer
                 format: int64
               cargo:
                 type: integer
                 format: int64
+                description: "maximum number of resources the ship can carry - sum over all types of resources"
               life:
                 type: integer
                 format: int64
