@@ -254,17 +254,6 @@ components:
           type: string
         player:
           type: string
-    Tick:
-      type: object
-      properties:
-        tick:
-          type: integer
-          description: Game tick in milliseconds
-          format: int64
-          example: 10
-        wait:
-          type: boolean
-          default: true
 
     Coordinates:
       type: object
