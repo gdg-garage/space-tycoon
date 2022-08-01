@@ -256,17 +256,13 @@ components:
           type: string
 
     Coordinates:
-      type: object
-      properties:
-        x:
-          type: integer
-          format: int64
-        y:
-          type: integer
-          format: int64
-      example:
-        x: 10
-        y: 20
+      type: array
+      items:
+        type: integer
+        format: int64
+      minItems: 2
+      maxItems: 2
+      example: [10, 20]
 
     StaticData:
       type: object
@@ -324,17 +320,15 @@ components:
         }
 
     Color:
-      type: object
-      properties:
-        r:
-          type: integer
-          format: int64
-        g:
-          type: integer
-          format: int64
-        b:
-          type: integer
-          format: int64
+      type: array
+      items:
+        type: integer
+        format: int32
+      minItems: 3
+      maxItems: 3
+      minimum: 0
+      maximum: 255
+      example: [0, 255, 255]
 
     Planet:
       type: object
@@ -630,14 +624,8 @@ components:
       example: {
         '12': {
           name: "Milenium Falcon",
-          position: {
-            x: -13,
-            y: 25,
-          },
-          prev-position: {
-            x: -12,
-            y: 27,
-          },
+          position: [-13, 25],
+          prev-position: [-12, 27],
           resources: {
             '1': {
               amount: 5
@@ -658,14 +646,8 @@ components:
         },
         '15': {
           name: "Nostromo",
-          position: {
-            x: -13,
-            y: 25
-          },
-          prev-position: {
-            x: -12,
-            y: 27
-          },
+          position: [-13, 25],
+          prev-position: [-12, 27],
           resources: {},
           ship-class: 1,
           player: 1,
@@ -673,36 +655,21 @@ components:
         },
         '17': {
           name: "Invisible Hand I",
-          position: {
-            x: 10,
-            y: 10
-          },
-          prevPos: {
-            x: 5,
-            y: 5
-          },
+          position: [10, 10],
+          prevPos: [5, 5],
           resources: {},
           ship-class: 2,
           player: 3,
           life: 200,
           command: {
             type: "move",
-            coordinates: {
-              x: 131,
-              y: 128
-            },
+            coordinates: [131, 128],
           }
         },
         '19': {
           name: "Invisible Hand II",
-          position: {
-            x: 5,
-            y: 5
-          },
-          prev-position: {
-            x: 0,
-            y: 0
-          },
+          position: [5, 5],
+          prev-position: [0, 0],
           resources: {},
           ship-class: 2,
           player: 3,
