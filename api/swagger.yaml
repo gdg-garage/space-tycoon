@@ -400,7 +400,7 @@ components:
           $ref: '#/components/schemas/Coordinates'
         prevPosition:
           $ref: '#/components/schemas/Coordinates'
-    Player:
+    PlayerId:
       type: object
       properties:
         id:
@@ -613,7 +613,7 @@ components:
           amount:
             type: integer
             format: int64
-    RivalPlayer:
+    Player:
       type: object
       properties:
         name:
@@ -759,11 +759,11 @@ components:
           items:
             $ref: '#/components/schemas/Planet'
         player:
-          $ref: '#/components/schemas/Player'
+          $ref: '#/components/schemas/PlayerId'
         players:
           type: array
           items:
-            $ref: '#/components/schemas/RivalPlayer'
+            $ref: '#/components/schemas/Player'
         ships:
           $ref: '#/components/schemas/Ships'
 
