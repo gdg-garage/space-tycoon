@@ -11,23 +11,40 @@ package stycoon
 
 type StaticDataShipClassesValue struct {
 
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// whether ships of this class are allowed to construct new ships
-	Shipyard bool `json:"shipyard,omitempty"`
+	Shipyard bool `json:"shipyard"`
 
-	Speed float64 `json:"speed,omitempty"`
+	Speed float64 `json:"speed"`
 
 	// maximum number of resources the ship can carry - sum over all types of resources
-	CargoCapacity int64 `json:"cargo-capacity,omitempty"`
+	CargoCapacity int64 `json:"cargo-capacity"`
 
-	Life int64 `json:"life,omitempty"`
+	Life int64 `json:"life"`
 
-	Damage int64 `json:"damage,omitempty"`
+	Damage int64 `json:"damage"`
+
+	Price int64 `json:"price"`
 }
 
 // AssertStaticDataShipClassesValueRequired checks if the required fields are not zero-ed
 func AssertStaticDataShipClassesValueRequired(obj StaticDataShipClassesValue) error {
+	elements := map[string]interface{}{
+		"name": obj.Name,
+		"shipyard": obj.Shipyard,
+		"speed": obj.Speed,
+		"cargo-capacity": obj.CargoCapacity,
+		"life": obj.Life,
+		"damage": obj.Damage,
+		"price": obj.Price,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	return nil
 }
 
