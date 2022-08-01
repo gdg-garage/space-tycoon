@@ -743,6 +743,9 @@ components:
         timeLeftMs:
           type: integer
           format: int64
+        season:
+          type: integer
+          format: int64
       required:
       - currentTick
       - timeLeftMs
