@@ -18,8 +18,12 @@ func (game *Game) getGameTick() {
 	}
 }
 
+func (game *Game) getTickWaitMs() int64 {
+	return TickDuration.Milliseconds() - time.Since(game.lastTick).Milliseconds()
+}
+
 func (game *Game) GetGameTickState() GameTickState {
 	tickData := game.Tick
-	tickData.TimeWaitMs = TickDuration.Milliseconds() - time.Since(game.lastTick).Milliseconds()
+	tickData.TimeWaitMs = game.getTickWaitMs()
 	return tickData
 }
