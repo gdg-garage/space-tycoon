@@ -63,7 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /static-data:
-    post:
+    get:
       tags:
       - static-data
       responses:
@@ -73,14 +73,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
-        "403":
-          description: Not authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /data:
-    post:
+    get:
       tags:
       - data
       responses:
@@ -90,12 +84,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
-        "403":
-          description: Not authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   /commands:
     post:
       tags:
@@ -150,7 +138,7 @@ paths:
           content: {}
 
   /current-tick:
-    post:
+    get:
       tags:
       - current-tick
       responses:
@@ -160,17 +148,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
-        "403":
-          description: Not authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "405":
-          description: Invalid input
-          content: {}
   /reports:
-    post:
+    get:
       tags:
       - reports
       responses:
@@ -180,12 +159,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
-        "403":
-          description: Not authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Command:
@@ -197,6 +170,7 @@ components:
           type: string
       discriminator:
         propertyName: Type_
+# Problematic section for python client generation (stack overflow)
       oneOf:
       - $ref: '#/components/schemas/MoveCommand'
       - $ref: '#/components/schemas/StopCommand'
@@ -205,6 +179,7 @@ components:
       - $ref: '#/components/schemas/AttackCommand'
       - $ref: '#/components/schemas/TradeCommand'
       - $ref: '#/components/schemas/RenameCommand'
+    
     MoveCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
