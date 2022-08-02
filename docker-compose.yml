@@ -31,3 +31,16 @@ services:
       - ./database:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
+
+  server-gen:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /api/swagger.yaml
+      -g go-server
+      -o /server/gen
+      --global-property models,supportingFiles
+      --additional-properties=outputAsLibrary=true,packageName=stycoon
+    volumes:
+      - "./api:/api"
+      - "./server:/server"
