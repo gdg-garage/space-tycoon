@@ -338,11 +338,30 @@ components:
           name:
             type: string
           resources:
-              $ref: '#/components/schemas/TradingResources'
+            $ref: '#/components/schemas/TradingResources'
           position:
             $ref: '#/components/schemas/Coordinates'
           prev-position:
             $ref: '#/components/schemas/Coordinates'
+      example:
+        {
+          10: {
+            name: Aldebaran,
+            position: [-13, 25],
+            prev-position: [-13, 25],
+            resources: {
+              1: {
+                amount: 0,
+                buy-price: 500
+              },
+              5: {
+                amount: 20,
+                sell-price: 230.5
+              }
+            }
+          }
+        }
+
     PlayerId:
       type: object
       properties:
@@ -617,15 +636,15 @@ components:
           command:
             $ref: '#/components/schemas/Command'
       example: {
-        '12': {
-          name: "Milenium Falcon",
+        12: {
+          name: Milenium Falcon,
           position: [-13, 25],
           prev-position: [-12, 27],
           resources: {
-            '1': {
+            1: {
               amount: 5
             },
-            '5': {
+            5: {
               amount: 7
             },
           },
@@ -633,14 +652,14 @@ components:
           player: 3,
           life: 189,
           command: {
-            type: "trade",
+            type: trade,
             target: 10,
             resource: 5,
             amount: -7,
           },
         },
-        '15': {
-          name: "Nostromo",
+        15: {
+          name: Nostromo,
           position: [-13, 25],
           prev-position: [-12, 27],
           resources: {},
@@ -648,8 +667,8 @@ components:
           player: 1,
           life: 1000,
         },
-        '17': {
-          name: "Invisible Hand I",
+        17: {
+          name: Invisible Hand I,
           position: [10, 10],
           prevPos: [5, 5],
           resources: {},
@@ -657,12 +676,12 @@ components:
           player: 3,
           life: 200,
           command: {
-            type: "move",
+            type: move,
             coordinates: [131, 128],
           }
         },
-        '19': {
-          name: "Invisible Hand II",
+        19: {
+          name: Invisible Hand II,
           position: [5, 5],
           prev-position: [0, 0],
           resources: {},
@@ -670,7 +689,7 @@ components:
           player: 3,
           life: 200,
           command: {
-            type: "move",
+            type: move,
             target: 17,
           }
         }
@@ -691,6 +710,13 @@ components:
         total:
           type: integer
           format: int64
+      example:
+        {
+          money: 123456,
+          resources: 123456,
+          ships: 123456,
+          total: 123456,
+        }
 
     Data:
       type: object
@@ -723,9 +749,12 @@ components:
       - time-left-ms
       - season
       example:
-        "tick": 165
-        "time-left-ms": 350
-        "season": 13
+        {
+          tick: 165,
+          time-left-ms: 350,
+          season: 13,
+        }
+
     EndTurn:
       type: object
       properties:
@@ -735,7 +764,9 @@ components:
       required:
       - tick
       example:
-        "tick": 3600
+        {
+          tick: 3600
+        }
 
     Error:
       required:
