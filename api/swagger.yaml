@@ -1,0 +1,820 @@
+openapi: 3.0.1
+info:
+  title: Space Tycoon
+  description: Space Tycoon server.
+  contact:
+    url: https://www.garage-trip.cz/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Space Tycoon game
+  url: https://github.com/gdg-garage/space-tycoon
+servers:
+- url: https://space-tycoon.garage-trip.cz/api/
+tags:
+- name: login
+  description: Get user session
+- name: static-data
+  description: Data that do not change during entire season, such as ships classes.
+- name: data
+  description: "Dynamic game data (scores, prices, spaceship positions)"
+- name: commands
+  description: Specify commands for your ships
+- name: current-tick
+  description: Returns the current tick and the approximate time until the next tick.
+- name: end-turn
+  description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
+- name: reports
+  description: Fetch statistical data about all players.
+paths:
+  /login:
+    post:
+      tags:
+      - login
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Credentials'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  player-id:
+                    type: integer
+                    format: int64
+        "403":
+          description: Invalid name or password
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /static-data:
+    post:
+      tags:
+      - static-data
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaticData'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /data:
+    post:
+      tags:
+      - data
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Data'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /commands:
+    post:
+      tags:
+      - commands
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Commands'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content: {}
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /end-turn:
+    post:
+      tags:
+      - end-turn
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/EndTurn'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentTick'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Invalid input
+          content: {}
+
+  /current-tick:
+    post:
+      tags:
+      - current-tick
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentTick'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "405":
+          description: Invalid input
+          content: {}
+  /reports:
+    post:
+      tags:
+      - reports
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reports"
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Command:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+      discriminator:
+        propertyName: Type_
+      oneOf:
+      - $ref: '#/components/schemas/MoveCommand'
+      - $ref: '#/components/schemas/StopCommand'
+      - $ref: '#/components/schemas/ConstructCommand'
+      - $ref: '#/components/schemas/DecommissionCommand'
+      - $ref: '#/components/schemas/AttackCommand'
+      - $ref: '#/components/schemas/TradeCommand'
+      - $ref: '#/components/schemas/RenameCommand'
+    MoveCommand:
+      allOf:
+      - $ref: '#/components/schemas/Command'
+      - required:
+        - where
+        type: object
+        properties:
+          destination:
+            $ref: "#/components/schemas/Destination"
+    StopCommand:
+      $ref: '#/components/schemas/Command'
+
+    ConstructCommand:
+      allOf:
+      - $ref: '#/components/schemas/Command'
+      - required:
+        - class
+        type: object
+        properties:
+          class:
+            type: string
+          name:
+            type: string
+
+    DecommissionCommand:
+      $ref: '#/components/schemas/Command'
+
+    RenameCommand:
+      allOf:
+      - $ref: '#/components/schemas/Command'
+      - required:
+        - name
+        type: object
+        properties:
+          name:
+            type: string
+    AttackCommand:
+      allOf:
+      - $ref: '#/components/schemas/Command'
+      - required:
+        - target
+        type: object
+        properties:
+          target:
+            type: integer
+            format: int64
+    TradeCommand:
+      allOf:
+      - $ref: '#/components/schemas/Command'
+      - required:
+        - amount
+        - resource
+        - where
+        type: object
+        properties:
+          resource:
+            type: integer
+            format: int64
+          amount:
+            type: integer
+            format: int64
+          where:
+            type: integer
+            format: int64
+
+    Destination:
+      oneOf:
+      - $ref: "#/components/schemas/Coordinates"
+      - $ref: "#/components/schemas/Waypoint"
+
+    Waypoint:
+      type: integer
+      format: int64
+      example: 234
+
+    Commands:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Command'
+    Credentials:
+      required:
+      - name
+      - password
+      - player
+      type: object
+      properties:
+        name:
+          type: string
+        password:
+          type: string
+        player:
+          type: string
+
+    Coordinates:
+      type: array
+      items:
+        type: integer
+        format: int64
+      minItems: 2
+      maxItems: 2
+      example: [10, 20]
+
+    StaticData:
+      type: object
+      properties:
+        ship-classes:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              name:
+                type: string
+              shipyard:
+                type: boolean
+                description: "whether ships of this class are allowed to construct new ships"
+              speed:
+                type: number
+                format: double
+              cargo-capacity:
+                type: integer
+                format: int64
+                description: "maximum number of resources the ship can carry - sum over all types of resources"
+              life:
+                type: integer
+                format: int64
+              damage:
+                type: integer
+                format: int64
+        resource-names:
+          type: object
+          additionalProperties:
+            type: string
+      example:
+        ship-classes: {
+          "1": {
+            name: "mothership",
+            shipyard: true,
+            speed: 10,
+            cargo-capacity: 100,
+            life: 360,
+            damage: 30,
+          },
+          "2": {
+            name: "hauler",
+            shipyard: false,
+            speed: 13,
+            cargo-capacity: 200,
+            life: 200,
+            damage: 0,
+            price: 500000
+          }
+        }
+        resource-names: {
+         "1": "spice melange",
+         "2": "pokeballs"
+        }
+
+    Color:
+      type: array
+      items:
+        type: integer
+        format: int32
+      minItems: 3
+      maxItems: 3
+      minimum: 0
+      maximum: 255
+      example: [0, 255, 255]
+
+    Planets:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          name:
+            type: string
+          resources:
+            $ref: '#/components/schemas/TradingResources'
+          position:
+            $ref: '#/components/schemas/Coordinates'
+          prev-position:
+            $ref: '#/components/schemas/Coordinates'
+      example:
+        {
+          10: {
+            name: Aldebaran,
+            position: [-13, 25],
+            prev-position: [-13, 25],
+            resources: {
+              1: {
+                amount: 0,
+                buy-price: 500
+              },
+              5: {
+                amount: 20,
+                sell-price: 230.5
+              }
+            }
+          }
+        }
+ 
+    PlayerId:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+      example:
+        id: 3
+    Combat:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+        attacker:
+          type: integer
+          format: int64
+        defender:
+          type: integer
+          format: int64
+        killed:
+          type: boolean
+      example: 
+        combat: {
+          tick: 126,
+          attacker: 15,
+          defender: 12,
+          killed: false
+        }
+    Profiling:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+        movement:
+          type: integer
+          format: int64
+        attacks:
+          type: integer
+          format: int64
+        trades:
+          type: integer
+          format: int64
+        recipes:
+          type: integer
+          format: int64
+        prices:
+          type: integer
+          format: int64
+        constructions:
+          type: integer
+          format: int64
+        report:
+          type: integer
+          format: int64
+        total:
+          type: integer
+          format: int64
+        overall:
+          type: integer
+          format: int64
+        at:
+          type: integer
+          format: int64
+    Price:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          tick:
+            type: integer
+            format: int64
+          buyer:
+            type: integer
+            format: int64
+          seller:
+            type: integer
+            format: int64
+          resource:
+            type: integer
+            format: int64
+          amount:
+            type: integer
+            format: int64
+          price:
+            type: integer
+            format: int64
+      example:
+        1: {
+          tick: 10,
+          buyer: 2,
+          seller: 3,
+          resource: 30,
+          amount: 21,
+          price: 60,
+        }
+    Score:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          money:
+            type: array
+            items:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int64
+          resources:
+            type: array
+            items:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int64
+          ships:
+            type: array
+            items:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int64
+          total:
+            type: array
+            items:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int64
+      example: 
+        1: {
+          money: {
+            125: 123456,
+            126: 123000,
+            127: 123564
+          },
+          resources: {
+            125: 123456,
+            126: 123000,
+            127: 123564
+          },
+          ships: {
+            125: 123456,
+            126: 123000,
+            127: 123564
+          },
+          total: {
+            125: 123456,
+            126: 123000,
+            127: 123564
+          }
+        }
+    Trade:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+        buyer:
+          type: integer
+          format: int64
+        seller:
+          type: integer
+          format: int64
+        resource:
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int64
+        price:
+          type: integer
+          format: int64
+      example: {
+        tick: 127,
+        buyer: 12,
+        seller: 10,
+        resource: 1,
+        amount: 5,
+        price: 450
+      }
+    Reports:
+      type: object
+      properties:
+        combat:
+          type: array
+          items:
+            $ref: '#/components/schemas/Combat'
+        profiling:
+          description: Profiling information about the game. Used by the visualization website.
+          type: array
+          items:
+            $ref: '#/components/schemas/Profiling'
+        prices:
+          description: Prices are average across all planets.
+          type: array
+          items:
+            $ref: '#/components/schemas/Price'
+        scores:
+          type: array
+          items:
+            $ref: '#/components/schemas/Score'
+        trade:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trade'
+
+    Resource:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: integer
+          format: int64
+
+    TradingResource:
+      allOf:
+      - $ref: '#/components/schemas/Resource'
+      - properties:
+          buy-price:
+            type: number
+            format: double
+          sell-price:
+              type: number
+              format: double
+
+    Resources:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Resource'
+
+    TradingResources:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/TradingResource'
+
+    Players:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          name:
+            type: string
+          color:
+            $ref: '#/components/schemas/Color'
+          stats:
+            $ref: '#/components/schemas/Stats'
+    Ships:
+      type: object
+      additionalProperties:
+        type: object
+        properties:
+          ship-class:
+            type: integer
+            format: int64
+          life:
+            type: integer
+            format: int64
+          name:
+            type: string
+          player:
+            type: integer
+            format: int64
+          position:
+            $ref: '#/components/schemas/Coordinates'
+          prev-position:
+            $ref: '#/components/schemas/Coordinates'
+          resources:
+            $ref: '#/components/schemas/Resources'
+          command:
+            $ref: '#/components/schemas/Command'
+      example: {
+        12: {
+          name: Milenium Falcon,
+          position: [-13, 25],
+          prev-position: [-12, 27],
+          resources: {
+            1: {
+              amount: 5
+            },
+            5: {
+              amount: 7
+            },
+          },
+          ship-class: 2,
+          player: 3,
+          life: 189,
+          command: {
+            type: trade,
+            target: 10,
+            resource: 5,
+            amount: -7,
+          },
+        },
+        15: {
+          name: Nostromo,
+          position: [-13, 25],
+          prev-position: [-12, 27],
+          resources: {},
+          ship-class: 1,
+          player: 1,
+          life: 1000,
+        },
+        17: {
+          name: Invisible Hand I,
+          position: [10, 10],
+          prevPos: [5, 5],
+          resources: {},
+          ship-class: 2,
+          player: 3,
+          life: 200,
+          command: {
+            type: move,
+            coordinates: [131, 128],
+          }
+        },
+        19: {
+          name: Invisible Hand II,
+          position: [5, 5],
+          prev-position: [0, 0],
+          resources: {},
+          ship-class: 2,
+          player: 3,
+          life: 200,
+          command: {
+            type: move,
+            target: 17,
+          }
+        }
+      }
+
+    Stats:
+      type: object
+      properties:
+        money:
+          type: integer
+          format: int64
+        resources:
+          type: integer
+          format: int64
+        ships:
+          type: integer
+          format: int64        
+        total:
+          type: integer
+          format: int64
+      example:
+        {
+          money: 123456,
+          resources: 123456,
+          ships: 123456,
+          total: 123456,
+        }
+
+    Data:
+      type: object
+      properties:
+        current-tick:
+          $ref: '#/components/schemas/CurrentTick'
+        planets:
+          $ref: '#/components/schemas/Planets'
+        player:
+          $ref: '#/components/schemas/PlayerId'
+        players:
+          $ref: '#/components/schemas/Players'
+        ships:
+          $ref: '#/components/schemas/Ships'
+
+    CurrentTick:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+        time-left-ms:
+          type: integer
+          format: int64
+        season:
+          type: integer
+          format: int64
+      required:
+      - current-tick
+      - time-left-ms
+      - season
+      example:
+        {
+          tick: 165,
+          time-left-ms: 350,
+          season: 13,
+        }
+
+    EndTurn:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+      required:
+      - tick
+      example:
+        {
+          tick: 3600
+        }
+
+    Error:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string

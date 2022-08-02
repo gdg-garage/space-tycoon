@@ -3,10 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/rs/zerolog/log"
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
