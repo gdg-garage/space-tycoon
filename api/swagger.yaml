@@ -330,20 +330,19 @@ components:
       maximum: 255
       example: [0, 255, 255]
 
-    Planet:
+    Planets:
       type: object
-      properties:
-        name:
-          type: string
-        id: 
-          type: integer
-          format: int64
-        resources:
-            $ref: '#/components/schemas/TradingResources'
-        position:
-          $ref: '#/components/schemas/Coordinates'
-        prev-position:
-          $ref: '#/components/schemas/Coordinates'
+      additionalProperties:
+        type: object
+        properties:
+          name:
+            type: string
+          resources:
+              $ref: '#/components/schemas/TradingResources'
+          position:
+            $ref: '#/components/schemas/Coordinates'
+          prev-position:
+            $ref: '#/components/schemas/Coordinates'
     PlayerId:
       type: object
       properties:
@@ -564,19 +563,13 @@ components:
     TradingResource:
       allOf:
       - $ref: '#/components/schemas/Resource'
-      - oneOf: # TODO onef sell-price/buy-price or support both
-        - properties:
-            buy-price:
+      - properties:
+          buy-price:
+            type: number
+            format: double
+          sell-price:
               type: number
               format: double
-          required:
-          - buy-price
-        - properties:
-            sell-price:
-              type: number
-              format: double
-          required:
-          - sell-price
 
     Resources:
       type: object
@@ -588,15 +581,17 @@ components:
       additionalProperties:
         $ref: '#/components/schemas/TradingResource'
 
-    Player:
+    Players:
       type: object
-      properties:
-        name:
-          type: string
-        color:
-          $ref: '#/components/schemas/Color'
-        stats:
-          $ref: '#/components/schemas/Stats'    
+      additionalProperties:
+        type: object
+        properties:
+          name:
+            type: string
+          color:
+            $ref: '#/components/schemas/Color'
+          stats:
+            $ref: '#/components/schemas/Stats'
     Ships:
       type: object
       additionalProperties:
@@ -703,15 +698,11 @@ components:
         current-tick:
           $ref: '#/components/schemas/CurrentTick'
         planets:
-          type: array
-          items:
-            $ref: '#/components/schemas/Planet'
+          $ref: '#/components/schemas/Planets'
         player:
           $ref: '#/components/schemas/PlayerId'
         players:
-          type: array
-          items:
-            $ref: '#/components/schemas/Player'
+          $ref: '#/components/schemas/Players'
         ships:
           $ref: '#/components/schemas/Ships'
 
