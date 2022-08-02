@@ -53,6 +53,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
@@ -94,4 +95,5 @@ func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
