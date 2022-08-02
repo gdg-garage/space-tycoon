@@ -42,7 +42,14 @@ paths:
       responses:
         "200":
           description: OK
-          content: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  player-id:
+                    type: integer
+                    format: int64
         "403":
           description: Invalid name or password
           content:
@@ -66,6 +73,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /data:
     post:
       tags:
@@ -77,6 +90,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /commands:
     post:
       tags:
@@ -91,6 +110,12 @@ paths:
         "200":
           description: OK
           content: {}
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "405":
           description: Invalid input
           content:
@@ -114,6 +139,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "405":
           description: Invalid input
           content: {}
@@ -129,6 +160,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "405":
           description: Invalid input
           content: {}
@@ -143,6 +180,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Command:
@@ -361,7 +404,7 @@ components:
             }
           }
         }
-
+ 
     PlayerId:
       type: object
       properties:
