@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
 )
 
 func InsertUser(db *sql.DB, username string, password string) error {
@@ -10,14 +11,15 @@ func InsertUser(db *sql.DB, username string, password string) error {
 	return err
 }
 
-func GetUserPassword(db *sql.DB, username string) (string, error) {
+func GetUserPassword(db *sql.DB, username string) (stycoon.PlayerId, string, error) {
 	var password sql.NullString
-	err := db.QueryRow("select password from d_user where name = ? limit 1", username).Scan(&password)
+	var player stycoon.PlayerId
+	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&player.Id, &password)
 	if err != nil {
-		return "", err
+		return player, "", err
 	}
 	if !password.Valid {
-		return "", errors.New("user password is NULL")
+		return player, "", errors.New("user password is NULL")
 	}
-	return password.String, nil
+	return player, password.String, nil
 }

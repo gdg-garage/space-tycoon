@@ -72,7 +72,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	hash, err := database.GetUserPassword(db, userCredentials.Name)
+	player, hash, err := database.GetUserPassword(db, userCredentials.Name)
 	if err != nil {
 		log.Warn().Err(err).Str("username", userCredentials.Name).Msg("user search failed")
 		w.WriteHeader(http.StatusForbidden)
@@ -95,7 +95,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		return
 	}
 	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
-	r, err := json.Marshal(map[string]string{"loggedUser": userCredentials.Name})
+	r, err := json.Marshal(player)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
