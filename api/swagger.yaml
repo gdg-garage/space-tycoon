@@ -73,6 +73,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /data:
     get:
       tags:
@@ -84,6 +90,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
+        "403":
+          description: Not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /commands:
     post:
       tags:
