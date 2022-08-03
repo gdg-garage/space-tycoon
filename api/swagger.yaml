@@ -176,31 +176,34 @@ components:
     Command:
       required:
       - type
-      type: object
       properties:
         type:
           type: string
-      discriminator:
-        propertyName: Type_
-# Problematic section for python client generation (stack overflow)
-      oneOf:
-      - $ref: '#/components/schemas/MoveCommand'
-      - $ref: '#/components/schemas/StopCommand'
-      - $ref: '#/components/schemas/ConstructCommand'
-      - $ref: '#/components/schemas/DecommissionCommand'
-      - $ref: '#/components/schemas/AttackCommand'
-      - $ref: '#/components/schemas/TradeCommand'
-      - $ref: '#/components/schemas/RenameCommand'
-    
+        target:
+          type: integer
+          format: int64
+        resource:
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int64
+        ship-class:
+          type: integer
+          format: int64
+        name:
+            type: string
+
     MoveCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - where
+        - destination
         type: object
         properties:
           destination:
             $ref: "#/components/schemas/Destination"
+
     StopCommand:
       $ref: '#/components/schemas/Command'
 
@@ -208,13 +211,12 @@ components:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - class
+        - ship-class
         type: object
         properties:
-          class:
-            type: string
-          name:
-            type: string
+          ship-class:
+            type: integer
+            format: int64
 
     DecommissionCommand:
       $ref: '#/components/schemas/Command'
@@ -228,6 +230,7 @@ components:
         properties:
           name:
             type: string
+
     AttackCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
@@ -238,22 +241,23 @@ components:
           target:
             type: integer
             format: int64
+
     TradeCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
         - amount
         - resource
-        - where
+        - target
         type: object
         properties:
-          resource:
-            type: integer
-            format: int64
           amount:
             type: integer
             format: int64
-          where:
+          resource:
+            type: integer
+            format: int64
+          target:
             type: integer
             format: int64
 
