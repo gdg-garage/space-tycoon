@@ -25,24 +25,30 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   `name` tinytext NOT NULL,
   `shipyard` enum('Y','N') NOT NULL DEFAULT 'N' COMMENT 'allows constructing new ships',
   `speed` double NOT NULL,
-  `cargo` int(11) NOT NULL,
-  `life` int(11) NOT NULL,
+  `cargo` int(11) NOT NULL COMMENT 'maximum allowed amount of resources loaded on the ship',
+  `life` int(11) NOT NULL COMMENT 'maximum life for the ship',
+  `regen` int(11) NOT NULL COMMENT 'amount of life restored passively every tick',
+  `repair_life` int(11) NOT NULL COMMENT 'amount of life restored with the repair command every tick',
+  `repair_price` int(11) NOT NULL COMMENT 'money required for repairing every tick',
   `damage` int(11) NOT NULL,
-  `price` int(11) DEFAULT NULL,
+  `price` int(11) DEFAULT NULL COMMENT 'price to build new ship (also the value of the ship in score)',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Index 2` (`name`(255))
+  UNIQUE KEY `Index 2` (`name`(255)),
+  CONSTRAINT `positive numbers` CHECK (`speed` >= 0 and `cargo` >= 0 and `life` > 0 and `regen` >= 0 and `repair_life` >= 0 and `repair_price` >= 0 and `damage` >= 0 and (`price` is null or `price` > 0)),
+  CONSTRAINT `repair is faster than regen` CHECK (`repair_life` = 0 or `repair_life` >= 10 * `regen`),
+  CONSTRAINT `repair is affordable` CHECK (`repair_price` = 0 or `price` is null or `life` * `repair_price` < `price` * `repair_life`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
-INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price`) VALUES
-	(1, 'mothership', 'Y', 10, 0, 1000, 50, NULL),
-	(2, 'hauler', 'N', 13, 200, 200, 0, 500000),
-	(3, 'shipper', 'N', 18, 50, 100, 0, 300000),
-	(4, 'fighter', 'N', 20, 0, 150, 15, 1500000),
-	(5, 'bomber', 'N', 15, 0, 250, 30, 2000000),
-	(6, 'destroyer', 'Y', 10, 0, 3000, 250, 42000000),
-	(7, 'shipyard', 'Y', 10, 0, 1000, 0, 5000000);
+INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`) VALUES
+	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL),
+	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000),
+	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000),
+	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000),
+	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000),
+	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000),
+	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_names
@@ -2090,7 +2096,6 @@ DELETE FROM t_recipe;
 DELETE FROM t_planet;
 DELETE FROM t_command;
 DELETE FROM t_ship;
-DELETE FROM t_waypoint;
 DELETE FROM t_object;
 DELETE FROM t_player;
 
@@ -2120,13 +2125,13 @@ CREATE TEMPORARY TABLE t_planet_names
 SELECT name FROM d_names
 ORDER BY RAND();
 
-SET num_stars = RAND() * 100 + 200;
+SET num_stars = RAND() * 100 + 100;
 SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
 	SET star_a = RAND() * 2 * PI();
-	SET star_d = RAND() * RAND() * 3000 + 250; # averages at 1000
+	SET star_d = (1 - RAND() * RAND()) * 2000 + 500; # averages at 2000
 	SET star_x = COS(star_a) * star_d;
 	SET star_y = SIN(star_a) * star_d;
 	SET num_planets = RAND() * RAND() * 5 + 1;
@@ -2217,9 +2222,9 @@ WHILE player_index < player_count DO
 	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
 	WHILE ship_index < ship_count DO
-		INSERT INTO t_object (name, pos_x, pos_y) VALUES (CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
+		INSERT INTO t_object (owner, name, pos_x, pos_y) VALUES (player_id, CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
 		SET ship_id = LAST_INSERT_ID();
-		INSERT INTO t_ship (id, class, player, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), player_id, 0);
+		INSERT INTO t_ship (id, class, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), 0);
 		SET ship_index = ship_index + 1;
 	END WHILE;
 	SET player_index = player_index + 1;
@@ -2227,9 +2232,10 @@ END WHILE;
 
 UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = d_class.life;
 
-INSERT ignore INTO t_command (ship, type, target)
-SELECT a.id, 'attack', (SELECT b.id FROM t_ship AS b WHERE b.player = (SELECT id FROM t_player WHERE t_player.id != a.player ORDER BY RAND() LIMIT 1) ORDER BY RAND() LIMIT 1)
+INSERT IGNORE INTO t_command (ship, type, target)
+SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
 FROM t_ship AS a
+JOIN t_object AS b ON b.id = a.id
 JOIN d_class ON d_class.id = a.class
 WHERE d_class.damage > 0;
 
@@ -2358,9 +2364,6 @@ JOIN t_ship ON t_ship.id = t_ship_attacks.defender;
 
 UPDATE t_ship JOIN t_ship_damages ON t_ship_damages.ship = t_ship.id SET life = GREATEST(life - damage, 0);
 
-# decommissions
-UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
-
 END//
 DELIMITER ;
 
@@ -2378,13 +2381,14 @@ DECLARE id INT;
 # pick suitable construction commands
 DROP TEMPORARY TABLE IF EXISTS t_constructions;
 CREATE TEMPORARY TABLE t_constructions
-(INDEX(ship), INDEX(player), PRIMARY KEY(ship, player))
-SELECT t_command.ship, t_ship.player, t_command.class, d_class.price
+(PRIMARY KEY(ship), INDEX(player))
+SELECT t_command.ship, t_object.owner AS player, t_command.class, nc.price
 FROM t_command
 JOIN t_ship ON t_ship.id = t_command.ship
-JOIN t_player ON t_player.id = t_ship.player
-JOIN d_class ON d_class.id = t_command.class
-WHERE t_command.`type` = 'construct' AND d_class.shipyard = 'Y' AND d_class.price IS NOT NULL;
+JOIN t_object ON t_object.id = t_command.ship
+JOIN d_class AS cc ON cc.id = t_ship.class
+JOIN d_class AS nc ON nc.id = t_command.class
+WHERE t_command.`type` = 'construct' AND cc.shipyard = 'Y' AND nc.price IS NOT NULL;
 
 # players with insufficient money shall construct no ships
 DELETE a
@@ -2413,14 +2417,14 @@ SET t_player.money = t_player.money - IFNULL(
 # create ships, one by one, so that the auto-incremented t_object.id can be used to insert into t_ship
 SELECT COUNT(*) INTO n FROM t_constructions;
 WHILE i < n DO
-	INSERT INTO t_object (pos_x, pos_y, pos_x_prev, pos_y_prev)
-	SELECT pos_x, pos_y, pos_x, pos_y
+	INSERT INTO t_object (owner, pos_x, pos_y, pos_x_prev, pos_y_prev)
+	SELECT t_object.owner, pos_x, pos_y, pos_x, pos_y
 	FROM t_constructions
 	JOIN t_object ON t_object.id = t_constructions.ship
 	LIMIT i,1;
 	SET id = LAST_INSERT_ID();
-	INSERT INTO t_ship (id, class, player, life)
-	SELECT id, t_constructions.class, t_constructions.player, d_class.life
+	INSERT INTO t_ship (id, class, life)
+	SELECT id, t_constructions.class, d_class.life
 	FROM t_constructions
 	JOIN d_class ON d_class.id = t_constructions.class
 	LIMIT i,1;
@@ -2431,6 +2435,53 @@ END WHILE;
 DELETE t_command
 FROM t_command
 JOIN t_constructions ON t_constructions.ship = t_command.ship;
+
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_process_decommissions
+DROP PROCEDURE IF EXISTS `p_process_decommissions`;
+DELIMITER //
+CREATE PROCEDURE `p_process_decommissions`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# refund some money to players
+UPDATE t_player
+SET t_player.money = t_player.money + IFNULL(
+(
+	SELECT SUM(d_class.price * t_ship.life / d_class.life / 2)
+	FROM t_command
+	JOIN t_ship ON t_ship.id = t_command.ship
+	JOIN t_object ON t_object.id = t_ship.id
+	JOIN d_class ON d_class.id = t_ship.class
+	WHERE t_command.type = 'decommission' and t_object.owner = t_player.id AND d_class.price > 0
+), 0);
+
+# set ships life to zero
+UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
+
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_process_destroyed_ships
+DROP PROCEDURE IF EXISTS `p_process_destroyed_ships`;
+DELIMITER //
+CREATE PROCEDURE `p_process_destroyed_ships`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# destroyed ships may not have any commands
+DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.ship WHERE t_ship.life = 0;
+
+# delete commands that are targetting destroyed ships
+DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHERE t_ship.life = 0;
+
+# the cargo is lost
+DELETE t_commodity FROM t_commodity JOIN t_ship ON t_ship.id = t_commodity.object WHERE t_ship.life = 0;
+
+# actually delete the ships
+DELETE t_ship FROM t_ship WHERE t_ship.life = 0;
 
 END//
 DELIMITER ;
@@ -2471,6 +2522,67 @@ DELETE FROM t_commodity WHERE amount = 0;
 END//
 DELIMITER ;
 
+-- Dumping structure for procedure space_tycoon.p_process_repairs
+DROP PROCEDURE IF EXISTS `p_process_repairs`;
+DELIMITER //
+CREATE PROCEDURE `p_process_repairs`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# passive regen
+UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = t_ship.life + d_class.regen;
+
+# find suitable commands
+DROP TEMPORARY TABLE IF EXISTS t_repairs;
+CREATE TEMPORARY TABLE t_repairs
+(PRIMARY KEY(id), INDEX(player))
+SELECT t_ship.id, t_object.owner AS player, d_class.repair_life AS repair, d_class.repair_price AS price
+FROM t_command
+JOIN t_ship ON t_ship.id = t_command.ship
+JOIN t_object ON t_object.id = t_ship.id
+JOIN d_class ON d_class.id = t_ship.class
+WHERE t_command.type = 'repair';
+
+# players with insufficient money shall repair no ships
+DELETE a
+FROM t_repairs AS a
+WHERE a.player IN
+(
+	SELECT player FROM
+	(
+		SELECT b.player, t_player.money
+		FROM t_repairs AS b
+		JOIN t_player ON t_player.id = b.player
+		GROUP BY t_player.id
+		HAVING SUM(b.price) > t_player.money
+	) AS subquery
+);
+
+# subtract players money
+UPDATE t_player
+SET t_player.money = t_player.money - IFNULL(
+(
+	SELECT SUM(t_repairs.price)
+	FROM t_repairs
+	WHERE t_repairs.player = t_player.id
+), 0);
+
+# replenish ships life
+UPDATE t_ship
+JOIN t_repairs ON t_repairs.id = t_ship.id
+SET t_ship.life = t_ship.life + t_repairs.repair;
+
+# cap the life
+UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = LEAST(t_ship.life, d_class.life);
+
+# delete fulfilled commands
+DELETE t_command
+FROM t_command
+JOIN t_repairs ON t_repairs.id = t_command.ship;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_process_trades
 DROP PROCEDURE IF EXISTS `p_process_trades`;
 DELIMITER //
@@ -2481,19 +2593,21 @@ BEGIN
 # create a temporary player to represent all the planets which allows to simplify the other queries related to money
 # it has A LOT of money from the beginning to ensure that the planets pass the 'available money' filter
 INSERT IGNORE INTO d_user (id, name) VALUES (-1, '<planets>');
-INSERT IGNORE INTO t_player (id, user, NAME, money) VALUES (-1, -1, '<planets>', 1000000000000000);
+INSERT IGNORE INTO t_player (id, user, name, money) VALUES (-1, -1, '<planets>', 1000000000000000);
 
 # filter by commands
 
 DROP TEMPORARY TABLE IF EXISTS t_trades;
 CREATE TEMPORARY TABLE t_trades
 (price int NULL, INDEX(buyer), INDEX(seller), INDEX(resource), PRIMARY KEY(buyer, seller, resource), INDEX(buyer_player), INDEX(seller_player))
-SELECT if(amount > 0, ship, target) AS buyer , IFNULL(if(amount > 0, a.player, b.player), -1) AS buyer_player,
-       if(amount > 0, target, ship) AS seller, IFNULL(if(amount > 0, b.player, a.player), -1) AS seller_player,
+SELECT if(amount > 0, ship, target) AS buyer , IFNULL(if(amount > 0, ao.owner, bo.owner), -1) AS buyer_player,
+       if(amount > 0, target, ship) AS seller, IFNULL(if(amount > 0, bo.owner, ao.owner), -1) AS seller_player,
 	   resource, ABS(amount) AS amount, NULL AS price
 FROM t_command
 LEFT JOIN t_ship AS a ON a.id = t_command.ship
+LEFT JOIN t_object AS ao ON ao.id = a.id
 LEFT JOIN t_ship AS b ON b.id = t_command.target
+LEFT JOIN t_object AS bo ON bo.id = b.id
 WHERE t_command.type = 'trade';
 
 # filter by positions
@@ -2639,7 +2753,6 @@ CALL p_clear_all;
 
 DELETE FROM d_user_score;
 DELETE FROM d_user;
-
 ALTER TABLE d_user AUTO_INCREMENT = 1;
 
 ALTER TABLE t_report_resource_price AUTO_INCREMENT = 1;
@@ -2653,27 +2766,9 @@ ALTER TABLE t_recipe AUTO_INCREMENT = 1;
 ALTER TABLE t_planet AUTO_INCREMENT = 1;
 ALTER TABLE t_command AUTO_INCREMENT = 1;
 ALTER TABLE t_ship AUTO_INCREMENT = 1;
-ALTER TABLE t_waypoint AUTO_INCREMENT = 1;
 ALTER TABLE t_object AUTO_INCREMENT = 1;
 ALTER TABLE t_player AUTO_INCREMENT = 1;
-
 UPDATE t_game SET season = 0, tick = 0;
-
-END//
-DELIMITER ;
-
--- Dumping structure for procedure space_tycoon.p_purge_commands
-DROP PROCEDURE IF EXISTS `p_purge_commands`;
-DELIMITER //
-CREATE PROCEDURE `p_purge_commands`()
-    SQL SECURITY INVOKER
-BEGIN
-
-# dead ships may not have any commands
-DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.ship WHERE t_ship.life = 0;
-
-# delete attack commands that are targetting dead ships
-DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHERE t_command.type = 'attack' AND t_ship.life = 0;
 
 END//
 DELIMITER ;
@@ -2758,11 +2853,11 @@ START TRANSACTION READ WRITE;
 SELECT tick FROM t_game INTO my_tick;
 
 SET ts_begin = SYSDATE(6);
-CALL p_purge_commands;
 CALL p_move_ships;
 SET ts_movement = SYSDATE(6);
 CALL p_process_attacks;
-CALL p_purge_commands;
+CALL p_process_decommissions;
+CALL p_process_destroyed_ships;
 SET ts_attacks = SYSDATE(6);
 CALL p_process_trades;
 SET ts_trades = SYSDATE(6);
@@ -2771,6 +2866,7 @@ SET ts_recipes = SYSDATE(6);
 CALL p_update_prices;
 SET ts_prices = SYSDATE(6);
 CALL p_process_constructions;
+CALL p_process_repairs;
 SET ts_constructions = SYSDATE(6);
 CALL p_report_player_score;
 SET ts_report = SYSDATE(6);
@@ -2805,6 +2901,8 @@ CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
 BEGIN
 
+# TODO
+
 END//
 DELIMITER ;
 
@@ -2812,7 +2910,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `t_command`;
 CREATE TABLE IF NOT EXISTS `t_command` (
   `ship` int(11) NOT NULL,
-  `type` enum('move','attack','trade','construct','decommission') NOT NULL,
+  `type` enum('move','attack','trade','construct','decommission','repair') NOT NULL,
   `target` int(11) DEFAULT NULL,
   `resource` int(11) DEFAULT NULL,
   `amount` int(11) DEFAULT NULL COMMENT 'positive = buy, negative = sell',
@@ -2831,7 +2929,8 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `attack command` CHECK (`type` <> 'attack' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null),
   CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `class` is null),
-  CONSTRAINT `decommission command` CHECK (`type` <> 'decommission' or `target` is null and `resource` is null and `amount` is null and `class` is null)
+  CONSTRAINT `decommission command` CHECK (`type` <> 'decommission' or `target` is null and `resource` is null and `amount` is null and `class` is null),
+  CONSTRAINT `repair command` CHECK (`type` <> 'repair' or `target` is null and `resource` is null and `amount` is null and `class` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_command: ~0 rows (approximately)
@@ -2872,12 +2971,15 @@ INSERT INTO `t_game` (`season`, `tick`) VALUES
 DROP TABLE IF EXISTS `t_object`;
 CREATE TABLE IF NOT EXISTS `t_object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner` int(11) DEFAULT NULL,
   `name` tinytext NOT NULL DEFAULT '',
   `pos_x` int(11) NOT NULL,
   `pos_y` int(11) NOT NULL,
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `FK_t_object_t_player` (`owner`),
+  CONSTRAINT `FK_t_object_t_player` FOREIGN KEY (`owner`) REFERENCES `t_player` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
@@ -2928,7 +3030,7 @@ CREATE TABLE IF NOT EXISTS `t_price` (
   CONSTRAINT `FK__resource_type_` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `buy_price_is_positive` CHECK (`buy` is null or `buy` > 0),
   CONSTRAINT `sell_price_is_positive` CHECK (`sell` is null or `sell` > 0),
-  CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` >= `sell`)
+  CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` > `sell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_price: ~0 rows (approximately)
@@ -2961,11 +3063,11 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   `defender` int(11) NOT NULL,
   `killed` enum('Y','N') NOT NULL DEFAULT 'N',
   PRIMARY KEY (`id`),
-  KEY `FK_t_report_combat_t_ship` (`attacker`),
-  KEY `FK_t_report_combat_t_ship_2` (`defender`),
   KEY `Index 4` (`tick`),
-  CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
-  CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
+  KEY `FK_t_report_combat_t_object` (`attacker`),
+  KEY `FK_t_report_combat_t_object_2` (`defender`),
+  CONSTRAINT `FK_t_report_combat_t_object` FOREIGN KEY (`attacker`) REFERENCES `t_object` (`id`),
+  CONSTRAINT `FK_t_report_combat_t_object_2` FOREIGN KEY (`defender`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
@@ -3053,13 +3155,10 @@ DROP TABLE IF EXISTS `t_ship`;
 CREATE TABLE IF NOT EXISTS `t_ship` (
   `id` int(11) NOT NULL,
   `class` int(11) NOT NULL,
-  `player` int(11) NOT NULL,
   `life` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_ship_ship_type` (`class`),
-  KEY `FK_ship_person` (`player`) USING BTREE,
   CONSTRAINT `FK_ship_object` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`),
-  CONSTRAINT `FK_ship_person` FOREIGN KEY (`player`) REFERENCES `t_player` (`id`),
   CONSTRAINT `FK_ship_ship_type` FOREIGN KEY (`class`) REFERENCES `d_class` (`id`),
   CONSTRAINT `life_is_not_negative` CHECK (`life` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -3067,18 +3166,6 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
 -- Dumping data for table space_tycoon.t_ship: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
-
--- Dumping structure for table space_tycoon.t_waypoint
-DROP TABLE IF EXISTS `t_waypoint`;
-CREATE TABLE IF NOT EXISTS `t_waypoint` (
-  `id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK__object_id_` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-
--- Dumping data for table space_tycoon.t_waypoint: ~0 rows (approximately)
-/*!40000 ALTER TABLE `t_waypoint` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_waypoint` ENABLE KEYS */;
 
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
@@ -3127,7 +3214,7 @@ DROP VIEW IF EXISTS `v_ship_cargo`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_ship_cargo` (
 	`id` INT(11) NOT NULL,
-	`capacity` INT(11) NOT NULL,
+	`capacity` INT(11) NOT NULL COMMENT 'maximum allowed amount of resources loaded on the ship',
 	`used` DECIMAL(32,0) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3154,8 +3241,8 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS price
 FROM t_player
-LEFT JOIN t_ship ON t_ship.player = t_player.id
-LEFT JOIN t_commodity ON t_commodity.object = t_ship.id
+LEFT JOIN t_object ON t_object.owner = t_player.id
+LEFT JOIN t_commodity ON t_commodity.object = t_object.id
 LEFT JOIN v_resource_price ON v_resource_price.resource = t_commodity.resource
 GROUP BY t_player.id ;
 
@@ -3175,7 +3262,8 @@ DROP VIEW IF EXISTS `v_player_ships_worth`;
 DROP TABLE IF EXISTS `v_player_ships_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, SUM(ifnull(d_class.price, 0)) AS price
 FROM t_player
-LEFT JOIN t_ship ON t_ship.player = t_player.id AND t_ship.life > 0
+LEFT JOIN t_object ON t_object.owner = t_player.id
+LEFT JOIN t_ship ON t_ship.id = t_object.id
 LEFT JOIN d_class ON d_class.id = t_ship.class
 GROUP BY t_player.id ;
 
@@ -3194,7 +3282,7 @@ DROP VIEW IF EXISTS `v_resource_price`;
 DROP TABLE IF EXISTS `v_resource_price`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELECT d_resource.id AS resource, CAST(ifnull(AVG(buy), 0) AS integer) AS buy, CAST(ifnull(AVG(sell), 0) AS integer) AS sell
 FROM d_resource
-left JOIN t_price ON t_price.resource = d_resource.id
+LEFT JOIN t_price ON t_price.resource = d_resource.id
 GROUP BY d_resource.id ;
 
 -- Dumping structure for view space_tycoon.v_ship_cargo
