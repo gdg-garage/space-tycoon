@@ -2,8 +2,9 @@ package stycoon
 
 import (
 	"database/sql"
-	"github.com/rs/zerolog/log"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (game *Game) getGameTick() {

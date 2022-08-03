@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB

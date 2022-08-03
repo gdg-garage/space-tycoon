@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/rs/zerolog/log"
 )
 
 func CurrentTick(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
