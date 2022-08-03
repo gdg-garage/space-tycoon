@@ -11,12 +11,6 @@ import (
 
 const TickDuration = time.Second
 
-type GameTickState struct {
-	Season     int   `json:"season"`
-	Tick       int   `json:"tick"`
-	TimeWaitMs int64 `json:"time-wait-ms"`
-}
-
 func (game *Game) callUpdate() {
 	err := game.db.QueryRow("CALL p_update_all();").Scan()
 	if err != nil {
