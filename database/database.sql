@@ -2096,7 +2096,6 @@ DELETE FROM t_recipe;
 DELETE FROM t_planet;
 DELETE FROM t_command;
 DELETE FROM t_ship;
-DELETE FROM t_waypoint;
 DELETE FROM t_object;
 DELETE FROM t_player;
 
@@ -2223,9 +2222,9 @@ WHILE player_index < player_count DO
 	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
 	WHILE ship_index < ship_count DO
-		INSERT INTO t_object (name, pos_x, pos_y) VALUES (CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
+		INSERT INTO t_object (owner, name, pos_x, pos_y) VALUES (player_id, CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
 		SET ship_id = LAST_INSERT_ID();
-		INSERT INTO t_ship (id, class, player, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), player_id, 0);
+		INSERT INTO t_ship (id, class, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), 0);
 		SET ship_index = ship_index + 1;
 	END WHILE;
 	SET player_index = player_index + 1;
@@ -2233,9 +2232,10 @@ END WHILE;
 
 UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = d_class.life;
 
-INSERT ignore INTO t_command (ship, type, target)
-SELECT a.id, 'attack', (SELECT b.id FROM t_ship AS b WHERE b.player = (SELECT id FROM t_player WHERE t_player.id != a.player ORDER BY RAND() LIMIT 1) ORDER BY RAND() LIMIT 1)
+INSERT IGNORE INTO t_command (ship, type, target)
+SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
 FROM t_ship AS a
+JOIN t_object AS b ON b.id = a.id
 JOIN d_class ON d_class.id = a.class
 WHERE d_class.damage > 0;
 
@@ -2389,12 +2389,13 @@ DECLARE id INT;
 DROP TEMPORARY TABLE IF EXISTS t_constructions;
 CREATE TEMPORARY TABLE t_constructions
 (INDEX(ship), INDEX(player), PRIMARY KEY(ship, player))
-SELECT t_command.ship, t_ship.player, t_command.class, d_class.price
+SELECT t_command.ship, t_object.owner AS player, t_command.class, nc.price
 FROM t_command
 JOIN t_ship ON t_ship.id = t_command.ship
-JOIN t_player ON t_player.id = t_ship.player
-JOIN d_class ON d_class.id = t_command.class
-WHERE t_command.`type` = 'construct' AND d_class.shipyard = 'Y' AND d_class.price IS NOT NULL;
+JOIN t_object ON t_object.id = t_command.ship
+JOIN d_class AS cc ON cc.id = t_ship.class
+JOIN d_class AS nc ON nc.id = t_command.class
+WHERE t_command.`type` = 'construct' AND cc.shipyard = 'Y' AND nc.price IS NOT NULL;
 
 # players with insufficient money shall construct no ships
 DELETE a
@@ -2423,14 +2424,14 @@ SET t_player.money = t_player.money - IFNULL(
 # create ships, one by one, so that the auto-incremented t_object.id can be used to insert into t_ship
 SELECT COUNT(*) INTO n FROM t_constructions;
 WHILE i < n DO
-	INSERT INTO t_object (pos_x, pos_y, pos_x_prev, pos_y_prev)
-	SELECT pos_x, pos_y, pos_x, pos_y
+	INSERT INTO t_object (owner, pos_x, pos_y, pos_x_prev, pos_y_prev)
+	SELECT t_object.owner, pos_x, pos_y, pos_x, pos_y
 	FROM t_constructions
 	JOIN t_object ON t_object.id = t_constructions.ship
 	LIMIT i,1;
 	SET id = LAST_INSERT_ID();
-	INSERT INTO t_ship (id, class, player, life)
-	SELECT id, t_constructions.class, t_constructions.player, d_class.life
+	INSERT INTO t_ship (id, class, life)
+	SELECT id, t_constructions.class, d_class.life
 	FROM t_constructions
 	JOIN d_class ON d_class.id = t_constructions.class
 	LIMIT i,1;
@@ -2503,19 +2504,21 @@ BEGIN
 # create a temporary player to represent all the planets which allows to simplify the other queries related to money
 # it has A LOT of money from the beginning to ensure that the planets pass the 'available money' filter
 INSERT IGNORE INTO d_user (id, name) VALUES (-1, '<planets>');
-INSERT IGNORE INTO t_player (id, user, NAME, money) VALUES (-1, -1, '<planets>', 1000000000000000);
+INSERT IGNORE INTO t_player (id, user, name, money) VALUES (-1, -1, '<planets>', 1000000000000000);
 
 # filter by commands
 
 DROP TEMPORARY TABLE IF EXISTS t_trades;
 CREATE TEMPORARY TABLE t_trades
 (price int NULL, INDEX(buyer), INDEX(seller), INDEX(resource), PRIMARY KEY(buyer, seller, resource), INDEX(buyer_player), INDEX(seller_player))
-SELECT if(amount > 0, ship, target) AS buyer , IFNULL(if(amount > 0, a.player, b.player), -1) AS buyer_player,
-       if(amount > 0, target, ship) AS seller, IFNULL(if(amount > 0, b.player, a.player), -1) AS seller_player,
+SELECT if(amount > 0, ship, target) AS buyer , IFNULL(if(amount > 0, ao.owner, bo.owner), -1) AS buyer_player,
+       if(amount > 0, target, ship) AS seller, IFNULL(if(amount > 0, bo.owner, ao.owner), -1) AS seller_player,
 	   resource, ABS(amount) AS amount, NULL AS price
 FROM t_command
 LEFT JOIN t_ship AS a ON a.id = t_command.ship
+LEFT JOIN t_object AS ao ON ao.id = a.id
 LEFT JOIN t_ship AS b ON b.id = t_command.target
+LEFT JOIN t_object AS bo ON bo.id = b.id
 WHERE t_command.type = 'trade';
 
 # filter by positions
@@ -2661,7 +2664,6 @@ CALL p_clear_all;
 
 DELETE FROM d_user_score;
 DELETE FROM d_user;
-
 ALTER TABLE d_user AUTO_INCREMENT = 1;
 
 ALTER TABLE t_report_resource_price AUTO_INCREMENT = 1;
@@ -2675,10 +2677,8 @@ ALTER TABLE t_recipe AUTO_INCREMENT = 1;
 ALTER TABLE t_planet AUTO_INCREMENT = 1;
 ALTER TABLE t_command AUTO_INCREMENT = 1;
 ALTER TABLE t_ship AUTO_INCREMENT = 1;
-ALTER TABLE t_waypoint AUTO_INCREMENT = 1;
 ALTER TABLE t_object AUTO_INCREMENT = 1;
 ALTER TABLE t_player AUTO_INCREMENT = 1;
-
 UPDATE t_game SET season = 0, tick = 0;
 
 END//
@@ -2897,12 +2897,15 @@ INSERT INTO `t_game` (`season`, `tick`) VALUES
 DROP TABLE IF EXISTS `t_object`;
 CREATE TABLE IF NOT EXISTS `t_object` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner` int(11) DEFAULT NULL,
   `name` tinytext NOT NULL DEFAULT '',
   `pos_x` int(11) NOT NULL,
   `pos_y` int(11) NOT NULL,
   `pos_x_prev` int(11) NOT NULL DEFAULT 0,
   `pos_y_prev` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `FK_t_object_t_player` (`owner`),
+  CONSTRAINT `FK_t_object_t_player` FOREIGN KEY (`owner`) REFERENCES `t_player` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_object: ~0 rows (approximately)
@@ -2986,11 +2989,11 @@ CREATE TABLE IF NOT EXISTS `t_report_combat` (
   `defender` int(11) NOT NULL,
   `killed` enum('Y','N') NOT NULL DEFAULT 'N',
   PRIMARY KEY (`id`),
-  KEY `FK_t_report_combat_t_ship` (`attacker`),
-  KEY `FK_t_report_combat_t_ship_2` (`defender`),
   KEY `Index 4` (`tick`),
-  CONSTRAINT `FK_t_report_combat_t_ship` FOREIGN KEY (`attacker`) REFERENCES `t_ship` (`id`),
-  CONSTRAINT `FK_t_report_combat_t_ship_2` FOREIGN KEY (`defender`) REFERENCES `t_ship` (`id`)
+  KEY `FK_t_report_combat_t_object` (`attacker`),
+  KEY `FK_t_report_combat_t_object_2` (`defender`),
+  CONSTRAINT `FK_t_report_combat_t_object` FOREIGN KEY (`attacker`) REFERENCES `t_object` (`id`),
+  CONSTRAINT `FK_t_report_combat_t_object_2` FOREIGN KEY (`defender`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_report_combat: ~0 rows (approximately)
@@ -3078,13 +3081,10 @@ DROP TABLE IF EXISTS `t_ship`;
 CREATE TABLE IF NOT EXISTS `t_ship` (
   `id` int(11) NOT NULL,
   `class` int(11) NOT NULL,
-  `player` int(11) NOT NULL,
   `life` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_ship_ship_type` (`class`),
-  KEY `FK_ship_person` (`player`) USING BTREE,
   CONSTRAINT `FK_ship_object` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`),
-  CONSTRAINT `FK_ship_person` FOREIGN KEY (`player`) REFERENCES `t_player` (`id`),
   CONSTRAINT `FK_ship_ship_type` FOREIGN KEY (`class`) REFERENCES `d_class` (`id`),
   CONSTRAINT `life_is_not_negative` CHECK (`life` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -3092,18 +3092,6 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
 -- Dumping data for table space_tycoon.t_ship: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
-
--- Dumping structure for table space_tycoon.t_waypoint
-DROP TABLE IF EXISTS `t_waypoint`;
-CREATE TABLE IF NOT EXISTS `t_waypoint` (
-  `id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `FK__object_id_` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-
--- Dumping data for table space_tycoon.t_waypoint: ~0 rows (approximately)
-/*!40000 ALTER TABLE `t_waypoint` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_waypoint` ENABLE KEYS */;
 
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
@@ -3179,8 +3167,8 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS price
 FROM t_player
-LEFT JOIN t_ship ON t_ship.player = t_player.id
-LEFT JOIN t_commodity ON t_commodity.object = t_ship.id
+LEFT JOIN t_object ON t_object.owner = t_player.id
+LEFT JOIN t_commodity ON t_commodity.object = t_object.id
 LEFT JOIN v_resource_price ON v_resource_price.resource = t_commodity.resource
 GROUP BY t_player.id ;
 
@@ -3200,7 +3188,8 @@ DROP VIEW IF EXISTS `v_player_ships_worth`;
 DROP TABLE IF EXISTS `v_player_ships_worth`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, SUM(ifnull(d_class.price, 0)) AS price
 FROM t_player
-LEFT JOIN t_ship ON t_ship.player = t_player.id AND t_ship.life > 0
+LEFT JOIN t_object ON t_object.owner = t_player.id
+LEFT JOIN t_ship ON t_ship.id = t_object.id
 LEFT JOIN d_class ON d_class.id = t_ship.class
 GROUP BY t_player.id ;
 
@@ -3219,7 +3208,7 @@ DROP VIEW IF EXISTS `v_resource_price`;
 DROP TABLE IF EXISTS `v_resource_price`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELECT d_resource.id AS resource, CAST(ifnull(AVG(buy), 0) AS integer) AS buy, CAST(ifnull(AVG(sell), 0) AS integer) AS sell
 FROM d_resource
-left JOIN t_price ON t_price.resource = d_resource.id
+LEFT JOIN t_price ON t_price.resource = d_resource.id
 GROUP BY d_resource.id ;
 
 -- Dumping structure for view space_tycoon.v_ship_cargo
