@@ -17,7 +17,6 @@ func (game *Game) GetPlayerScores() ([]PlayerScore, error) {
 
 		return scores, fmt.Errorf("query failed %v", err)
 	}
-
 	var score PlayerScore
 	for rows.Next() {
 		err = rows.Scan(&score.Player, &score.Price, &score.Score)

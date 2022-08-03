@@ -2,8 +2,9 @@ package stycoon
 
 import (
 	"database/sql"
-	"github.com/rs/zerolog/log"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (game *Game) getGameTick() {
@@ -18,12 +19,26 @@ func (game *Game) getGameTick() {
 	}
 }
 
-func (game *Game) getTickWaitMs() int64 {
-	return TickDuration.Milliseconds() - time.Since(game.lastTick).Milliseconds()
+func (game *Game) getTickWait() time.Duration {
+	return TickDuration - time.Since(game.lastTick)
 }
 
 func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
-	tickData.TimeLeftMs = game.getTickWaitMs()
+	tickData.TimeLeftMs = game.getTickWait().Milliseconds()
 	return tickData
+}
+
+func (game *Game) EndTurn(tick int64) CurrentTick {
+	if tick < game.Tick.Tick {
+		return game.GetGameTickState()
+	}
+	currentTick := game.Tick.Tick
+	time.Sleep(game.getTickWait())
+	tickState := game.GetGameTickState()
+	for tickState.Tick == currentTick {
+		time.Sleep(time.Millisecond)
+		tickState = game.GetGameTickState()
+	}
+	return tickState
 }
