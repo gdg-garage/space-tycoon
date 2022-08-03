@@ -1,6 +1,6 @@
 # Space Tycoon
 
-server [![Go](https://github.com/gdg-garage/space-tycoon/actions/workflows/go.yml/badge.svg)](https://github.com/gdg-garage/space-tycoon/actions/workflows/go.yml)
+[![Server](https://github.com/gdg-garage/space-tycoon/actions/workflows/go.yml/badge.svg)](https://github.com/gdg-garage/space-tycoon/actions/workflows/go.yml)
 
 ## Observe the API in Swagger
 https://editor.swagger.io/?url=https://raw.githubusercontent.com/gdg-garage/space-tycoon/master/api/swagger.yaml
