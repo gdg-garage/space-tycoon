@@ -9,6 +9,11 @@ import (
 )
 
 func CurrentTick(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
 	tickData := game.GetGameTickState()
 	tick, err := json.Marshal(tickData)
 	if err != nil {
@@ -24,6 +29,11 @@ func CurrentTick(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 }
 
 func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		return
+	}
 	// TODO not sure if this should be only for logged users
 	// TODO add dev server functionality
 	body, err := ioutil.ReadAll(req.Body)
@@ -32,7 +42,13 @@ func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var userTick stycoon.Tick
+	var userTick stycoon.EndTurn
+	err = stycoon.AssertEndTurnRequired(userTick)
+	if err != nil {
+		log.Warn().Err(err).Msg("end turn object is invalid")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	err = json.Unmarshal(body, &userTick)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")

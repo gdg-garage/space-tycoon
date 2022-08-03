@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-type Tick struct {
-	Tick int64 `json:"tick"`
-}
-
 func (game *Game) getGameTick() {
 	err := game.db.QueryRow("select * from t_game").Scan(&game.Tick.Season, &game.Tick.Tick)
 	if err != nil {
@@ -28,15 +24,11 @@ func (game *Game) getTickWait() time.Duration {
 
 func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
-<<<<<<< HEAD
-	tickData.TimeLeftMs = game.getTickWaitMs()
-=======
-	tickData.TimeWaitMs = game.getTickWait().Milliseconds()
->>>>>>> cdcf03c (end-turn endpoint)
+	tickData.TimeLeftMs = game.getTickWait().Milliseconds()
 	return tickData
 }
 
-func (game *Game) EndTurn(tick int64) GameTickState {
+func (game *Game) EndTurn(tick int64) CurrentTick {
 	if tick < game.Tick.Tick {
 		return game.GetGameTickState()
 	}
