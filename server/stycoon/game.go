@@ -6,7 +6,7 @@ import (
 )
 
 type Game struct {
-	Tick     GameTickState
+	Tick     CurrentTick
 	db       *sql.DB
 	lastTick time.Time
 }

@@ -22,8 +22,8 @@ func (game *Game) getTickWaitMs() int64 {
 	return TickDuration.Milliseconds() - time.Since(game.lastTick).Milliseconds()
 }
 
-func (game *Game) GetGameTickState() GameTickState {
+func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
-	tickData.TimeWaitMs = game.getTickWaitMs()
+	tickData.TimeLeftMs = game.getTickWaitMs()
 	return tickData
 }
