@@ -2461,9 +2461,27 @@ SET t_player.money = t_player.money + IFNULL(
 # set ships life to zero
 UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
 
-# remove dead ships
-CALL p_purge_commands;
-# TODO
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_process_destroyed_ships
+DROP PROCEDURE IF EXISTS `p_process_destroyed_ships`;
+DELIMITER //
+CREATE PROCEDURE `p_process_destroyed_ships`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# destroyed ships may not have any commands
+DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.ship WHERE t_ship.life = 0;
+
+# delete commands that are targetting destroyed ships
+DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHERE t_ship.life = 0;
+
+# the cargo is lost
+DELETE t_commodity FROM t_commodity JOIN t_ship ON t_ship.id = t_commodity.object WHERE t_ship.life = 0;
+
+# actually delete the ships
+DELETE t_ship FROM t_ship WHERE t_ship.life = 0;
 
 END//
 DELIMITER ;
@@ -2755,22 +2773,6 @@ UPDATE t_game SET season = 0, tick = 0;
 END//
 DELIMITER ;
 
--- Dumping structure for procedure space_tycoon.p_purge_commands
-DROP PROCEDURE IF EXISTS `p_purge_commands`;
-DELIMITER //
-CREATE PROCEDURE `p_purge_commands`()
-    SQL SECURITY INVOKER
-BEGIN
-
-# dead ships may not have any commands
-DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.ship WHERE t_ship.life = 0;
-
-# delete attack commands that are targetting dead ships
-DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHERE t_command.type = 'attack' AND t_ship.life = 0;
-
-END//
-DELIMITER ;
-
 -- Dumping structure for procedure space_tycoon.p_report_player_score
 DROP PROCEDURE IF EXISTS `p_report_player_score`;
 DELIMITER //
@@ -2851,11 +2853,11 @@ START TRANSACTION READ WRITE;
 SELECT tick FROM t_game INTO my_tick;
 
 SET ts_begin = SYSDATE(6);
-CALL p_purge_commands;
 CALL p_move_ships;
 SET ts_movement = SYSDATE(6);
 CALL p_process_attacks;
 CALL p_process_decommissions;
+CALL p_process_destroyed_ships;
 SET ts_attacks = SYSDATE(6);
 CALL p_process_trades;
 SET ts_trades = SYSDATE(6);
