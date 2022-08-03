@@ -65,7 +65,7 @@ func InternalPage(sessionManager sessions.Store, w http.ResponseWriter, req *htt
 		http.Error(w, "only for logged users", http.StatusForbidden)
 		return
 	}
-	_, err = w.Write([]byte(fmt.Sprintf("Hello %s", user.Username)))
+	_, err = w.Write([]byte(fmt.Sprintf("Hello %s", user.Name)))
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
