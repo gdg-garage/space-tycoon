@@ -16,6 +16,11 @@ type User struct {
 }
 
 func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		return
+	}
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
@@ -57,6 +62,11 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 }
 
 func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		return
+	}
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
