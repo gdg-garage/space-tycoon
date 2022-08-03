@@ -18,7 +18,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var createUser stycoon.User
+	var createUser stycoon.Credentials
 	err = json.Unmarshal(body, &createUser)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
@@ -31,7 +31,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = database.InsertUser(db, createUser.Username, passwordHash)
+	err = database.InsertUser(db, createUser.Name, passwordHash)
 	if err != nil {
 		log.Warn().Err(err).Msg("Insert user into DB failed")
 		http.Error(w, "", http.StatusInternalServerError)
@@ -59,29 +59,35 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var loginUser stycoon.User
-	err = json.Unmarshal(body, &loginUser)
+	var userCredentials stycoon.Credentials
+	err = json.Unmarshal(body, &userCredentials)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
 		http.Error(w, "can't parse json", http.StatusBadRequest)
 		return
 	}
-	hash, err := database.GetUserPassword(db, loginUser.Username)
+	err = stycoon.AssertCredentialsRequired(userCredentials)
 	if err != nil {
-		log.Warn().Err(err).Str("username", loginUser.Username).Msg("user search failed")
+		log.Warn().Err(err).Msg("credentials object is invalid")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	hash, err := database.GetUserPassword(db, userCredentials.Name)
+	if err != nil {
+		log.Warn().Err(err).Str("username", userCredentials.Name).Msg("user search failed")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	err = stycoon.IsPasswordValid(hash, loginUser.Password)
+	err = stycoon.IsPasswordValid(hash, userCredentials.Password)
 	if err != nil {
-		log.Warn().Err(err).Str("username", loginUser.Username).Msg("invalid password")
+		log.Warn().Err(err).Str("username", userCredentials.Name).Msg("invalid password")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	session, _ := sessionManager.Get(req, stycoon.SessionKey)
-	session.Values["username"] = loginUser.Username
+	session.Values["username"] = userCredentials.Name
 	// TODO check if player is connected to the user.
-	session.Values["player"] = loginUser.Player
+	session.Values["player"] = userCredentials.Player
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
@@ -89,7 +95,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		return
 	}
 	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
-	r, err := json.Marshal(map[string]string{"loggedUser": loginUser.Username})
+	r, err := json.Marshal(map[string]string{"loggedUser": userCredentials.Name})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
