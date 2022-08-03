@@ -788,7 +788,7 @@ components:
           type: integer
           format: int64
       required:
-      - current-tick
+      - tick
       - time-left-ms
       - season
       example:
