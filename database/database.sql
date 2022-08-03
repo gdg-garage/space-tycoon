@@ -2364,13 +2364,6 @@ JOIN t_ship ON t_ship.id = t_ship_attacks.defender;
 
 UPDATE t_ship JOIN t_ship_damages ON t_ship_damages.ship = t_ship.id SET life = GREATEST(life - damage, 0);
 
-# decommissions
-UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
-
-# remove dead ships
-CALL p_purge_commands;
-# TODO
-
 END//
 DELIMITER ;
 
@@ -2442,6 +2435,35 @@ END WHILE;
 DELETE t_command
 FROM t_command
 JOIN t_constructions ON t_constructions.ship = t_command.ship;
+
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_process_decommissions
+DROP PROCEDURE IF EXISTS `p_process_decommissions`;
+DELIMITER //
+CREATE PROCEDURE `p_process_decommissions`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# refund some money to players
+UPDATE t_player
+SET t_player.money = t_player.money + IFNULL(
+(
+	SELECT SUM(d_class.price * t_ship.life / d_class.life / 2)
+	FROM t_command
+	JOIN t_ship ON t_ship.id = t_command.ship
+	JOIN t_object ON t_object.id = t_ship.id
+	JOIN d_class ON d_class.id = t_ship.class
+	WHERE t_command.type = 'decommission' and t_object.owner = t_player.id AND d_class.price > 0
+), 0);
+
+# set ships life to zero
+UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
+
+# remove dead ships
+CALL p_purge_commands;
+# TODO
 
 END//
 DELIMITER ;
@@ -2833,6 +2855,7 @@ CALL p_purge_commands;
 CALL p_move_ships;
 SET ts_movement = SYSDATE(6);
 CALL p_process_attacks;
+CALL p_process_decommissions;
 SET ts_attacks = SYSDATE(6);
 CALL p_process_trades;
 SET ts_trades = SYSDATE(6);
