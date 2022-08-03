@@ -2388,7 +2388,7 @@ DECLARE id INT;
 # pick suitable construction commands
 DROP TEMPORARY TABLE IF EXISTS t_constructions;
 CREATE TEMPORARY TABLE t_constructions
-(INDEX(ship), INDEX(player), PRIMARY KEY(ship, player))
+(PRIMARY KEY(ship), INDEX(player))
 SELECT t_command.ship, t_object.owner AS player, t_command.class, nc.price
 FROM t_command
 JOIN t_ship ON t_ship.id = t_command.ship
@@ -2489,7 +2489,56 @@ CREATE PROCEDURE `p_process_repairs`()
     SQL SECURITY INVOKER
 BEGIN
 
-# TODO
+# passive regen
+UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = t_ship.life + d_class.regen;
+
+# find suitable commands
+DROP TEMPORARY TABLE IF EXISTS t_repairs;
+CREATE TEMPORARY TABLE t_repairs
+(PRIMARY KEY(id), INDEX(player))
+SELECT t_ship.id, t_object.owner AS player, d_class.repair_life AS repair, d_class.repair_price AS price
+FROM t_command
+JOIN t_ship ON t_ship.id = t_command.ship
+JOIN t_object ON t_object.id = t_ship.id
+JOIN d_class ON d_class.id = t_ship.class
+WHERE t_command.type = 'repair';
+
+# players with insufficient money shall repair no ships
+DELETE a
+FROM t_repairs AS a
+WHERE a.player IN
+(
+	SELECT player FROM
+	(
+		SELECT b.player, t_player.money
+		FROM t_repairs AS b
+		JOIN t_player ON t_player.id = b.player
+		GROUP BY t_player.id
+		HAVING SUM(b.price) > t_player.money
+	) AS subquery
+);
+
+# subtract players money
+UPDATE t_player
+SET t_player.money = t_player.money - IFNULL(
+(
+	SELECT SUM(t_repairs.price)
+	FROM t_repairs
+	WHERE t_repairs.player = t_player.id
+), 0);
+
+# replenish ships life
+UPDATE t_ship
+JOIN t_repairs ON t_repairs.id = t_ship.id
+SET t_ship.life = t_ship.life + t_repairs.repair;
+
+# cap the life
+UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = LEAST(t_ship.life, d_class.life);
+
+# delete fulfilled commands
+DELETE t_command
+FROM t_command
+JOIN t_repairs ON t_repairs.id = t_command.ship;
 
 END//
 DELIMITER ;
