@@ -25,24 +25,30 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   `name` tinytext NOT NULL,
   `shipyard` enum('Y','N') NOT NULL DEFAULT 'N' COMMENT 'allows constructing new ships',
   `speed` double NOT NULL,
-  `cargo` int(11) NOT NULL,
-  `life` int(11) NOT NULL,
+  `cargo` int(11) NOT NULL COMMENT 'maximum allowed amount of resources loaded on the ship',
+  `life` int(11) NOT NULL COMMENT 'maximum life for the ship',
+  `regen` int(11) NOT NULL COMMENT 'amount of life restored passively every tick',
+  `repair_life` int(11) NOT NULL COMMENT 'amount of life restored with the repair command every tick',
+  `repair_price` int(11) NOT NULL COMMENT 'money required for repairing every tick',
   `damage` int(11) NOT NULL,
-  `price` int(11) DEFAULT NULL,
+  `price` int(11) DEFAULT NULL COMMENT 'price to build new ship (also the value of the ship in score)',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Index 2` (`name`(255))
+  UNIQUE KEY `Index 2` (`name`(255)),
+  CONSTRAINT `positive numbers` CHECK (`speed` >= 0 and `cargo` >= 0 and `life` > 0 and `regen` >= 0 and `repair_life` >= 0 and `repair_price` >= 0 and `damage` >= 0 and (`price` is null or `price` > 0)),
+  CONSTRAINT `repair is faster than regen` CHECK (`repair_life` = 0 or `repair_life` >= 10 * `regen`),
+  CONSTRAINT `repair is affordable` CHECK (`repair_price` = 0 or `price` is null or `life` * `repair_price` < `price` * `repair_life`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
-INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price`) VALUES
-	(1, 'mothership', 'Y', 10, 0, 1000, 50, NULL),
-	(2, 'hauler', 'N', 13, 200, 200, 0, 500000),
-	(3, 'shipper', 'N', 18, 50, 100, 0, 300000),
-	(4, 'fighter', 'N', 20, 0, 150, 15, 1500000),
-	(5, 'bomber', 'N', 15, 0, 250, 30, 2000000),
-	(6, 'destroyer', 'Y', 10, 0, 3000, 250, 42000000),
-	(7, 'shipyard', 'Y', 10, 0, 1000, 0, 5000000);
+INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`) VALUES
+	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL),
+	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000),
+	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000),
+	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000),
+	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000),
+	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000),
+	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_names
@@ -2120,13 +2126,13 @@ CREATE TEMPORARY TABLE t_planet_names
 SELECT name FROM d_names
 ORDER BY RAND();
 
-SET num_stars = RAND() * 100 + 200;
+SET num_stars = RAND() * 100 + 100;
 SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
 	SET star_a = RAND() * 2 * PI();
-	SET star_d = RAND() * RAND() * 3000 + 250; # averages at 1000
+	SET star_d = (1 - RAND() * RAND()) * 2000 + 500; # averages at 2000
 	SET star_x = COS(star_a) * star_d;
 	SET star_y = SIN(star_a) * star_d;
 	SET num_planets = RAND() * RAND() * 5 + 1;
@@ -2361,6 +2367,10 @@ UPDATE t_ship JOIN t_ship_damages ON t_ship_damages.ship = t_ship.id SET life = 
 # decommissions
 UPDATE t_ship JOIN t_command ON t_ship.id = t_command.ship SET life = 0 WHERE t_command.type = 'decommission';
 
+# remove dead ships
+CALL p_purge_commands;
+# TODO
+
 END//
 DELIMITER ;
 
@@ -2467,6 +2477,18 @@ REPLACE INTO t_commodity
 SELECT * FROM t_recipe_result;
 
 DELETE FROM t_commodity WHERE amount = 0;
+
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_process_repairs
+DROP PROCEDURE IF EXISTS `p_process_repairs`;
+DELIMITER //
+CREATE PROCEDURE `p_process_repairs`()
+    SQL SECURITY INVOKER
+BEGIN
+
+# TODO
 
 END//
 DELIMITER ;
@@ -2762,7 +2784,6 @@ CALL p_purge_commands;
 CALL p_move_ships;
 SET ts_movement = SYSDATE(6);
 CALL p_process_attacks;
-CALL p_purge_commands;
 SET ts_attacks = SYSDATE(6);
 CALL p_process_trades;
 SET ts_trades = SYSDATE(6);
@@ -2771,6 +2792,7 @@ SET ts_recipes = SYSDATE(6);
 CALL p_update_prices;
 SET ts_prices = SYSDATE(6);
 CALL p_process_constructions;
+CALL p_process_repairs;
 SET ts_constructions = SYSDATE(6);
 CALL p_report_player_score;
 SET ts_report = SYSDATE(6);
@@ -2805,6 +2827,8 @@ CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
 BEGIN
 
+# TODO
+
 END//
 DELIMITER ;
 
@@ -2812,7 +2836,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `t_command`;
 CREATE TABLE IF NOT EXISTS `t_command` (
   `ship` int(11) NOT NULL,
-  `type` enum('move','attack','trade','construct','decommission') NOT NULL,
+  `type` enum('move','attack','trade','construct','decommission','repair') NOT NULL,
   `target` int(11) DEFAULT NULL,
   `resource` int(11) DEFAULT NULL,
   `amount` int(11) DEFAULT NULL COMMENT 'positive = buy, negative = sell',
@@ -2831,7 +2855,8 @@ CREATE TABLE IF NOT EXISTS `t_command` (
   CONSTRAINT `attack command` CHECK (`type` <> 'attack' or `target` is not null and `resource` is null and `amount` is null and `class` is null),
   CONSTRAINT `construct command` CHECK (`type` <> 'construct' or `target` is null and `resource` is null and `amount` is null and `class` is not null),
   CONSTRAINT `trade command` CHECK (`type` <> 'trade' or `target` is not null and `resource` is not null and `amount` is not null and `class` is null),
-  CONSTRAINT `decommission command` CHECK (`type` <> 'decommission' or `target` is null and `resource` is null and `amount` is null and `class` is null)
+  CONSTRAINT `decommission command` CHECK (`type` <> 'decommission' or `target` is null and `resource` is null and `amount` is null and `class` is null),
+  CONSTRAINT `repair command` CHECK (`type` <> 'repair' or `target` is null and `resource` is null and `amount` is null and `class` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_command: ~0 rows (approximately)
@@ -2928,7 +2953,7 @@ CREATE TABLE IF NOT EXISTS `t_price` (
   CONSTRAINT `FK__resource_type_` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`),
   CONSTRAINT `buy_price_is_positive` CHECK (`buy` is null or `buy` > 0),
   CONSTRAINT `sell_price_is_positive` CHECK (`sell` is null or `sell` > 0),
-  CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` >= `sell`)
+  CONSTRAINT `buy_price_is_larger_than_sell_price` CHECK (`buy` is null or `sell` is null or `buy` > `sell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table space_tycoon.t_price: ~0 rows (approximately)
@@ -3127,7 +3152,7 @@ DROP VIEW IF EXISTS `v_ship_cargo`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_ship_cargo` (
 	`id` INT(11) NOT NULL,
-	`capacity` INT(11) NOT NULL,
+	`capacity` INT(11) NOT NULL COMMENT 'maximum allowed amount of resources loaded on the ship',
 	`used` DECIMAL(32,0) NOT NULL
 ) ENGINE=MyISAM;
 
