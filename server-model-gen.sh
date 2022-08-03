@@ -13,3 +13,5 @@ rm -rf server/gen
 # Garbage
 rm server/stycoon/models/api.go
 rm server/stycoon/models/routers.go
+rm server/stycoon/models/logger.go
+rm server/stycoon/models/error.go
