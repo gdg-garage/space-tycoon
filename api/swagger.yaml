@@ -74,7 +74,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StaticData'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -91,7 +91,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Data'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -111,7 +111,7 @@ paths:
           description: OK
           content: {}
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -140,7 +140,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -148,7 +148,6 @@ paths:
         "405":
           description: Invalid input
           content: {}
-
   /current-tick:
     get:
       tags:
@@ -160,6 +159,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "403":
+          description: Please login again
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /reports:
     get:
       tags:
@@ -171,6 +176,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
+        "403":
+          description: Please login again
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Command:
