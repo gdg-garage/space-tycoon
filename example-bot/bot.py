@@ -1,10 +1,11 @@
 from pprint import pprint
 
 import space_tycoon_client
+from space_tycoon_client.api import end_turn_api
 from space_tycoon_client.api import login_api
 from space_tycoon_client.api import static_data_api
-from space_tycoon_client.api import end_turn_api
 from space_tycoon_client.model.credentials import Credentials
+from space_tycoon_client.model.current_tick import CurrentTick
 from space_tycoon_client.model.end_turn import EndTurn
 
 
@@ -34,12 +35,13 @@ def static_data(api_client):
 
 
 def game_loop(api_client, game_static_data):
-    tick = 0
+    tick = -1
     while True:
-        end_turn = end_turn_api.EndTurnApi(api_client).end_turn_post(EndTurn(
+        print(f"tick {tick}")
+        current_tick: CurrentTick = end_turn_api.EndTurnApi(api_client).end_turn_post(EndTurn(
             tick=tick,
         ))
-        pprint(end_turn)
+        tick = current_tick.tick
 
 
 def main_loop(api_client):
