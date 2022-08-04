@@ -62,7 +62,7 @@ configuration = space_tycoon_client.Configuration(
 )
 
 
-# Enter a context with an instance of the API client
+# Enter a context with an instance of the API example-bot
 with space_tycoon_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = commands_api.CommandsApi(api_client)

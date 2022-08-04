@@ -44,10 +44,10 @@ class Configuration(object):
     :param password: Password for HTTP basic authentication
     :param discard_unknown_keys: Boolean value indicating whether to discard
       unknown properties. A server may send a response that includes additional
-      properties that are not known by the client in the following scenarios:
+      properties that are not known by the example-bot in the following scenarios:
       1. The OpenAPI document is incomplete, i.e. it does not match the server
          implementation.
-      2. The client was generated using an older version of the OpenAPI document
+      2. The example-bot was generated using an older version of the OpenAPI document
          and the server has been upgraded since then.
       If a schema in the OpenAPI document defines the additionalProperties attribute,
       then all undeclared properties received by the server are injected into the
@@ -58,7 +58,7 @@ class Configuration(object):
       rules. The following keywords may be specified: multipleOf, maximum,
       exclusiveMaximum, minimum, exclusiveMinimum, maxLength, minLength, pattern,
       maxItems, minItems.
-      By default, the validation is performed for data generated locally by the client
+      By default, the validation is performed for data generated locally by the example-bot
       and data received from the server, independent of any validation performed by
       the server side. If the input data does not satisfy the JSON schema validation
       rules specified in the OpenAPI document, an exception is raised.
@@ -156,10 +156,10 @@ class Configuration(object):
         """Set this to customize the certificate file to verify the peer.
         """
         self.cert_file = None
-        """client certificate file
+        """example-bot certificate file
         """
         self.key_file = None
-        """client key file
+        """example-bot key file
         """
         self.assert_hostname = None
         """Set this to True/False to enable/disable SSL hostname verification.
@@ -185,7 +185,7 @@ class Configuration(object):
         self.retries = None
         """Adding retries to override urllib3 default value 3
         """
-        # Enable client side validation
+        # Enable example-bot side validation
         self.client_side_validation = True
 
         # Options to pass down to the underlying urllib3 socket
@@ -358,7 +358,7 @@ class Configuration(object):
         ).get('authorization')
 
     def auth_settings(self):
-        """Gets Auth Settings dict for api client.
+        """Gets Auth Settings dict for api example-bot.
 
         :return: The Auth Settings information dict.
         """

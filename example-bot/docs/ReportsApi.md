@@ -1,13 +1,13 @@
-# space_tycoon_client.CurrentTickApi
+# space_tycoon_client.ReportsApi
 
 All URIs are relative to *https://space-tycoon.garage-trip.cz/api*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**current_tick_get**](CurrentTickApi.md#current_tick_get) | **get** /current-tick | 
+[**reports_get**](ReportsApi.md#reports_get) | **get** /reports | 
 
-# **current_tick_get**
-> CurrentTick current_tick_get()
+# **reports_get**
+> Reports reports_get()
 
 
 
@@ -15,9 +15,9 @@ Method | HTTP request | Description
 
 ```python
 import space_tycoon_client
-from space_tycoon_client.apis.tags import current_tick_api
+from space_tycoon_client.apis.tags import reports_api
+from space_tycoon_client.model.reports import Reports
 from space_tycoon_client.model.error import Error
-from space_tycoon_client.model.current_tick import CurrentTick
 from pprint import pprint
 # Defining the host is optional and defaults to https://space-tycoon.garage-trip.cz/api
 # See configuration.py for a list of all supported configuration parameters.
@@ -25,17 +25,17 @@ configuration = space_tycoon_client.Configuration(
     host = "https://space-tycoon.garage-trip.cz/api"
 )
 
-# Enter a context with an instance of the API client
+# Enter a context with an instance of the API example-bot
 with space_tycoon_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = current_tick_api.CurrentTickApi(api_client)
+    api_instance = reports_api.ReportsApi(api_client)
 
     # example, this endpoint has no required or optional parameters
     try:
-        api_response = api_instance.current_tick_get()
+        api_response = api_instance.reports_get()
         pprint(api_response)
     except space_tycoon_client.ApiException as e:
-        print("Exception when calling CurrentTickApi->current_tick_get: %s\n" % e)
+        print("Exception when calling ReportsApi->reports_get: %s\n" % e)
 ```
 ### Parameters
 This endpoint does not need any parameter.
@@ -58,7 +58,7 @@ headers | Unset | headers were not defined |
 #### SchemaFor200ResponseBodyApplicationJson
 Type | Description  | Notes
 ------------- | ------------- | -------------
-[**CurrentTick**](CurrentTick.md) |  | 
+[**Reports**](Reports.md) |  | 
 
 
 #### ApiResponseFor403
@@ -75,7 +75,7 @@ Type | Description  | Notes
 
 
 
-[**CurrentTick**](CurrentTick.md)
+[**Reports**](Reports.md)
 
 ### Authorization
 

@@ -55,4 +55,4 @@ services:
       --additional-properties=packageName=space_tycoon_client
     volumes:
       - "./api:/api"
-      - "./client:/client"
+      - "./example-bot:/example-bot"

@@ -885,9 +885,9 @@ class OpenApiResponse(JSONDetector):
 
 
 class ApiClient:
-    """Generic API client for OpenAPI client library builds.
+    """Generic API example-bot for OpenAPI example-bot library builds.
 
-    OpenAPI generic API client. This client handles the client-
+    OpenAPI generic API example-bot. This example-bot handles the example-bot-
     server communication, and is invariant across implementations. Specifics of
     the methods and models for each application are generated from the OpenAPI
     templates.
@@ -896,7 +896,7 @@ class ApiClient:
     Ref: https://openapi-generator.tech
     Do not edit the class manually.
 
-    :param configuration: .Configuration object for this client
+    :param configuration: .Configuration object for this example-bot
     :param header_name: a header to pass when making calls to the API.
     :param header_value: a header value to pass when making calls to
         the API.
@@ -956,7 +956,7 @@ class ApiClient:
 
     @property
     def user_agent(self):
-        """User agent for this API client"""
+        """User agent for this API example-bot"""
         return self.default_headers['User-Agent']
 
     @user_agent.setter

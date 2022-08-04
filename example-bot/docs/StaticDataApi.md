@@ -1,13 +1,13 @@
-# space_tycoon_client.ReportsApi
+# space_tycoon_client.StaticDataApi
 
 All URIs are relative to *https://space-tycoon.garage-trip.cz/api*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**reports_get**](ReportsApi.md#reports_get) | **get** /reports | 
+[**static_data_get**](StaticDataApi.md#static_data_get) | **get** /static-data | 
 
-# **reports_get**
-> Reports reports_get()
+# **static_data_get**
+> StaticData static_data_get()
 
 
 
@@ -15,8 +15,8 @@ Method | HTTP request | Description
 
 ```python
 import space_tycoon_client
-from space_tycoon_client.apis.tags import reports_api
-from space_tycoon_client.model.reports import Reports
+from space_tycoon_client.apis.tags import static_data_api
+from space_tycoon_client.model.static_data import StaticData
 from space_tycoon_client.model.error import Error
 from pprint import pprint
 # Defining the host is optional and defaults to https://space-tycoon.garage-trip.cz/api
@@ -25,17 +25,17 @@ configuration = space_tycoon_client.Configuration(
     host = "https://space-tycoon.garage-trip.cz/api"
 )
 
-# Enter a context with an instance of the API client
+# Enter a context with an instance of the API example-bot
 with space_tycoon_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = reports_api.ReportsApi(api_client)
+    api_instance = static_data_api.StaticDataApi(api_client)
 
     # example, this endpoint has no required or optional parameters
     try:
-        api_response = api_instance.reports_get()
+        api_response = api_instance.static_data_get()
         pprint(api_response)
     except space_tycoon_client.ApiException as e:
-        print("Exception when calling ReportsApi->reports_get: %s\n" % e)
+        print("Exception when calling StaticDataApi->static_data_get: %s\n" % e)
 ```
 ### Parameters
 This endpoint does not need any parameter.
@@ -58,7 +58,7 @@ headers | Unset | headers were not defined |
 #### SchemaFor200ResponseBodyApplicationJson
 Type | Description  | Notes
 ------------- | ------------- | -------------
-[**Reports**](Reports.md) |  | 
+[**StaticData**](StaticData.md) |  | 
 
 
 #### ApiResponseFor403
@@ -75,7 +75,7 @@ Type | Description  | Notes
 
 
 
-[**Reports**](Reports.md)
+[**StaticData**](StaticData.md)
 
 ### Authorization
 

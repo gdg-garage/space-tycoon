@@ -100,7 +100,7 @@ class ValidationMetadata(frozendict):
                 This changes from location to location
             from_server: whether or not this data came form the server
                 True when receiving server data
-                False when instantiating model with client side data not form the server
+                False when instantiating model with example-bot side data not form the server
                 This does not change from location to location
             configuration: the Configuration instance to use
                 This is needed because in Configuration:
@@ -1965,7 +1965,7 @@ class DecimalSchema(DecimalBase, StrSchema):
         Note: Decimals may not be passed in because cast_to_allowed_types is only invoked once for payloads
         which can be simple (str) or complex (dicts or lists with nested values)
         Because casting is only done once and recursively casts all values prior to validation then for a potential
-        client side Decimal input if Decimal was accepted as an input in DecimalSchema then one would not know
+        example-bot side Decimal input if Decimal was accepted as an input in DecimalSchema then one would not know
         if one was using it for a StrSchema (where it should be cast to str) or one is using it for NumberSchema
         where it should stay as Decimal.
         """

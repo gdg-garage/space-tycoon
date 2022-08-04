@@ -1,13 +1,13 @@
-# space_tycoon_client.EndTurnApi
+# space_tycoon_client.CommandsApi
 
 All URIs are relative to *https://space-tycoon.garage-trip.cz/api*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**end_turn_post**](EndTurnApi.md#end_turn_post) | **post** /end-turn | 
+[**commands_post**](CommandsApi.md#commands_post) | **post** /commands | 
 
-# **end_turn_post**
-> CurrentTick end_turn_post(end_turn)
+# **commands_post**
+> commands_post(commands)
 
 
 
@@ -15,10 +15,9 @@ Method | HTTP request | Description
 
 ```python
 import space_tycoon_client
-from space_tycoon_client.apis.tags import end_turn_api
+from space_tycoon_client.apis.tags import commands_api
+from space_tycoon_client.model.commands import Commands
 from space_tycoon_client.model.error import Error
-from space_tycoon_client.model.end_turn import EndTurn
-from space_tycoon_client.model.current_tick import CurrentTick
 from pprint import pprint
 # Defining the host is optional and defaults to https://space-tycoon.garage-trip.cz/api
 # See configuration.py for a list of all supported configuration parameters.
@@ -26,22 +25,21 @@ configuration = space_tycoon_client.Configuration(
     host = "https://space-tycoon.garage-trip.cz/api"
 )
 
-# Enter a context with an instance of the API client
+# Enter a context with an instance of the API example-bot
 with space_tycoon_client.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = end_turn_api.EndTurnApi(api_client)
+    api_instance = commands_api.CommandsApi(api_client)
 
     # example passing only required values which don't have defaults set
-    body = EndTurn(
-        tick=1,
+    body = Commands(
+        key=Command(None),
     )
     try:
-        api_response = api_instance.end_turn_post(
+        api_response = api_instance.commands_post(
             body=body,
         )
-        pprint(api_response)
     except space_tycoon_client.ApiException as e:
-        print("Exception when calling EndTurnApi->end_turn_post: %s\n" % e)
+        print("Exception when calling CommandsApi->commands_post: %s\n" % e)
 ```
 ### Parameters
 
@@ -59,7 +57,7 @@ skip_deserialization | bool | default is False | when True, headers and body wil
 #### SchemaForRequestBody
 Type | Description  | Notes
 ------------- | ------------- | -------------
-[**EndTurn**](EndTurn.md) |  | 
+[**Commands**](Commands.md) |  | 
 
 
 ### Return Types, Responses
@@ -75,14 +73,8 @@ n/a | api_client.ApiResponseWithoutDeserialization | When skip_deserialization i
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor200ResponseBodyApplicationJson, ] |  |
+body | typing.Union[] |  |
 headers | Unset | headers were not defined |
-
-#### SchemaFor200ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**CurrentTick**](CurrentTick.md) |  | 
-
 
 #### ApiResponseFor403
 Name | Type | Description  | Notes
@@ -101,11 +93,17 @@ Type | Description  | Notes
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[] |  |
+body | typing.Union[SchemaFor405ResponseBodyApplicationJson, ] |  |
 headers | Unset | headers were not defined |
 
+#### SchemaFor405ResponseBodyApplicationJson
+Type | Description  | Notes
+------------- | ------------- | -------------
+[**Error**](Error.md) |  | 
 
-[**CurrentTick**](CurrentTick.md)
+
+
+void (empty response body)
 
 ### Authorization
 

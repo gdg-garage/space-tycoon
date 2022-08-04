@@ -11,7 +11,7 @@
 
 from setuptools import setup, find_packages  # noqa: H301
 
-NAME = "space-tycoon-client"
+NAME = "space-tycoon-example-bot"
 VERSION = "1.0.0"
 # To install the library, run the following
 #
