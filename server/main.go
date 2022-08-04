@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -45,6 +46,7 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
+	game := stycoon.NewGame(db)
 
 	http.HandleFunc("/", handlers.Root)
 	// TODO: disable based on config
@@ -55,7 +57,13 @@ func main() {
 		handlers.Login(db, w, r)
 	})
 	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PlayerScores(db, w, r)
+		handlers.PlayerScores(game, w, r)
+	})
+	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
+		handlers.CurrentTick(game, w, r)
+	})
+	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
+		handlers.EndTurn(game, w, r)
 	})
 
 	wg := &sync.WaitGroup{}
@@ -64,7 +72,8 @@ func main() {
 	defer stop()
 
 	wg.Add(1)
-	go stycoon.MainLoop(db, ctx, wg)
+	go game.MainLoop(ctx, wg)
+	// TODO add code for starting new season
 
 	serve(ctx, wg)
 

@@ -11,7 +11,7 @@ package stycoon
 
 type CurrentTick struct {
 
-	Tick int64 `json:"tick,omitempty"`
+	Tick int64 `json:"tick"`
 
 	TimeLeftMs int64 `json:"time-left-ms"`
 
@@ -21,6 +21,7 @@ type CurrentTick struct {
 // AssertCurrentTickRequired checks if the required fields are not zero-ed
 func AssertCurrentTickRequired(obj CurrentTick) error {
 	elements := map[string]interface{}{
+		"tick": obj.Tick,
 		"time-left-ms": obj.TimeLeftMs,
 		"season": obj.Season,
 	}

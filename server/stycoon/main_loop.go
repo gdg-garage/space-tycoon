@@ -9,8 +9,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func callUpdate(db *sql.DB) {
-	err := db.QueryRow("CALL p_update_all();").Scan()
+const TickDuration = time.Second
+
+func (game *Game) callUpdate() {
+	err := game.db.QueryRow("CALL p_update_all();").Scan()
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Expected error
@@ -21,15 +23,17 @@ func callUpdate(db *sql.DB) {
 	}
 }
 
-func MainLoop(db *sql.DB, ctx context.Context, wg *sync.WaitGroup) {
-	ticker := time.NewTicker(time.Second)
+func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
+	ticker := time.NewTicker(TickDuration)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
 			start := time.Now()
-			callUpdate(db)
+			game.callUpdate()
+			game.lastTick = time.Now()
+			game.getGameTick()
 			log.Info().Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():
 			wg.Done()
