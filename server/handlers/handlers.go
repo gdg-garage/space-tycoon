@@ -10,6 +10,11 @@ import (
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
@@ -31,6 +36,11 @@ func Root(w http.ResponseWriter, req *http.Request) {
 }
 
 func PlayerScores(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
 	playerScores, err := game.GetPlayerScores()
 	if err != nil {
 		log.Warn().Err(err)
