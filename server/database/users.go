@@ -13,15 +13,15 @@ func InsertUser(db *sql.DB, username string, password string) error {
 
 func GetUserPassword(db *sql.DB, username string) (int64, string, error) {
 	var password sql.NullString
-	var player int64
-	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&player, &password)
+	var userId int64
+	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&userId, &password)
 	if err != nil {
-		return player, "", err
+		return userId, "", err
 	}
 	if !password.Valid {
-		return player, "", errors.New("user password is NULL")
+		return userId, "", errors.New("user password is NULL")
 	}
-	return player, password.String, nil
+	return userId, password.String, nil
 }
 
 func GetPLayerIdForUser(db *sql.DB, userId int64, player string) (int64, error) {
