@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"fmt"
 )
 
 func InsertUser(db *sql.DB, username string, password string) error {
@@ -11,10 +11,10 @@ func InsertUser(db *sql.DB, username string, password string) error {
 	return err
 }
 
-func GetUserPassword(db *sql.DB, username string) (stycoon.PlayerId, string, error) {
+func GetUserPassword(db *sql.DB, username string) (int64, string, error) {
 	var password sql.NullString
-	var player stycoon.PlayerId
-	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&player.Id, &password)
+	var player int64
+	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&player, &password)
 	if err != nil {
 		return player, "", err
 	}
@@ -22,4 +22,16 @@ func GetUserPassword(db *sql.DB, username string) (stycoon.PlayerId, string, err
 		return player, "", errors.New("user password is NULL")
 	}
 	return player, password.String, nil
+}
+
+func GetPLayerIdForUser(db *sql.DB, userId int64, player string) (int64, error) {
+	var id int64
+	err := db.QueryRow("select `id` from t_player where user = ? and name = ?", userId, player).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return id, fmt.Errorf("player %s is unknown for %d", player, userId)
+		}
+		return id, fmt.Errorf("query failed %v", err)
+	}
+	return id, nil
 }

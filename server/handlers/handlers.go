@@ -59,13 +59,13 @@ func InternalPage(sessionManager sessions.Store, w http.ResponseWriter, req *htt
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
 		return
 	}
-	user, err := stycoon.LoggedUser(req, sessionManager)
+	user, err := stycoon.LoggedUserFromSession(req, sessionManager)
 	if err != nil {
 		log.Warn().Err(err).Msg("User is not logged in")
 		http.Error(w, "only for logged users", http.StatusForbidden)
 		return
 	}
-	_, err = w.Write([]byte(fmt.Sprintf("Hello %s", user.Name)))
+	_, err = w.Write([]byte(fmt.Sprintf("Hello %s", user.Username)))
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)

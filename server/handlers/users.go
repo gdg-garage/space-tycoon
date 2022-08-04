@@ -31,7 +31,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	err = database.InsertUser(db, createUser.Name, passwordHash)
+	err = database.InsertUser(db, createUser.Username, passwordHash)
 	if err != nil {
 		log.Warn().Err(err).Msg("Insert user into DB failed")
 		http.Error(w, "", http.StatusInternalServerError)
@@ -72,22 +72,27 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	player, hash, err := database.GetUserPassword(db, userCredentials.Name)
+	userId, hash, err := database.GetUserPassword(db, userCredentials.Username)
 	if err != nil {
-		log.Warn().Err(err).Str("username", userCredentials.Name).Msg("user search failed")
+		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("user search failed")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	err = stycoon.IsPasswordValid(hash, userCredentials.Password)
 	if err != nil {
-		log.Warn().Err(err).Str("username", userCredentials.Name).Msg("invalid password")
+		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("invalid password")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
 	session, _ := sessionManager.Get(req, stycoon.SessionKey)
-	session.Values["username"] = userCredentials.Name
-	// TODO check if player is connected to the user.
-	session.Values["player"] = userCredentials.Player
+	session.Values[stycoon.UsernameField] = userCredentials.Username
+	playerId, err := database.GetPLayerIdForUser(db, userId, userCredentials.Player)
+	if err != nil {
+		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Player).Msg("Players fetch failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	session.Values[stycoon.PlayerIdField] = playerId
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
@@ -95,7 +100,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		return
 	}
 	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
-	r, err := json.Marshal(player)
+	r, err := json.Marshal(stycoon.PlayerId{Id: playerId})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)

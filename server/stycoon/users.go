@@ -3,12 +3,18 @@ package stycoon
 import (
 	"errors"
 	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
 const SessionKey = "SESSION_ID"
+const UsernameField = "username"
+const PlayerIdField = "playerId"
+
+type LoggedUser struct {
+	Username string
+	PlayerId int64
+}
 
 func HashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -19,31 +25,29 @@ func IsPasswordValid(hash string, pass string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(pass))
 }
 
-func LoggedUser(req *http.Request, sessionManager sessions.Store) (Credentials, error) {
+func LoggedUserFromSession(req *http.Request, sessionManager sessions.Store) (LoggedUser, error) {
 	session, err := sessionManager.Get(req, SessionKey)
+	user := LoggedUser{}
 	if err != nil {
-		return Credentials{}, errors.New("session is missing = user is not logged")
+		return user, errors.New("session is missing = user is not logged")
 	}
-	user := Credentials{}
-	if username, ok := session.Values["username"]; ok {
-		if username, ok = username.(string); ok {
-			user.Name = username.(string)
+	if maybeUsername, ok := session.Values[UsernameField]; ok {
+		if username, ok := maybeUsername.(string); ok {
+			user.Username = username
 		} else {
-			return Credentials{}, errors.New("username is corrupted = user is not logged")
+			return user, errors.New("username is corrupted = user is not logged")
 		}
 	} else {
-		return Credentials{}, errors.New("username is missing = user is not logged")
+		return user, errors.New("username is missing = user is not logged")
 	}
-	if player, ok := session.Values["player"]; ok {
-		if player, ok = player.(string); ok {
-			user.Player = player.(string)
+	if maybePlayer, ok := session.Values[PlayerIdField]; ok {
+		if player, ok := maybePlayer.(int64); ok {
+			user.PlayerId = player
 		} else {
-			// TODO - how to handle
-			log.Warn().Msg("Player is corrupted")
+			return user, errors.New("player is corrupted")
 		}
 	} else {
-		// TODO - how to handle
-		log.Warn().Msg("Player is not set")
+		return user, errors.New("player is not set")
 	}
 	return user, nil
 }
