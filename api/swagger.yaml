@@ -289,12 +289,12 @@ components:
         $ref: '#/components/schemas/Command'
     Credentials:
       required:
-      - name
+      - username
       - password
       - player
       type: object
       properties:
-        name:
+        username:
           type: string
         password:
           type: string
