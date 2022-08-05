@@ -1,35 +1,31 @@
-var SpaceTycoonClient = require('space_tycoon_client')
+var STC = require('space_tycoon_client')
 
 // for development
-SpaceTycoonClient.ApiClient.instance.basePath = "http://localhost"
-console.log(SpaceTycoonClient)
+STC.ApiClient.instance.basePath = "http://localhost"
+console.log(STC)
 
-// example current tick api call
-var api = new SpaceTycoonClient.CurrentTickApi()
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error)
-  } else {
-    console.log('API called successfully.')
-    console.log(data)
-    console.log(response)
-  }
+var currentTick = -1
+
+function redraw() {
+	console.log(currentTick)
+	d3.select("#tickInfo").text("tick: " + currentTick)
 }
-api.currentTickGet(callback)
 
-// example commands api call
-/*
-var api = new SpaceTycoonClient.CommandsApi()
-var requestBody = {key: new SpaceTycoonClient.Command()}
-var callback = function(error, data, response) {
-  if (error) {
-    console.error(error)
-  } else {
-    console.log('API called successfully.')
-    console.log(data)
-    console.log(response)
-  }
+function timerLoop() {
+	(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
+		if (error) {
+			console.error(error)
+		} else {
+			console.log(data)
+			console.log(response)
+			setTimeout(timerLoop, data["time-left-ms"] || 300)
+			let tick = data.tick
+			if (tick != currentTick) {
+				currentTick = tick
+				redraw()
+			}
+		}
+	})
 }
-api.commandsPost(requestBody, callback)
-*/
 
+setTimeout(timerLoop, 10)
