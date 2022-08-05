@@ -43,28 +43,45 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
+func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Origin"); origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, User-Agent")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		fn(w, r)
+	}
+}
+
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
 	game := stycoon.NewGame(db)
 
-	http.HandleFunc("/", handlers.Root)
+	http.HandleFunc("/", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Root(w, r)
+	}))
 	// TODO: disable based on config
-	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateUser(db, w, r)
-	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(db, w, r)
-	})
-	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/player-scores", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.PlayerScores(game, w, r)
-	})
-	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/current-tick", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
-	})
-	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/end-turn", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
-	})
+	}))
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
