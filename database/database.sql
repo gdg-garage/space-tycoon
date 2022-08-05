@@ -2818,9 +2818,6 @@ CALL p_process_recipes;
 CALL p_generate_prices;
 CALL p_update_prices;
 
-# debug only
-CALL p_generate_random_players;
-
 COMMIT;
 
 END//
