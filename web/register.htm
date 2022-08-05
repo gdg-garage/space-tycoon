@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Space Tycoon</title>
+<link rel="stylesheet" href="style.css">
 <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
@@ -76,7 +77,7 @@ function registrationSumbit() {
 		}
 	})
 	.then(json => {
-		d3.select("#response").text(json.status)
+		d3.select("#response").text(JSON.stringify(json))
 	})
 }
 </script>
