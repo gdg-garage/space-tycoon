@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (game *Game) getGameTick() {
+func (game *Game) setGameTick() {
 	err := game.db.QueryRow("select * from t_game").Scan(&game.Tick.Season, &game.Tick.Tick)
 	if err != nil {
 		if err == sql.ErrNoRows {
