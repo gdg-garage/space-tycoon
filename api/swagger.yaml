@@ -23,7 +23,7 @@ tags:
 - name: commands
   description: Specify commands for your ships
 - name: current-tick
-  description: Returns the current tick and the approximate time until the next tick.
+  description: Returns the current tick, season and the approximate time until the next tick.
 - name: end-turn
   description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
 - name: reports

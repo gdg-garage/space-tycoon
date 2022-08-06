@@ -37,15 +37,22 @@ def static_data(api_client):
 def game_loop(api_client, game_static_data):
     tick = -1
     while True:
-        print(f"tick {tick}")
-        current_tick: CurrentTick = end_turn_api.EndTurnApi(api_client).end_turn_post(EndTurn(
-            tick=tick,
-        ))
-        tick = current_tick.tick
+        try:
+            print(f"tick {tick}")
+            current_tick: CurrentTick = end_turn_api.EndTurnApi(api_client).end_turn_post(EndTurn(
+                tick=tick,
+            ))
+            tick = current_tick.tick
+        except space_tycoon_client.ForbiddenException as e:
+            print(f"New season started or login expired: {e}")
+            break
+        except space_tycoon_client.ApiException as e:
+            print("Exception when calling StaticDataApi->static_data_get: %s\n" % e)
 
 
 def main_loop(api_client):
     while True:
+        print("new season started")
         login(api_client)
         static_game_data = static_data(api_client)
         pprint(static_game_data)
