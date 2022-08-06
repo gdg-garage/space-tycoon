@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 func InsertUser(db *sql.DB, username string, password string) error {
@@ -10,14 +11,27 @@ func InsertUser(db *sql.DB, username string, password string) error {
 	return err
 }
 
-func GetUserPassword(db *sql.DB, username string) (string, error) {
+func GetUserPassword(db *sql.DB, username string) (int64, string, error) {
 	var password sql.NullString
-	err := db.QueryRow("select password from d_user where name = ? limit 1", username).Scan(&password)
+	var userId int64
+	err := db.QueryRow("select id, password from d_user where name = ? limit 1", username).Scan(&userId, &password)
 	if err != nil {
-		return "", err
+		return userId, "", err
 	}
 	if !password.Valid {
-		return "", errors.New("user password is NULL")
+		return userId, "", errors.New("user password is NULL")
 	}
-	return password.String, nil
+	return userId, password.String, nil
+}
+
+func GetPLayerIdForUser(db *sql.DB, userId int64, player string) (int64, error) {
+	var id int64
+	err := db.QueryRow("select `id` from t_player where user = ? and name = ?", userId, player).Scan(&id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return id, fmt.Errorf("player %s is unknown for %d", player, userId)
+		}
+		return id, fmt.Errorf("query failed %v", err)
+	}
+	return id, nil
 }

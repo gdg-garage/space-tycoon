@@ -44,16 +44,16 @@ func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	var userTick stycoon.EndTurn
-	err = stycoon.AssertEndTurnRequired(userTick)
-	if err != nil {
-		log.Warn().Err(err).Msg("end turn object is invalid")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 	err = json.Unmarshal(body, &userTick)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
 		http.Error(w, "can't parse json", http.StatusBadRequest)
+		return
+	}
+	err = stycoon.AssertEndTurnRequired(userTick)
+	if err != nil {
+		log.Warn().Err(err).Msg("end turn object is invalid")
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	tickData := game.EndTurn(userTick.Tick)

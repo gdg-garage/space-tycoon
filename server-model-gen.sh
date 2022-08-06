@@ -13,3 +13,5 @@ mv server/gen/go/impl.go server/stycoon/
 mv server/gen/go/model_*.go server/stycoon/
 
 rm -rf server/gen
+
+chmod -R a+rw server

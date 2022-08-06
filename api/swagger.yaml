@@ -23,7 +23,7 @@ tags:
 - name: commands
   description: Specify commands for your ships
 - name: current-tick
-  description: Returns the current tick and the approximate time until the next tick.
+  description: Returns the current tick, season and the approximate time until the next tick.
 - name: end-turn
   description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
 - name: reports
@@ -63,7 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /static-data:
-    post:
+    get:
       tags:
       - static-data
       responses:
@@ -74,13 +74,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/StaticData'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /data:
-    post:
+    get:
       tags:
       - data
       responses:
@@ -91,7 +91,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Data'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -111,7 +111,7 @@ paths:
           description: OK
           content: {}
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -140,7 +140,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -148,9 +148,8 @@ paths:
         "405":
           description: Invalid input
           content: {}
-
   /current-tick:
-    post:
+    get:
       tags:
       - current-tick
       responses:
@@ -161,16 +160,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "405":
-          description: Invalid input
-          content: {}
   /reports:
-    post:
+    get:
       tags:
       - reports
       responses:
@@ -181,39 +177,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/Reports"
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Command:
       required:
       - type
-      type: object
       properties:
         type:
           type: string
-      discriminator:
-        propertyName: Type_
-      oneOf:
-      - $ref: '#/components/schemas/MoveCommand'
-      - $ref: '#/components/schemas/StopCommand'
-      - $ref: '#/components/schemas/ConstructCommand'
-      - $ref: '#/components/schemas/DecommissionCommand'
-      - $ref: '#/components/schemas/AttackCommand'
-      - $ref: '#/components/schemas/TradeCommand'
-      - $ref: '#/components/schemas/RenameCommand'
+        target:
+          type: integer
+          format: int64
+        resource:
+          type: integer
+          format: int64
+        amount:
+          type: integer
+          format: int64
+        ship-class:
+          type: integer
+          format: int64
+        name:
+            type: string
+
     MoveCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - where
+        - destination
         type: object
         properties:
           destination:
             $ref: "#/components/schemas/Destination"
+
     StopCommand:
       $ref: '#/components/schemas/Command'
 
@@ -221,13 +223,12 @@ components:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - class
+        - ship-class
         type: object
         properties:
-          class:
-            type: string
-          name:
-            type: string
+          ship-class:
+            type: integer
+            format: int64
 
     DecommissionCommand:
       $ref: '#/components/schemas/Command'
@@ -241,6 +242,7 @@ components:
         properties:
           name:
             type: string
+
     AttackCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
@@ -251,22 +253,23 @@ components:
           target:
             type: integer
             format: int64
+
     TradeCommand:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
         - amount
         - resource
-        - where
+        - target
         type: object
         properties:
-          resource:
-            type: integer
-            format: int64
           amount:
             type: integer
             format: int64
-          where:
+          resource:
+            type: integer
+            format: int64
+          target:
             type: integer
             format: int64
 
@@ -286,12 +289,12 @@ components:
         $ref: '#/components/schemas/Command'
     Credentials:
       required:
-      - name
+      - username
       - password
       - player
       type: object
       properties:
-        name:
+        username:
           type: string
         password:
           type: string

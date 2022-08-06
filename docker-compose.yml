@@ -7,6 +7,10 @@ services:
       - "80:80"
     depends_on:
       - db
+    environment:
+      - SESSION_KEY=thisisverysecret
+    volumes:
+      - ./sessions:/app/sessions
 
   server-tidy:
     image: golang:1.18-alpine
@@ -56,3 +60,16 @@ services:
     volumes:
       - "./api:/api"
       - "./web/js/client:/web/js/client"
+
+  client-gen:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /api/swagger.yaml
+      -g python
+      -o /example-bot
+      --additional-properties=packageName=space_tycoon_client
+    volumes:
+      - "./api:/api"
+      - "./example-bot:/example-bot"
+

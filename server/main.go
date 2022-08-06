@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -62,6 +62,7 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
+	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 	game := stycoon.NewGame(db)
 
 	http.HandleFunc("/", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +73,7 @@ func main() {
 		handlers.CreateUser(db, w, r)
 	}))
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, w, r)
+		handlers.Login(db, sessionManager, w, r)
 	}))
 	http.HandleFunc("/player-scores", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.PlayerScores(game, w, r)
@@ -82,6 +83,9 @@ func main() {
 	}))
 	http.HandleFunc("/end-turn", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
+	}))
+	http.HandleFunc("/internal", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.InternalPage(sessionManager, w, r)
 	}))
 
 	wg := &sync.WaitGroup{}
