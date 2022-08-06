@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -46,6 +46,7 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
+	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 	game := stycoon.NewGame(db)
 
 	http.HandleFunc("/", handlers.Root)
@@ -54,7 +55,7 @@ func main() {
 		handlers.CreateUser(db, w, r)
 	})
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, w, r)
+		handlers.Login(db, sessionManager, w, r)
 	})
 	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
 		handlers.PlayerScores(game, w, r)
@@ -64,6 +65,9 @@ func main() {
 	})
 	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
+	})
+	http.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
+		handlers.InternalPage(sessionManager, w, r)
 	})
 
 	wg := &sync.WaitGroup{}

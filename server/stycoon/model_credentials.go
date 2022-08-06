@@ -11,7 +11,7 @@ package stycoon
 
 type Credentials struct {
 
-	Name string `json:"name"`
+	Username string `json:"username"`
 
 	Password string `json:"password"`
 
@@ -21,7 +21,7 @@ type Credentials struct {
 // AssertCredentialsRequired checks if the required fields are not zero-ed
 func AssertCredentialsRequired(obj Credentials) error {
 	elements := map[string]interface{}{
-		"name": obj.Name,
+		"username": obj.Username,
 		"password": obj.Password,
 		"player": obj.Player,
 	}

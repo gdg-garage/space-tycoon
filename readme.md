@@ -9,7 +9,7 @@
 ## Dev
 
 ```shell
-docker-compose up sever adminer
+docker-compose up server adminer
 ```
 This will also run container `db`.
 
