@@ -22,7 +22,6 @@ func (game *Game) CreateWaypointFromCoordinates(c []int64) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	database.InsertWaypoint(game.db, waypointId)
 	return waypointId, nil
 }
 
