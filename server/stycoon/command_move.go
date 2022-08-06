@@ -8,7 +8,6 @@ import (
 
 func NewMoveCommand(command Command) *MoveCommand {
 	return &MoveCommand{
-		Type:        command.Type,
 		Destination: command.Destination,
 	}
 }
@@ -48,5 +47,5 @@ func (game *Game) processMove(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.InsertMoveCommand(game.db, id, c.Type, target)
+	return database.InsertMoveCommand(game.db, id, command.Type, target)
 }

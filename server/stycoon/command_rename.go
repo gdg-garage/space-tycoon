@@ -6,7 +6,6 @@ import (
 
 func NewRenameCommand(command Command) *RenameCommand {
 	return &RenameCommand{
-		Type: command.Type,
 		Name: command.Name,
 	}
 }

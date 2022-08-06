@@ -216,12 +216,9 @@ components:
     MoveCommand:
       type: object
       properties:
-        type:
-          type: string
         destination:
           $ref: "#/components/schemas/Destination"
       required:
-        - type
         - destination
 
     StopCommand:
@@ -234,50 +231,34 @@ components:
           type: integer
           format: int64
           nullable: true
-        type:
-          type: string
       required:
-        - type
         - ship-class
 
     DecommissionCommand:
       type: object
-      properties: 
-        type:
-          type: string
-      required:
-        - type
 
     RenameCommand:
       type: object
       properties:
-        type:
-          type: string
         name:
           type: string
           nullable: true
       required:
         - name
-        - type
 
     AttackCommand:
       type: object
       properties:
-        type:
-          type: string
         target:
           type: integer
           format: int64
           nullable: true
       required:
         - target
-        - type
 
     TradeCommand:
       type: object
       properties:
-        type:
-          type: string
         amount:
           type: integer
           format: int64
@@ -294,7 +275,6 @@ components:
       - amount
       - resource
       - target
-      - type
 
     Destination:
       type: object
