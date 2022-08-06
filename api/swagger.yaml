@@ -166,9 +166,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "405":
-          description: Invalid input
-          content: {}
   /reports:
     post:
       tags:
