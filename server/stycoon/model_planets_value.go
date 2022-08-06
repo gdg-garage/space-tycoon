@@ -10,18 +10,29 @@
 package stycoon
 
 type PlanetsValue struct {
+	Name string `json:"name"`
 
-	Name string `json:"name,omitempty"`
+	Resources map[string]PlanetResource `json:"resources"`
 
-	Resources map[string]TradingResource `json:"resources,omitempty"`
+	Position []int64 `json:"position"`
 
-	Position *[]int64 `json:"position,omitempty"`
-
-	PrevPosition *[]int64 `json:"prev-position,omitempty"`
+	PrevPosition []int64 `json:"prev-position"`
 }
 
 // AssertPlanetsValueRequired checks if the required fields are not zero-ed
 func AssertPlanetsValueRequired(obj PlanetsValue) error {
+	elements := map[string]interface{}{
+		"name":          obj.Name,
+		"resources":     obj.Resources,
+		"position":      obj.Position,
+		"prev-position": obj.PrevPosition,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	return nil
 }
 

@@ -31,10 +31,71 @@ func (game *Game) GetData(playerId *int64) (Data, error) {
 		Players:     game.players,
 	}
 
+	planets, err := game.GetPlanets()
+	if err != nil {
+		return data, err
+	}
+	data.Planets = planets
+
 	return data, nil
 }
 
-func (game *Game) SetPlayers() error {
+func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
+	var planets = make(map[string]PlanetsValue)
+	rows, err := game.db.Query("select t_object.`id`, `name`, `pos_x`, `pos_y`, `pos_x_prev`, `pos_y_prev` from t_object join t_planet tp on t_object.id = tp.id")
+	if err != nil {
+		return planets, fmt.Errorf("query failed %v", err)
+	}
+	var id int
+	var planet PlanetsValue
+	var pos = make([]int64, 2)
+	var posPrev = make([]int64, 2)
+	for rows.Next() {
+		err = rows.Scan(&id, &planet.Name, &pos[0], &pos[1], &posPrev[0], &posPrev[1])
+		if err != nil {
+			return planets, fmt.Errorf("row read failed %v", err)
+		}
+		planet.Position = pos
+		planet.PrevPosition = posPrev
+		planet.Resources = map[string]PlanetResource{}
+		err = game.getPlanetResources(id, &planet.Resources)
+		if err != nil {
+			return planets, err
+		}
+
+		planets[strconv.Itoa(id)] = planet
+	}
+	if err = rows.Err(); err != nil {
+		return planets, fmt.Errorf("rows read failed: %v", err)
+	}
+	return planets, nil
+}
+
+func (game *Game) getPlanetResources(planetId int, planetResources *map[string]PlanetResource) error {
+	rows, err := game.db.Query("select `resource`, `buy`, `sell`  from t_price where planet = ?", planetId)
+	if err != nil {
+		return fmt.Errorf("query failed %v", err)
+	}
+	var resource int
+	var buy, sell sql.NullFloat64
+	for rows.Next() {
+		err = rows.Scan(&resource, &buy, &sell)
+		if err != nil {
+			return fmt.Errorf("row read failed %v", err)
+		}
+		if buy.Valid {
+			(*planetResources)[strconv.Itoa(resource)] = PlanetResource{BuyPrice: buy.Float64}
+		} else {
+			(*planetResources)[strconv.Itoa(resource)] = PlanetResource{SellPrice: sell.Float64}
+		}
+	}
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows read failed: %v", err)
+	}
+	return nil
+}
+
+func (game *Game) setPlayers() error {
 	var players = make(map[string]PlayersValue)
 	rows, err := game.db.Query("select `id`, `name`, `color`, `money` from t_player")
 	if err != nil {
@@ -52,7 +113,7 @@ func (game *Game) SetPlayers() error {
 		if err != nil {
 			return err
 		}
-		err = game.SetPlayerNetWorth(id, &player.NetWorth)
+		err = game.setPlayerNetWorth(id, &player.NetWorth)
 		if err != nil {
 			return err
 		}
@@ -65,7 +126,7 @@ func (game *Game) SetPlayers() error {
 	return nil
 }
 
-func (game *Game) SetPlayerNetWorth(playerId int, playerNetWorth *NetWorth) error {
+func (game *Game) setPlayerNetWorth(playerId int, playerNetWorth *NetWorth) error {
 	err := game.db.QueryRow("select `price` from v_player_ships_worth where player = ?", playerId).Scan(&playerNetWorth.Ships)
 	if err != nil {
 		return err
