@@ -54,6 +54,7 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 		if r.Method == "OPTIONS" {
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		fn(w, r)
 	}
 }
