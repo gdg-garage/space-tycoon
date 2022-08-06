@@ -25,7 +25,7 @@ jobs:
 
     - name: Generate models
       working-directory: .
-      run: ./server-model-gen.sh
+      run: sudo ./server-model-gen.sh
 
     - name: Build
       run: go build -v ./...
