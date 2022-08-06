@@ -5,15 +5,11 @@ import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
-
-type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
 
 func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
@@ -27,7 +23,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var createUser User
+	var createUser stycoon.Credentials
 	err = json.Unmarshal(body, &createUser)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
@@ -61,7 +57,7 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only POST method is supported", http.StatusBadRequest)
@@ -73,27 +69,48 @@ func Login(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "can't read request body", http.StatusBadRequest)
 		return
 	}
-	var loginUser User
-	err = json.Unmarshal(body, &loginUser)
+	var userCredentials stycoon.Credentials
+	err = json.Unmarshal(body, &userCredentials)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
 		http.Error(w, "can't parse json", http.StatusBadRequest)
 		return
 	}
-	hash, err := database.GetUserPassword(db, loginUser.Username)
+	err = stycoon.AssertCredentialsRequired(userCredentials)
 	if err != nil {
-		log.Warn().Err(err).Str("username", loginUser.Username).Msg("user search failed")
+		log.Warn().Err(err).Msg("credentials object is invalid")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	userId, hash, err := database.GetUserPassword(db, userCredentials.Username)
+	if err != nil {
+		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("user search failed")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	err = stycoon.IsPasswordValid(hash, loginUser.Password)
+	err = stycoon.IsPasswordValid(hash, userCredentials.Password)
 	if err != nil {
-		log.Warn().Err(err).Str("username", loginUser.Username).Msg("invalid password")
+		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("invalid password")
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	// TODO create session
-	r, err := json.Marshal(map[string]string{"loggedUser": loginUser.Username})
+	session, _ := sessionManager.Get(req, stycoon.SessionKey)
+	session.Values[stycoon.UsernameField] = userCredentials.Username
+	playerId, err := database.GetPLayerIdForUser(db, userId, userCredentials.Player)
+	if err != nil {
+		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Player).Msg("Players fetch failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	session.Values[stycoon.PlayerIdField] = playerId
+	err = session.Save(req, w)
+	if err != nil {
+		log.Warn().Err(err).Msg("Session store failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
+	r, err := json.Marshal(stycoon.PlayerId{Id: playerId})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
