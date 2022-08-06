@@ -1,4 +1,4 @@
-var STC = require('space_tycoon_client')
+var STC = require("space_tycoon_client")
 
 // for development
 STC.ApiClient.instance.basePath = "http://localhost"

@@ -34,7 +34,7 @@
 				<tr>
 					<td>
 					<td>
-						<input type="button" value="Register" onclick="registrationSumbit()">
+						<input type="button" value="Register" onclick="registrationSubmit()">
 				</tr>
 				<tr>
 					<td>
@@ -52,7 +52,7 @@
 					d3.select("#response").text("invalid user name")
 					return false
 				}
-				if (p1.length <= 8 || p1.length >= 100) {
+				if (p1.length <= 4 || p1.length >= 100) {
 					d3.select("#response").text("invalid password")
 					return false
 				}
@@ -63,10 +63,10 @@
 				d3.select("#response").text("")
 				return true
 			}
-			function registrationSumbit() {
+			function registrationSubmit() {
 				if (!registrationValidate(-1))
 					return
-				d3.json('http://localhost/create-user', {
+				d3.json("http://localhost/create-user", {
 					method: "POST",
 					body: JSON.stringify({
 						username: d3.select("#username").node().value,
@@ -78,6 +78,9 @@
 				})
 				.then(json => {
 					d3.select("#response").text(JSON.stringify(json))
+				})
+				.catch(err => {
+					d3.select("#response").text(err)
 				})
 			}
 		</script>
