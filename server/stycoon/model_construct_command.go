@@ -10,31 +10,22 @@
 package stycoon
 
 type ConstructCommand struct {
-	Command
 
-	Class string `json:"class"`
+	ShipClass *int64 `json:"ship-class"`
 
-	Name string `json:"name,omitempty"`
+	Type string `json:"type"`
 }
 
 // AssertConstructCommandRequired checks if the required fields are not zero-ed
 func AssertConstructCommandRequired(obj ConstructCommand) error {
 	elements := map[string]interface{}{
-		"class": obj.Class,
-		"name": obj.Name,
-		"target": obj.Target,
-		"resource": obj.Resource,
-		"amount": obj.Amount,
-		"where": obj.Where,
+		"ship-class": obj.ShipClass,
+		"type": obj.Type,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
 			return &RequiredError{Field: name}
 		}
-	}
-
-	if err := AssertCommandRequired(obj.Command); err != nil {
-		return err
 	}
 
 	return nil

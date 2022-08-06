@@ -13,31 +13,23 @@ type Command struct {
 
 	Type string `json:"type"`
 
-	Destination Destination `json:"destination,omitempty"`
+	Target *int64 `json:"target,omitempty"`
 
-	Class string `json:"class"`
+	Destination *Destination `json:"destination,omitempty"`
 
-	Name string `json:"name"`
+	Resource *int64 `json:"resource,omitempty"`
 
-	Target int64 `json:"target"`
+	Amount *int64 `json:"amount,omitempty"`
 
-	Resource int64 `json:"resource"`
+	ShipClass *int64 `json:"ship-class,omitempty"`
 
-	Amount int64 `json:"amount"`
-
-	Where int64 `json:"where"`
+	Name *string `json:"name,omitempty"`
 }
 
 // AssertCommandRequired checks if the required fields are not zero-ed
 func AssertCommandRequired(obj Command) error {
 	elements := map[string]interface{}{
 		"type": obj.Type,
-		"class": obj.Class,
-		"name": obj.Name,
-		"target": obj.Target,
-		"resource": obj.Resource,
-		"amount": obj.Amount,
-		"where": obj.Where,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
@@ -45,8 +37,10 @@ func AssertCommandRequired(obj Command) error {
 		}
 	}
 
-	if err := AssertDestinationRequired(obj.Destination); err != nil {
-		return err
+	if obj.Destination != nil {
+		if err := AssertDestinationRequired(*obj.Destination); err != nil {
+			return err
+		}
 	}
 	return nil
 }

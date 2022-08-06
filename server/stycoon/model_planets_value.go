@@ -15,9 +15,9 @@ type PlanetsValue struct {
 
 	Resources map[string]TradingResource `json:"resources,omitempty"`
 
-	Position []int64 `json:"position,omitempty"`
+	Position *[]int64 `json:"position,omitempty"`
 
-	PrevPosition []int64 `json:"prev-position,omitempty"`
+	PrevPosition *[]int64 `json:"prev-position,omitempty"`
 }
 
 // AssertPlanetsValueRequired checks if the required fields are not zero-ed
