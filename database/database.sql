@@ -3169,7 +3169,7 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_commodities_worth` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(51,0) NULL
+	`price` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_score
@@ -3177,7 +3177,7 @@ DROP VIEW IF EXISTS `v_player_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_score` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(53,0) NULL,
+	`price` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3186,7 +3186,7 @@ DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_ships_worth` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(32,0) NULL
+	`price` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_total_worth
@@ -3194,7 +3194,7 @@ DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_total_worth` (
 	`player` INT(11) NOT NULL,
-	`price` DECIMAL(53,0) NULL
+	`price` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_resource_price
@@ -3212,7 +3212,7 @@ DROP VIEW IF EXISTS `v_ship_cargo`;
 CREATE TABLE `v_ship_cargo` (
 	`id` INT(11) NOT NULL,
 	`capacity` INT(11) NOT NULL COMMENT 'maximum allowed amount of resources loaded on the ship',
-	`used` DECIMAL(32,0) NOT NULL
+	`used` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_user_best_worth
@@ -3220,7 +3220,7 @@ DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_best_worth` (
 	`user` INT(11) NOT NULL,
-	`price` DECIMAL(53,0) NULL
+	`price` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_user_score
@@ -3228,7 +3228,7 @@ DROP VIEW IF EXISTS `v_user_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_score` (
 	`user` INT(11) NOT NULL,
-	`price` DECIMAL(53,0) NULL,
+	`price` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3236,7 +3236,7 @@ CREATE TABLE `v_user_score` (
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, CAST(SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS INTEGER) AS price
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_commodity ON t_commodity.object = t_object.id
@@ -3257,7 +3257,7 @@ ORDER BY a.price desc ;
 DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_ships_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, SUM(ifnull(d_class.price, 0)) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, CAST(SUM(ifnull(d_class.price, 0)) AS INTEGER) AS price
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_ship ON t_ship.id = t_object.id
@@ -3286,7 +3286,7 @@ GROUP BY d_resource.id ;
 DROP VIEW IF EXISTS `v_ship_cargo`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_ship_cargo`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_ship_cargo` AS SELECT t_ship.id, d_class.cargo AS capacity, IFNULL(SUM(t_commodity.amount), 0) AS used
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_ship_cargo` AS SELECT t_ship.id, d_class.cargo AS capacity, CAST(IFNULL(SUM(t_commodity.amount), 0) AS INTEGER) AS used
 FROM t_ship
 JOIN d_class ON d_class.id = t_ship.class
 LEFT JOIN t_commodity ON t_commodity.object = t_ship.id
