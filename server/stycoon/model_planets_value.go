@@ -13,7 +13,7 @@ type PlanetsValue struct {
 
 	Name string `json:"name"`
 
-	Resources map[string]PlanetResource `json:"resources"`
+	Resources map[string]TradingResource `json:"resources"`
 
 	Position []int64 `json:"position"`
 

@@ -641,16 +641,6 @@ components:
               type: number
               format: double
 
-    PlanetResource:
-      allOf:
-        - properties:
-            buy-price:
-              type: number
-              format: double
-            sell-price:
-              type: number
-              format: double
-
     Resources:
       type: object
       additionalProperties:
@@ -659,7 +649,7 @@ components:
     TradingResources:
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/PlanetResource'
+        $ref: '#/components/schemas/TradingResource'
 
     Players:
       type: object
