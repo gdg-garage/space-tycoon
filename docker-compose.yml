@@ -48,3 +48,15 @@ services:
     volumes:
       - "./api:/api"
       - "./server:/server"
+
+  client-gen:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /api/swagger.yaml
+      -g python
+      -o /example-bot
+      --additional-properties=packageName=space_tycoon_client
+    volumes:
+      - "./api:/api"
+      - "./example-bot:/example-bot"
