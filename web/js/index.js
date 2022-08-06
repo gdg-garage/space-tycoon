@@ -4,11 +4,10 @@ var STC = require('space_tycoon_client')
 STC.ApiClient.instance.basePath = "http://localhost"
 console.log(STC)
 
-var currentTick = -1
+var currentTick = new STC.CurrentTick()
 
 function redraw() {
-	console.log(currentTick)
-	d3.select("#tickInfo").text("tick: " + currentTick)
+	d3.select("#tickInfo").text("season: " + currentTick.season + ", tick: " + currentTick.tick)
 }
 
 function timerLoop() {
@@ -16,12 +15,9 @@ function timerLoop() {
 		if (error) {
 			console.error(error)
 		} else {
-			console.log(data)
-			console.log(response)
 			setTimeout(timerLoop, data["time-left-ms"] || 300)
-			let tick = data.tick
-			if (tick != currentTick) {
-				currentTick = tick
+			if (currentTick.tick != data.tick) {
+				currentTick = data
 				redraw()
 			}
 		}
