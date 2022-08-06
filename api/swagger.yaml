@@ -258,9 +258,9 @@ components:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - amount
         - resource
         - target
+        - amount
         type: object
         properties:
           amount:
@@ -380,6 +380,11 @@ components:
       type: object
       additionalProperties:
         type: object
+        required:
+          - name
+          - resources
+          - position
+          - prev-position
         properties:
           name:
             type: string
@@ -627,12 +632,22 @@ components:
 
     TradingResource:
       allOf:
-      - $ref: '#/components/schemas/Resource'
-      - properties:
-          buy-price:
-            type: number
-            format: double
-          sell-price:
+        - $ref: '#/components/schemas/Resource'
+        - properties:
+            buy-price:
+              type: number
+              format: double
+            sell-price:
+              type: number
+              format: double
+
+    PlanetResource:
+      allOf:
+        - properties:
+            buy-price:
+              type: number
+              format: double
+            sell-price:
               type: number
               format: double
 
@@ -644,7 +659,7 @@ components:
     TradingResources:
       type: object
       additionalProperties:
-        $ref: '#/components/schemas/TradingResource'
+        $ref: '#/components/schemas/PlanetResource'
 
     Players:
       type: object
