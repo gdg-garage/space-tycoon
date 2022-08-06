@@ -63,7 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   /static-data:
-    post:
+    get:
       tags:
       - static-data
       responses:
@@ -74,13 +74,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/StaticData'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /data:
-    post:
+    get:
       tags:
       - data
       responses:
@@ -91,7 +91,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Data'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -111,7 +111,7 @@ paths:
           description: OK
           content: {}
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -121,7 +121,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CommandError'
   /end-turn:
     post:
       tags:
@@ -140,7 +140,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
@@ -148,9 +148,8 @@ paths:
         "405":
           description: Invalid input
           content: {}
-
   /current-tick:
-    post:
+    get:
       tags:
       - current-tick
       responses:
@@ -161,16 +160,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "405":
-          description: Invalid input
-          content: {}
   /reports:
-    post:
+    get:
       tags:
       - reports
       responses:
@@ -181,123 +177,140 @@ paths:
               schema:
                 $ref: "#/components/schemas/Reports"
         "403":
-          description: Not authorized
+          description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     Command:
       required:
       - type
+      properties:
+        type:
+          type: string
+        target:
+          type: integer
+          format: int64
+          nullable: true
+        destination:
+          $ref: "#/components/schemas/Destination"
+        resource:
+          type: integer
+          format: int64
+          nullable: true
+        amount:
+          type: integer
+          format: int64
+          nullable: true
+        ship-class:
+          type: integer
+          format: int64
+          nullable: true
+        name:
+          type: string
+          nullable: true
+
+    MoveCommand:
       type: object
       properties:
         type:
           type: string
-      discriminator:
-        propertyName: Type_
-      oneOf:
-      - $ref: '#/components/schemas/MoveCommand'
-      - $ref: '#/components/schemas/StopCommand'
-      - $ref: '#/components/schemas/ConstructCommand'
-      - $ref: '#/components/schemas/DecommissionCommand'
-      - $ref: '#/components/schemas/AttackCommand'
-      - $ref: '#/components/schemas/TradeCommand'
-      - $ref: '#/components/schemas/RenameCommand'
-    MoveCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
-        - where
-        type: object
-        properties:
-          destination:
-            $ref: "#/components/schemas/Destination"
+        destination:
+          $ref: "#/components/schemas/Destination"
+      required:
+        - type
+        - destination
+
     StopCommand:
-      $ref: '#/components/schemas/Command'
+      type: object
 
     ConstructCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
-        - class
-        type: object
-        properties:
-          class:
-            type: string
-          name:
-            type: string
+      type: object
+      properties:
+        ship-class:
+          type: integer
+          format: int64
+          nullable: true
+        type:
+          type: string
+      required:
+        - type
+        - ship-class
 
     DecommissionCommand:
-      $ref: '#/components/schemas/Command'
+      type: object
+      properties: 
+        type:
+          type: string
+      required:
+        - type
 
     RenameCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+          nullable: true
+      required:
         - name
-        type: object
-        properties:
-          name:
-            type: string
+        - type
+
     AttackCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        type:
+          type: string
+        target:
+          type: integer
+          format: int64
+          nullable: true
+      required:
         - target
-        type: object
-        properties:
-          target:
-            type: integer
-            format: int64
+        - type
+
     TradeCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
-        - amount
-        - resource
-        - where
-        type: object
-        properties:
-          resource:
-            type: integer
-            format: int64
-          amount:
-            type: integer
-            format: int64
-          where:
-            type: integer
-            format: int64
+      type: object
+      properties:
+        type:
+          type: string
+        amount:
+          type: integer
+          format: int64
+          nullable: true
+        resource:
+          type: integer
+          format: int64
+          nullable: true
+        target:
+          type: integer
+          format: int64
+          nullable: true
+      required:
+      - amount
+      - resource
+      - target
+      - type
 
     Destination:
-      oneOf:
-      - $ref: "#/components/schemas/Coordinates"
-      - $ref: "#/components/schemas/Waypoint"
+      type: object
+      nullable: true # workaround explained here https://github.com/OpenAPITools/openapi-generator/issues/3159#issuecomment-572108376
+      properties:
+        coordinates:
+          $ref: "#/components/schemas/Coordinates"
+        target:
+          $ref: "#/components/schemas/Waypoint"
 
     Waypoint:
       type: integer
       format: int64
+      nullable: true
       example: 234
-
-    Commands:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/Command'
-    Credentials:
-      required:
-      - name
-      - password
-      - player
-      type: object
-      properties:
-        name:
-          type: string
-        password:
-          type: string
-        player:
-          type: string
-
+      
     Coordinates:
       type: array
       items:
@@ -305,7 +318,26 @@ components:
         format: int64
       minItems: 2
       maxItems: 2
+      nullable: true
       example: [10, 20]
+
+    Commands:
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/Command'
+    Credentials:
+      required:
+      - username
+      - password
+      - player
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        player:
+          type: string
 
     StaticData:
       type: object
@@ -818,3 +850,13 @@ components:
       properties:
         message:
           type: string
+          
+    CommandError:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Map of all commands that failed to be processed"
+      example: {
+        '1': "required field 'destination' is zero value",
+        '4': "move command: forbidden to specify both coordinates and target"
+      }

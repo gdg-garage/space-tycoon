@@ -65,6 +65,9 @@ func main() {
 	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
 	})
+	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
+		handlers.Commands(game, w, r)
+	})
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
