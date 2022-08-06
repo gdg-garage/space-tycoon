@@ -78,7 +78,7 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	}
 	// process
 	errs := game.ProcessCommands(commands)
-	for _, _ = range errs {
+	if len(errs) > 0 {
 		b, err := json.Marshal(errs)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
@@ -89,8 +89,7 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 			log.Warn().Err(err).Msg("response write failed")
 			w.WriteHeader(http.StatusInternalServerError)
 		}
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }

@@ -56,7 +56,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "405":
+        "400":
           description: Invalid input
           content:
             application/json:
