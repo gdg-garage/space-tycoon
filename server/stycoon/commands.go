@@ -20,6 +20,7 @@ func (game *Game) ProcessCommands(commands map[string]Command) map[string]string
 		id, err := strconv.Atoi(strId)
 		if err != nil {
 			res[strId] = fmt.Sprintf("unable to convert id to number")
+			continue
 		}
 		log.Info().Msgf("id: %d, command_type: %s", id, command.Type)
 
@@ -39,7 +40,7 @@ func (game *Game) ProcessCommands(commands map[string]Command) map[string]string
 		case "stop":
 			err = game.processStop(int64(id))
 		default:
-			err = fmt.Errorf("unrecognized command type")
+			err = fmt.Errorf("unrecognized command type: %s", command.Type)
 		}
 		if err != nil {
 			res[strId] = err.Error()
