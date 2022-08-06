@@ -57,7 +57,7 @@ func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
 		}
 		planet.Position = pos
 		planet.PrevPosition = posPrev
-		planet.Resources = map[string]PlanetResource{}
+		planet.Resources = map[string]TradingResource{}
 		err = game.getPlanetResources(id, &planet.Resources)
 		if err != nil {
 			return planets, err
@@ -71,28 +71,43 @@ func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
 	return planets, nil
 }
 
-func (game *Game) getPlanetResources(planetId int, planetResources *map[string]PlanetResource) error {
+func (game *Game) getPlanetResources(planetId int, planetResources *map[string]TradingResource) error {
 	rows, err := game.db.Query("select `resource`, `buy`, `sell`  from t_price where planet = ?", planetId)
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var resource int
+	var resourceId int
 	var buy, sell sql.NullFloat64
 	for rows.Next() {
-		err = rows.Scan(&resource, &buy, &sell)
+		err = rows.Scan(&resourceId, &buy, &sell)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
 		}
 		if buy.Valid {
-			(*planetResources)[strconv.Itoa(resource)] = PlanetResource{BuyPrice: buy.Float64}
+			resource := TradingResource{BuyPrice: buy.Float64}
+			resource.Amount, err = game.getCommodityAmount(planetId, resourceId)
+			if err != nil {
+				return err
+			}
+			(*planetResources)[strconv.Itoa(resourceId)] = resource
 		} else {
-			(*planetResources)[strconv.Itoa(resource)] = PlanetResource{SellPrice: sell.Float64}
+			(*planetResources)[strconv.Itoa(resourceId)] = TradingResource{SellPrice: sell.Float64}
 		}
+
 	}
 	if err = rows.Err(); err != nil {
 		return fmt.Errorf("rows read failed: %v", err)
 	}
 	return nil
+}
+
+func (game *Game) getCommodityAmount(objectId, resourceId int) (int64, error) {
+	var amount int64
+	err := game.db.QueryRow("select `amount` from t_commodity where object = ? and resource = ?", objectId, resourceId).Scan(&amount)
+	if err != nil {
+		return amount, fmt.Errorf("query failed %v", err)
+	}
+	return amount, nil
 }
 
 func (game *Game) setPlayers() error {
