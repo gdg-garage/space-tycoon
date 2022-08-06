@@ -650,13 +650,17 @@ components:
       type: object
       additionalProperties:
         type: object
+        required:
+          - name
+          - color
+          - net-worth
         properties:
           name:
             type: string
           color:
             $ref: '#/components/schemas/Color'
-          stats:
-            $ref: '#/components/schemas/Stats'
+          net-worth:
+            $ref: '#/components/schemas/NetWorth'
     Ships:
       type: object
       additionalProperties:
@@ -741,8 +745,13 @@ components:
         }
       }
 
-    Stats:
+    NetWorth:
       type: object
+      required:
+        - money
+        - resources
+        - ships
+        - total
       properties:
         money:
           type: integer
@@ -766,13 +775,20 @@ components:
 
     Data:
       type: object
+      required:
+        - current-tick
+        - planets
+        - players
+        - ships
       properties:
         current-tick:
           $ref: '#/components/schemas/CurrentTick'
         planets:
           $ref: '#/components/schemas/Planets'
-        player:
-          $ref: '#/components/schemas/PlayerId'
+        player_id:
+          type: integer
+          format: int64
+          nullable: true
         players:
           $ref: '#/components/schemas/Players'
         ships:

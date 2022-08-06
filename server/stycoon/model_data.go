@@ -11,23 +11,32 @@ package stycoon
 
 type Data struct {
 
-	CurrentTick CurrentTick `json:"current-tick,omitempty"`
+	CurrentTick CurrentTick `json:"current-tick"`
 
-	Planets map[string]PlanetsValue `json:"planets,omitempty"`
+	Planets map[string]PlanetsValue `json:"planets"`
 
-	Player PlayerId `json:"player,omitempty"`
+	PlayerId *int64 `json:"player_id,omitempty"`
 
-	Players map[string]PlayersValue `json:"players,omitempty"`
+	Players map[string]PlayersValue `json:"players"`
 
-	Ships map[string]ShipsValue `json:"ships,omitempty"`
+	Ships map[string]ShipsValue `json:"ships"`
 }
 
 // AssertDataRequired checks if the required fields are not zero-ed
 func AssertDataRequired(obj Data) error {
-	if err := AssertCurrentTickRequired(obj.CurrentTick); err != nil {
-		return err
+	elements := map[string]interface{}{
+		"current-tick": obj.CurrentTick,
+		"planets": obj.Planets,
+		"players": obj.Players,
+		"ships": obj.Ships,
 	}
-	if err := AssertPlayerIdRequired(obj.Player); err != nil {
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
+	if err := AssertCurrentTickRequired(obj.CurrentTick); err != nil {
 		return err
 	}
 	return nil

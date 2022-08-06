@@ -36,19 +36,20 @@ func Root(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func PlayerScores(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
 		return
 	}
-	playerScores, err := game.GetPlayerScores()
+	// TODO extract session for playerId
+	gameData, err := game.GetData(nil)
 	if err != nil {
-		log.Warn().Err(err)
+		log.Warn().Err(err).Msg("game data fetch failed")
 		http.Error(w, "db call failed", http.StatusInternalServerError)
 		return
 	}
-	scores, err := json.Marshal(playerScores)
+	scores, err := json.Marshal(gameData)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		http.Error(w, "response failed", http.StatusInternalServerError)
