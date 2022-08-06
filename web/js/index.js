@@ -7,16 +7,18 @@ console.log(STC)
 var currentTick = new STC.CurrentTick()
 
 function redraw() {
-	d3.select("#tickInfo").text("season: " + currentTick.season + ", tick: " + currentTick.tick)
+	// TODO
 }
 
 function timerLoop() {
 	(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
 		if (error) {
-			console.error(error)
+			setTimeout(timerLoop, 1000)
+			d3.select("#tickInfo").text(error)
 		} else {
 			setTimeout(timerLoop, data["time-left-ms"] || 300)
 			if (currentTick.tick != data.tick) {
+				d3.select("#tickInfo").text("season: " + data.season + ", tick: " + data.tick)
 				currentTick = data
 				redraw()
 			}
@@ -24,4 +26,10 @@ function timerLoop() {
 	})
 }
 
-setTimeout(timerLoop, 10)
+function startLoop()
+{
+	d3.select("#tickInfo").text("Connecting...")
+	setTimeout(timerLoop, 0)
+}
+
+setTimeout(startLoop, 0)

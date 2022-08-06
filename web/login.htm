@@ -17,26 +17,26 @@
 					<td>
 						<label for="username">User name:</label>
 					<td>
-						<input type="text" id="username" name="username" onchange="registrationValidate(0)">
+						<input type="text" id="username" name="username" onchange="loginValidate(0)">
 				</tr>
 				<tr>
 					<td>
 						<label for="password">Password:</label>
 					<td>
-						<input type="password" id="password" name="password" onchange="registrationValidate(1)">
+						<input type="password" id="password" name="password" onchange="loginValidate(1)">
 				</tr>
-					<!--
+				<!--
 					<tr>
 					<td>
 					<label for="player">Player:</label>
 					<td>
-					<input type="text" id="player" name="player" onchange="registrationValidate(2)">
+					<input type="text" id="player" name="player" onchange="loginValidate(2)">
 					</tr>
-					-->
+				-->
 				<tr>
 					<td>
 					<td>
-						<input type="button" value="Log in" onclick="registrationSumbit()">
+						<input type="button" value="Log in" onclick="loginSumbit()">
 				</tr>
 				<tr>
 					<td>
@@ -46,7 +46,7 @@
 			</table>
 		</form>
 		<script>
-			function registrationValidate(which) {
+			function loginValidate(which) {
 				let u = d3.select("#username").node().value
 				let ps = d3.select("#password").node().value
 				//let pl = d3.select("#player").node().value
@@ -61,8 +61,8 @@
 				d3.select("#response").text("")
 				return true
 			}
-			function registrationSumbit() {
-				if (!registrationValidate(-1))
+			function loginSumbit() {
+				if (!loginValidate(-1))
 					return
 				d3.json('http://localhost/login', {
 					method: "POST",
