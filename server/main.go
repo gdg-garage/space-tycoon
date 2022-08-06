@@ -58,8 +58,8 @@ func main() {
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(db, sessionManager, w, r)
 	})
-	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PlayerScores(game, w, r)
+	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+		handlers.Data(game, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
