@@ -4,7 +4,7 @@
 
 ## API
 
-[Observe the API in Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/gdg-garage/space-tycoon/master/api/swagger.yaml)
+[Observe the API in Swagger Editor](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/gdg-garage/space-tycoon/master/api/swagger.yaml)
 
 ## Dev
 
