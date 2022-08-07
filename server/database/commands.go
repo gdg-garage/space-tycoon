@@ -30,15 +30,15 @@ func InsertTradeCommand(db *sql.DB, id int64, commandType string, target int64, 
 	return err
 }
 
-func StopCommand(db *sql.DB, id int64) error {
-	log.Info().Msgf("delete from t_command where ship = %d", id)
-	_, err := db.Exec(`delete from t_command where ship = ?`, id)
+func InsertDecommissionCommand(db *sql.DB, id int64, commandType string) error {
+	log.Info().Msgf("insert into t_command (ship, type) values (%d, %s)", id, commandType)
+	_, err := db.Exec(`insert into t_command (ship, type) values (?, ?)`, id, commandType)
 	return err
 }
 
-func ProcessDecommission(db *sql.DB, id int64) error {
-	log.Info().Msgf("update t_ship set life = 0 where ship = %d", id)
-	_, err := db.Exec(`update t_ship set life = 0 where ship = ?`, id)
+func StopCommand(db *sql.DB, id int64) error {
+	log.Info().Msgf("delete from t_command where ship = %d", id)
+	_, err := db.Exec(`delete from t_command where ship = ?`, id)
 	return err
 }
 
