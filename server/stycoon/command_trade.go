@@ -20,5 +20,5 @@ func (game *Game) processTrade(id int64, command Command) error {
 		return err
 	}
 	// TODO should we validate trading with own ships?
-	return database.InsertTradeCommand(game.db, id, command.Type, *c.Target, *c.Resource, *c.Amount)
+	return database.ReplaceTradeCommand(game.db, id, command.Type, *c.Target, *c.Resource, *c.Amount)
 }

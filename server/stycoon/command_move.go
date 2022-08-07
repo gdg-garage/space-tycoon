@@ -48,5 +48,5 @@ func (game *Game) processMove(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.InsertMoveCommand(game.db, id, command.Type, target)
+	return database.ReplaceMoveCommand(game.db, id, command.Type, target)
 }
