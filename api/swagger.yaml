@@ -282,6 +282,7 @@ components:
           type: integer
           format: int64
           nullable: true
+          description: "Positive value means buy, negative sell."
         resource:
           type: integer
           format: int64
