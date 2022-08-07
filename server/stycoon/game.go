@@ -27,8 +27,8 @@ func NewGame(db *sql.DB) *Game {
 func (game *Game) GetData(playerId *int64) (Data, error) {
 	data := Data{
 		CurrentTick: game.Tick,
-		PlayerId:    playerId,
 		Players:     game.players,
+		PlayerId:    playerId,
 	}
 
 	planets, err := game.GetPlanets()

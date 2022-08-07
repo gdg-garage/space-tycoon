@@ -59,7 +59,7 @@ func main() {
 		handlers.Login(db, sessionManager, w, r)
 	})
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, w, r)
+		handlers.Data(game, sessionManager, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
