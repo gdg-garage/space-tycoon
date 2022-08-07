@@ -43,7 +43,7 @@ func StopCommand(db *sql.DB, id int64) error {
 }
 
 func ProcessRename(db *sql.DB, id int64, name string) error {
-	log.Info().Msgf("update t_object set name = ? where id = %d", id)
+	log.Info().Msgf("update t_object set name = %s where id = %d", name, id)
 	_, err := db.Exec(`update t_object set name = ? where id = ?;`, name, id)
 	return err
 }
