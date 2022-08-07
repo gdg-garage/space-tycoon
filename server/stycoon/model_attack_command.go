@@ -11,12 +11,15 @@ package stycoon
 
 type AttackCommand struct {
 
+	Type string `json:"type"`
+
 	Target *int64 `json:"target"`
 }
 
 // AssertAttackCommandRequired checks if the required fields are not zero-ed
 func AssertAttackCommandRequired(obj AttackCommand) error {
 	elements := map[string]interface{}{
+		"type": obj.Type,
 		"target": obj.Target,
 	}
 	for name, el := range elements {

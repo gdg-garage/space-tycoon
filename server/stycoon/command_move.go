@@ -8,6 +8,7 @@ import (
 
 func NewMoveCommand(command Command) *MoveCommand {
 	return &MoveCommand{
+		Type:        command.Type,
 		Destination: command.Destination,
 	}
 }

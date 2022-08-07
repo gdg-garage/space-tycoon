@@ -6,6 +6,7 @@ import (
 
 func NewConstructCommand(command Command) *ConstructCommand {
 	return &ConstructCommand{
+		Type:      command.Type,
 		ShipClass: command.ShipClass,
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 func NewTradeCommand(command Command) *TradeCommand {
 	return &TradeCommand{
+		Type:     command.Type,
 		Amount:   command.Amount,
 		Resource: command.Resource,
 		Target:   command.Target,
