@@ -1,7 +1,7 @@
 var STC = require("space_tycoon_client")
 
-// for development
-STC.ApiClient.instance.basePath = "http://localhost"
+STC.ApiClient.instance.basePath = "http://localhost" // for development
+STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 
 var currentTick = new STC.CurrentTick()
@@ -26,8 +26,26 @@ function timerLoop() {
 	})
 }
 
+function parseCookies() {
+	let c = document.cookie
+	if (c == "")
+		return {}
+	return document.cookie
+	.split(';')
+	.map(v => v.split('='))
+	.reduce((acc, v) => {
+		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
+		return acc
+	}, {})
+}
+
 function startLoop()
 {
+	let cookies = parseCookies()
+	let playerid = cookies["player-id"] || -1
+	if (playerid > 0) {
+		d3.select("#userInfo").node().innerHTML = "Player id: " + playerid + ' <a href="logout.htm">Log out</a>'
+	}
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(timerLoop, 0)
 }
