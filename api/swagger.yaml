@@ -798,7 +798,7 @@ components:
           $ref: '#/components/schemas/CurrentTick'
         planets:
           $ref: '#/components/schemas/Planets'
-        player_id:
+        player-id:
           type: integer
           format: int64
           nullable: true
