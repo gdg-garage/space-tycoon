@@ -6,6 +6,7 @@ import (
 
 func NewAttackCommand(command Command) *AttackCommand {
 	return &AttackCommand{
+		Type:   command.Type,
 		Target: command.Target,
 	}
 }

@@ -11,6 +11,8 @@ package stycoon
 
 type TradeCommand struct {
 
+	Type string `json:"type"`
+
 	Amount *int64 `json:"amount"`
 
 	Resource *int64 `json:"resource"`
@@ -21,6 +23,7 @@ type TradeCommand struct {
 // AssertTradeCommandRequired checks if the required fields are not zero-ed
 func AssertTradeCommandRequired(obj TradeCommand) error {
 	elements := map[string]interface{}{
+		"type": obj.Type,
 		"amount": obj.Amount,
 		"resource": obj.Resource,
 		"target": obj.Target,
