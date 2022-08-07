@@ -282,7 +282,7 @@ components:
           type: integer
           format: int64
           nullable: true
-          description: "Positive value means buy, negative sell."
+          description: Positive value means buy, negative sell.
         resource:
           type: integer
           format: int64
@@ -291,6 +291,7 @@ components:
           type: integer
           format: int64
           nullable: true
+          description: Any planet or own ship.
       required:
       - amount
       - resource
