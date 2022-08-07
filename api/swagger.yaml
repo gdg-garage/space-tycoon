@@ -701,6 +701,14 @@ components:
       type: object
       additionalProperties:
         type: object
+        required:
+          - ship-class
+          - life
+          - name
+          - player
+          - position
+          - prev-position
+          - resources
         properties:
           ship-class:
             type: integer
