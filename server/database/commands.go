@@ -6,33 +6,33 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func InsertMoveCommand(db *sql.DB, id int64, commandType string, target int64) error {
-	log.Info().Msgf("insert into t_command (ship, type, target) values (%d, %s, %d)", id, commandType, target)
-	_, err := db.Exec(`insert into t_command (ship, type, target) values (?, ?, ?)`, id, commandType, target)
+func ReplaceMoveCommand(db *sql.DB, id int64, commandType string, target int64) error {
+	log.Info().Msgf("replace into t_command (ship, type, target) values (%d, %s, %d)", id, commandType, target)
+	_, err := db.Exec(`replace into t_command (ship, type, target) values (?, ?, ?)`, id, commandType, target)
 	return err
 }
 
-func InsertConstructCommand(db *sql.DB, id int64, commandType string, class int64) error {
-	log.Info().Msgf("insert into t_command (ship, type, class) values (%d, %s, %d)", id, commandType, class)
-	_, err := db.Exec(`insert into t_command (ship, type, class) values (?, ?, ?)`, id, commandType, class)
+func ReplaceConstructCommand(db *sql.DB, id int64, commandType string, class int64) error {
+	log.Info().Msgf("replace into t_command (ship, type, class) values (%d, %s, %d)", id, commandType, class)
+	_, err := db.Exec(`replace into t_command (ship, type, class) values (?, ?, ?)`, id, commandType, class)
 	return err
 }
 
-func InsertAttackCommand(db *sql.DB, id int64, commandType string, target int64) error {
-	log.Info().Msgf("insert into t_command (ship, type, target) values (%d, %s, %d)", id, commandType, target)
-	_, err := db.Exec(`insert into t_command (ship, type, target) values (?, ?, ?)`, id, commandType, target)
+func ReplaceAttackCommand(db *sql.DB, id int64, commandType string, target int64) error {
+	log.Info().Msgf("replace into t_command (ship, type, target) values (%d, %s, %d)", id, commandType, target)
+	_, err := db.Exec(`replace into t_command (ship, type, target) values (?, ?, ?)`, id, commandType, target)
 	return err
 }
 
-func InsertTradeCommand(db *sql.DB, id int64, commandType string, target int64, resource int64, amount int64) error {
-	log.Info().Msgf("insert into t_command (ship, type, target, resource, amount) values (%d, %s, %d, %d, %d)", id, commandType, target, resource, amount)
-	_, err := db.Exec(`insert into t_command (ship, type, target, resource, amount) values (?, ?, ?, ?, ?)`, id, commandType, target, resource, amount)
+func ReplaceTradeCommand(db *sql.DB, id int64, commandType string, target int64, resource int64, amount int64) error {
+	log.Info().Msgf("replace into t_command (ship, type, target, resource, amount) values (%d, %s, %d, %d, %d)", id, commandType, target, resource, amount)
+	_, err := db.Exec(`replace into t_command (ship, type, target, resource, amount) values (?, ?, ?, ?, ?)`, id, commandType, target, resource, amount)
 	return err
 }
 
-func InsertDecommissionCommand(db *sql.DB, id int64, commandType string) error {
-	log.Info().Msgf("insert into t_command (ship, type) values (%d, %s)", id, commandType)
-	_, err := db.Exec(`insert into t_command (ship, type) values (?, ?)`, id, commandType)
+func ReplaceDecommissionCommand(db *sql.DB, id int64, commandType string) error {
+	log.Info().Msgf("replace into t_command (ship, type) values (%d, %s)", id, commandType)
+	_, err := db.Exec(`replace into t_command (ship, type) values (?, ?)`, id, commandType)
 	return err
 }
 
@@ -55,10 +55,4 @@ func InsertObject(db *sql.DB, x int64, y int64) (int64, error) {
 		return 0, err
 	}
 	return res.LastInsertId()
-}
-
-func InsertWaypoint(db *sql.DB, id int64) error {
-	log.Info().Msgf("insert into t_waypoint (id) values (%d)", id)
-	_, err := db.Exec(`insert into t_waypoint (id) values (?)`, id)
-	return err
 }

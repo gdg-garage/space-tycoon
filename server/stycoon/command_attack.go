@@ -17,5 +17,5 @@ func (game *Game) processAttack(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.InsertAttackCommand(game.db, id, command.Type, *c.Target)
+	return database.ReplaceAttackCommand(game.db, id, command.Type, *c.Target)
 }

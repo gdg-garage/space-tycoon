@@ -17,5 +17,5 @@ func (game *Game) processConstruct(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.InsertConstructCommand(game.db, id, command.Type, *c.ShipClass)
+	return database.ReplaceConstructCommand(game.db, id, command.Type, *c.ShipClass)
 }
