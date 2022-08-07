@@ -11,11 +11,20 @@ package stycoon
 
 type MoveCommandAllOf struct {
 
-	Destination Destination `json:"destination,omitempty"`
+	Destination Destination `json:"destination"`
 }
 
 // AssertMoveCommandAllOfRequired checks if the required fields are not zero-ed
 func AssertMoveCommandAllOfRequired(obj MoveCommandAllOf) error {
+	elements := map[string]interface{}{
+		"destination": obj.Destination,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	if err := AssertDestinationRequired(obj.Destination); err != nil {
 		return err
 	}

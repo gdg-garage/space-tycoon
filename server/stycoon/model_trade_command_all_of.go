@@ -11,19 +11,19 @@ package stycoon
 
 type TradeCommandAllOf struct {
 
-	Resource int64 `json:"resource"`
-
 	Amount int64 `json:"amount"`
 
-	Where int64 `json:"where"`
+	Resource int64 `json:"resource"`
+
+	Target int64 `json:"target"`
 }
 
 // AssertTradeCommandAllOfRequired checks if the required fields are not zero-ed
 func AssertTradeCommandAllOfRequired(obj TradeCommandAllOf) error {
 	elements := map[string]interface{}{
-		"resource": obj.Resource,
 		"amount": obj.Amount,
-		"where": obj.Where,
+		"resource": obj.Resource,
+		"target": obj.Target,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

@@ -10,7 +10,16 @@
 package stycoon
 
 type RenameCommand struct {
-	Command
+
+	Type string `json:"type"`
+
+	Target int64 `json:"target,omitempty"`
+
+	Resource int64 `json:"resource,omitempty"`
+
+	Amount int64 `json:"amount,omitempty"`
+
+	ShipClass int64 `json:"ship-class,omitempty"`
 
 	Name string `json:"name"`
 }
@@ -18,21 +27,13 @@ type RenameCommand struct {
 // AssertRenameCommandRequired checks if the required fields are not zero-ed
 func AssertRenameCommandRequired(obj RenameCommand) error {
 	elements := map[string]interface{}{
+		"type": obj.Type,
 		"name": obj.Name,
-		"class": obj.Class,
-		"target": obj.Target,
-		"resource": obj.Resource,
-		"amount": obj.Amount,
-		"where": obj.Where,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
 			return &RequiredError{Field: name}
 		}
-	}
-
-	if err := AssertCommandRequired(obj.Command); err != nil {
-		return err
 	}
 
 	return nil

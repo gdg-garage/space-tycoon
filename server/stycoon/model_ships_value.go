@@ -11,25 +11,40 @@ package stycoon
 
 type ShipsValue struct {
 
-	ShipClass int64 `json:"ship-class,omitempty"`
+	ShipClass int64 `json:"ship-class"`
 
-	Life int64 `json:"life,omitempty"`
+	Life int64 `json:"life"`
 
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
-	Player int64 `json:"player,omitempty"`
+	Player int64 `json:"player"`
 
-	Position []int64 `json:"position,omitempty"`
+	Position []int64 `json:"position"`
 
-	PrevPosition []int64 `json:"prev-position,omitempty"`
+	PrevPosition []int64 `json:"prev-position"`
 
-	Resources map[string]Resource `json:"resources,omitempty"`
+	Resources map[string]Resource `json:"resources"`
 
 	Command Command `json:"command,omitempty"`
 }
 
 // AssertShipsValueRequired checks if the required fields are not zero-ed
 func AssertShipsValueRequired(obj ShipsValue) error {
+	elements := map[string]interface{}{
+		"ship-class": obj.ShipClass,
+		"life": obj.Life,
+		"name": obj.Name,
+		"player": obj.Player,
+		"position": obj.Position,
+		"prev-position": obj.PrevPosition,
+		"resources": obj.Resources,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	if err := AssertCommandRequired(obj.Command); err != nil {
 		return err
 	}
