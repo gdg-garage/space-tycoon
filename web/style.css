@@ -31,3 +31,11 @@ form {
 	flex-grow: 1;
 	background-color: lightgray;
 }
+
+.planet {
+	fill: green;
+}
+
+.ship {
+	fill: red;
+}

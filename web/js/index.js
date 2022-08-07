@@ -5,9 +5,63 @@ STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 
 var currentTick = new STC.CurrentTick()
+var zoom
 
-function redraw() {
-	// TODO
+function handleZoom(e) {
+	d3.selectAll("#themap g").attr("transform", e.transform)
+}
+
+function initDraw() {
+	zoom = d3.zoom().on("zoom", handleZoom)
+	d3.select("#themap").call(zoom)
+}
+
+function redraw(data) {
+	if (!zoom)
+		initDraw()
+
+	let planets = []
+	for (let pid of Object.keys(data.planets)) {
+		let p = data.planets[pid]
+		p.id = pid
+		planets.push(p)
+	}
+
+	let ships = []
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		s.id = sid
+		ships.push(s)
+	}
+
+	d3.select("#planets")
+	.selectAll(".planet")
+	.data(planets, d => d.id)
+	.join("circle")
+	.classed("planet", true)
+	.attr("cx", d => d.position[0] )
+	.attr("cy", d => d.position[1] )
+	.attr("r", 10)
+
+	d3.select("#ships")
+	.selectAll(".ship")
+	.data(ships, d => d.id)
+	.join("circle")
+	.classed("ship", true)
+	.attr("cx", d => d.position[0] )
+	.attr("cy", d => d.position[1] )
+	.attr("r", 7)
+}
+
+function refresh() {
+	(new STC.DataApi()).dataGet(function(error, data, response) {
+		if (error) {
+			d3.select("#tickInfo").text(error)
+		} else {
+			console.log(data)
+			redraw(data)
+		}
+	})
 }
 
 function timerLoop() {
@@ -20,7 +74,7 @@ function timerLoop() {
 			if (currentTick.tick != data.tick) {
 				d3.select("#tickInfo").text("season: " + data.season + ", tick: " + data.tick)
 				currentTick = data
-				redraw()
+				refresh()
 			}
 		}
 	})
@@ -31,8 +85,8 @@ function parseCookies() {
 	if (c == "")
 		return {}
 	return document.cookie
-	.split(';')
-	.map(v => v.split('='))
+	.split(";")
+	.map(v => v.split("="))
 	.reduce((acc, v) => {
 		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
 		return acc
@@ -44,7 +98,7 @@ function startLoop()
 	let cookies = parseCookies()
 	let playerid = cookies["player-id"] || -1
 	if (playerid > 0) {
-		d3.select("#userInfo").node().innerHTML = "Player id: " + playerid + ' <a href="logout.htm">Log out</a>'
+		d3.select("#userInfo").node().innerHTML = "Player id: " + playerid + " <a href=\"logout.htm\">Log out</a>"
 	}
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(timerLoop, 0)
