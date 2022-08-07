@@ -58,16 +58,13 @@ func main() {
 		handlers.Login(db, sessionManager, w, r)
 	})
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, w, r)
+		handlers.Data(game, sessionManager, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
 	})
 	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
-	})
-	http.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
-		handlers.InternalPage(sessionManager, w, r)
 	})
 
 	wg := &sync.WaitGroup{}
