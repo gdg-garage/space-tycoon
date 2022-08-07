@@ -119,7 +119,7 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 
 func (game *Game) getCommand(shipId int) (Command, error) {
 	var command Command
-	err := game.db.QueryRow("select `type`, `target`, `resource`, `amount`, `class` from t_command where ship = ?", shipId).Scan(&command.Type, &command.Target, &command.Resource, &command.Amount, &command.Class)
+	err := game.db.QueryRow("select `type`, `target`, `resource`, `amount`, `class` from t_command where ship = ?", shipId).Scan(&command.Type, &command.Target, &command.Resource, &command.Amount, &command.ShipClass)
 	if err != nil {
 		return command, err
 	}

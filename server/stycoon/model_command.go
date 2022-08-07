@@ -10,7 +10,6 @@
 package stycoon
 
 type Command struct {
-
 	Type string `json:"type"`
 
 	Target *int64 `json:"target,omitempty"`
