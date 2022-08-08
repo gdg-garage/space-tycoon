@@ -63,7 +63,7 @@ func PlayerScores(game *stycoon.Game, w http.ResponseWriter, req *http.Request) 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+func Commands(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
 	// read
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -79,7 +79,13 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// process
-	errs := game.ProcessCommands(commands)
+	user, err := stycoon.LoggedUserFromSession(req, sessionManager)
+	if err != nil {
+		log.Warn().Err(err).Msg("User is not logged in")
+		http.Error(w, "only for logged users", http.StatusForbidden)
+		return
+	}
+	errs := game.ProcessCommands(commands, user)
 	if len(errs) > 0 {
 		b, err := json.Marshal(errs)
 		if err != nil {

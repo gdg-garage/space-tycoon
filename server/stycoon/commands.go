@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/rs/zerolog/log"
 )
 
@@ -14,7 +15,7 @@ func ParseCommands(s string) (map[string]Command, error) {
 	return c, err
 }
 
-func (game *Game) ProcessCommands(commands map[string]Command) map[string]string {
+func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) map[string]string {
 	res := map[string]string{}
 	for strId, command := range commands {
 		id, err := strconv.Atoi(strId)
@@ -23,6 +24,16 @@ func (game *Game) ProcessCommands(commands map[string]Command) map[string]string
 			continue
 		}
 		log.Info().Msgf("id: %d, command_type: %s", id, command.Type)
+
+		ownedByPlayer, err := database.IsObjectOwnedByPlayer(game.db, user.PlayerId, int64(id))
+		if err != nil {
+			res[strId] = err.Error()
+			continue
+		}
+		if !ownedByPlayer {
+			res[strId] = fmt.Sprintf("object id: %d does not belong to player id: %d", id, user.PlayerId)
+			continue
+		}
 
 		switch command.Type {
 		case "move":
