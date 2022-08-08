@@ -24,7 +24,7 @@ type ShipsValue struct {
 
 	Resources map[string]Resource `json:"resources"`
 
-	Command Command `json:"command,omitempty"`
+	Command *Command `json:"command,omitempty"`
 }
 
 // AssertShipsValueRequired checks if the required fields are not zero-ed
@@ -44,8 +44,10 @@ func AssertShipsValueRequired(obj ShipsValue) error {
 		}
 	}
 
-	if err := AssertCommandRequired(obj.Command); err != nil {
-		return err
+	if obj.Command != nil {
+		if err := AssertCommandRequired(*obj.Command); err != nil {
+			return err
+		}
 	}
 	return nil
 }
