@@ -31,13 +31,22 @@ func (game *Game) GetData(playerId *int64) (Data, error) {
 		PlayerId:    playerId,
 	}
 
-	planets, err := game.GetPlanets()
+	resources, err := game.getCommodityAmounts()
+	if err != nil {
+		return data, err
+	}
+	err = game.setPlanetResourcePrices(&resources)
+	if err != nil {
+		return data, err
+	}
+
+	planets, err := game.GetPlanets(&resources)
 	if err != nil {
 		return data, err
 	}
 	data.Planets = planets
 
-	ships, err := game.GetShips(playerId)
+	ships, err := game.GetShips(playerId, &resources)
 	if err != nil {
 		return data, err
 	}
@@ -46,7 +55,7 @@ func (game *Game) GetData(playerId *int64) (Data, error) {
 	return data, nil
 }
 
-func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
+func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (map[string]PlanetsValue, error) {
 	var planets = make(map[string]PlanetsValue)
 	rows, err := game.db.Query("select t_object.`id`, `name`, `pos_x`, `pos_y`, `pos_x_prev`, `pos_y_prev` from t_object join t_planet tp on t_object.id = tp.id")
 	if err != nil {
@@ -63,16 +72,7 @@ func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
 		}
 		planet.Position = pos
 		planet.PrevPosition = posPrev
-		planet.Resources = map[string]TradingResource{}
-		err = game.setTradingResources(id, &planet.Resources)
-		if err != nil {
-			return planets, err
-		}
-		err = game.setPlanetResourcePrices(id, &planet.Resources)
-		if err != nil {
-			return planets, err
-		}
-
+		planet.Resources = game.getTradingResources(id, resources)
 		planets[strconv.Itoa(id)] = planet
 	}
 	if err = rows.Err(); err != nil {
@@ -81,7 +81,7 @@ func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
 	return planets, nil
 }
 
-func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
+func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*TradingResource) (map[string]ShipsValue, error) {
 	var ships = make(map[string]ShipsValue)
 	rows, err := game.db.Query("select o.`id`, o.`name`, o.`pos_x`, o.`pos_y`, o.`pos_x_prev`, o.`pos_y_prev`, s.`class`, o.`owner`, s.`life` from t_object as o join t_ship s on o.id = s.id")
 	if err != nil {
@@ -105,11 +105,7 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 		}
 		ship.Position = pos
 		ship.PrevPosition = posPrev
-		ship.Resources = map[string]Resource{}
-		err = game.setResources(id, &ship.Resources)
-		if err != nil {
-			return ships, err
-		}
+		ship.Resources = game.getResources(id, resources)
 		if playerId != nil {
 			if command, ok := commands[id]; ok {
 				ship.Command = &command
@@ -158,32 +154,29 @@ func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
 	return commands, nil
 }
 
-func (game *Game) setPlanetResourcePrices(planetId int, planetResources *map[string]TradingResource) error {
-	rows, err := game.db.Query("select `resource`, `buy`, `sell`  from t_price where planet = ?", planetId)
+func (game *Game) setPlanetResourcePrices(resources *map[int]map[string]*TradingResource) error {
+	rows, err := game.db.Query("select `planet`, `resource`, `buy`, `sell`  from t_price")
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var resourceId int
+	var planetId, resourceId int
 	var buy, sell sql.NullFloat64
 	for rows.Next() {
-		err = rows.Scan(&resourceId, &buy, &sell)
+		err = rows.Scan(&planetId, &resourceId, &buy, &sell)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
 		}
+		resourceIdStr := strconv.Itoa(resourceId)
+		if _, ok := (*resources)[planetId]; !ok {
+			(*resources)[planetId] = make(map[string]*TradingResource)
+		}
+		if _, ok := (*resources)[planetId][resourceIdStr]; !ok {
+			(*resources)[planetId][resourceIdStr] = &TradingResource{}
+		}
 		if buy.Valid {
-			resource, ok := (*planetResources)[strconv.Itoa(resourceId)]
-			if ok {
-				(*planetResources)[strconv.Itoa(resourceId)] = TradingResource{Amount: resource.Amount, BuyPrice: buy.Float64}
-			} else {
-				(*planetResources)[strconv.Itoa(resourceId)] = TradingResource{BuyPrice: buy.Float64}
-			}
+			(*resources)[planetId][resourceIdStr].BuyPrice = buy.Float64
 		} else if sell.Valid {
-			resource, ok := (*planetResources)[strconv.Itoa(resourceId)]
-			if ok {
-				(*planetResources)[strconv.Itoa(resourceId)] = TradingResource{Amount: resource.Amount, SellPrice: sell.Float64}
-			} else {
-				(*planetResources)[strconv.Itoa(resourceId)] = TradingResource{SellPrice: sell.Float64}
-			}
+			(*resources)[planetId][resourceIdStr].SellPrice = sell.Float64
 		}
 	}
 	if err = rows.Err(); err != nil {
@@ -192,42 +185,39 @@ func (game *Game) setPlanetResourcePrices(planetId int, planetResources *map[str
 	return nil
 }
 
-func (game *Game) setTradingResources(objectId int, resources *map[string]TradingResource) error {
-	amounts, err := game.getCommodityAmounts(objectId)
-	if err != nil {
-		return nil
+func (game *Game) getTradingResources(objectId int, resources *map[int]map[string]*TradingResource) map[string]TradingResource {
+	planetResources := make(map[string]TradingResource)
+	for key, resource := range (*resources)[objectId] {
+		planetResources[key] = *resource
 	}
-	for key, amount := range amounts {
-		(*resources)[key] = TradingResource{Amount: amount}
-	}
-	return nil
+	return planetResources
 }
 
-func (game *Game) setResources(objectId int, resources *map[string]Resource) error {
-	amounts, err := game.getCommodityAmounts(objectId)
-	if err != nil {
-		return nil
+func (game *Game) getResources(objectId int, resources *map[int]map[string]*TradingResource) map[string]Resource {
+	shipResources := make(map[string]Resource)
+	for key, resource := range (*resources)[objectId] {
+		shipResources[key] = Resource{Amount: resource.Amount}
 	}
-	for key, amount := range amounts {
-		(*resources)[key] = Resource{Amount: amount}
-	}
-	return nil
+	return shipResources
 }
 
-func (game *Game) getCommodityAmounts(objectId int) (map[string]int64, error) {
-	amounts := make(map[string]int64)
-	rows, err := game.db.Query("select `resource`, `amount` from t_commodity where object = ?", objectId)
+func (game *Game) getCommodityAmounts() (map[int]map[string]*TradingResource, error) {
+	amounts := make(map[int]map[string]*TradingResource)
+	rows, err := game.db.Query("select `object`, `resource`, `amount` from t_commodity")
 	if err != nil {
 		return amounts, fmt.Errorf("query failed %v", err)
 	}
-	var resourceId int
+	var objectId, resourceId int
 	var amount int64
 	for rows.Next() {
-		err = rows.Scan(&resourceId, &amount)
+		err = rows.Scan(&objectId, &resourceId, &amount)
 		if err != nil {
 			return amounts, fmt.Errorf("row read failed %v", err)
 		}
-		amounts[strconv.Itoa(resourceId)] = amount
+		if _, ok := amounts[objectId]; !ok {
+			amounts[objectId] = make(map[string]*TradingResource)
+		}
+		amounts[objectId][strconv.Itoa(resourceId)] = &TradingResource{Amount: amount}
 	}
 	if err = rows.Err(); err != nil {
 		return amounts, fmt.Errorf("rows read failed: %v", err)
