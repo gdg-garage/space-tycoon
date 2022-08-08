@@ -186,6 +186,7 @@ paths:
 components:
   schemas:
     Command:
+      nullable: true
       required:
       - type
       properties:

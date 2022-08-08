@@ -88,6 +88,13 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 		return ships, fmt.Errorf("query failed %v", err)
 	}
 	var id int
+	var commands map[int]Command
+	if playerId != nil {
+		commands, err = game.getPlayerCommands(*playerId)
+		if err != nil {
+			return ships, err
+		}
+	}
 	for rows.Next() {
 		var ship ShipsValue
 		var pos = make([]int64, 2)
@@ -103,10 +110,9 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 		if err != nil {
 			return ships, err
 		}
-		if playerId != nil && *playerId == ship.Player {
-			ship.Command, err = game.getCommand(id)
-			if err != nil {
-				return ships, err
+		if playerId != nil {
+			if command, ok := commands[id]; ok {
+				ship.Command = &command
 			}
 		}
 		ships[strconv.Itoa(id)] = ship
@@ -117,13 +123,39 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 	return ships, nil
 }
 
-func (game *Game) getCommand(shipId int) (Command, error) {
-	var command Command
-	err := game.db.QueryRow("select `type`, `target`, `resource`, `amount`, `class` from t_command where ship = ?", shipId).Scan(&command.Type, &command.Target, &command.Resource, &command.Amount, &command.ShipClass)
+func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
+	commands := make(map[int]Command)
+	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
 	if err != nil {
-		return command, err
+		return commands, err
 	}
-	return command, nil
+	var id int
+	var target, resource, amount, class sql.NullInt64
+	for rows.Next() {
+		var command Command
+		err = rows.Scan(&id, &command.Type, &target, &resource, &amount, &class)
+		if err != nil {
+			return commands, fmt.Errorf("row read failed %v", err)
+		}
+		if target.Valid {
+			command.Target = target.Int64
+		}
+		if resource.Valid {
+			command.Resource = resource.Int64
+		}
+		if amount.Valid {
+			command.Amount = amount.Int64
+		}
+		if class.Valid {
+			command.ShipClass = class.Int64
+		}
+		commands[id] = command
+	}
+	if err = rows.Err(); err != nil {
+		return commands, fmt.Errorf("rows read failed: %v", err)
+
+	}
+	return commands, nil
 }
 
 func (game *Game) setPlanetResourcePrices(planetId int, planetResources *map[string]TradingResource) error {
