@@ -35,3 +35,21 @@ func GetPLayerIdForUser(db *sql.DB, userId int64, player string) (int64, error) 
 	}
 	return id, nil
 }
+
+func IsObjectOwnedByPlayer(db *sql.DB, playerId int64, objectId int64) (bool, error) {
+	ownedObjects := make(map[int64]struct{})
+	rows, err := db.Query("select `id` from t_object where owner = ?", playerId)
+	if err != nil {
+		return false, fmt.Errorf("query failed %v", err)
+	}
+	var id int64
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			return false, fmt.Errorf("row read failed %v", err)
+		}
+		ownedObjects[id] = struct{}{}
+	}
+	_, ok := ownedObjects[objectId]
+	return ok, nil
+}

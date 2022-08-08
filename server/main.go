@@ -68,7 +68,7 @@ func main() {
 		handlers.EndTurn(game, w, r)
 	})
 	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Commands(game, w, r)
+		handlers.Commands(game, sessionManager, w, r)
 	})
 
 	wg := &sync.WaitGroup{}
