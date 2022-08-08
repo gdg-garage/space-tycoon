@@ -53,10 +53,10 @@ func (game *Game) GetPlanets() (map[string]PlanetsValue, error) {
 		return planets, fmt.Errorf("query failed %v", err)
 	}
 	var id int
-	var planet PlanetsValue
-	var pos = make([]int64, 2)
-	var posPrev = make([]int64, 2)
 	for rows.Next() {
+		var planet PlanetsValue
+		var pos = make([]int64, 2)
+		var posPrev = make([]int64, 2)
 		err = rows.Scan(&id, &planet.Name, &pos[0], &pos[1], &posPrev[0], &posPrev[1])
 		if err != nil {
 			return planets, fmt.Errorf("row read failed %v", err)
@@ -88,10 +88,10 @@ func (game *Game) GetShips(playerId *int64) (map[string]ShipsValue, error) {
 		return ships, fmt.Errorf("query failed %v", err)
 	}
 	var id int
-	var ship ShipsValue
-	var pos = make([]int64, 2)
-	var posPrev = make([]int64, 2)
 	for rows.Next() {
+		var ship ShipsValue
+		var pos = make([]int64, 2)
+		var posPrev = make([]int64, 2)
 		err = rows.Scan(&id, &ship.Name, &pos[0], &pos[1], &posPrev[0], &posPrev[1], &ship.ShipClass, &ship.Player, &ship.Life)
 		if err != nil {
 			return ships, fmt.Errorf("row read failed %v", err)
