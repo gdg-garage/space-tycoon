@@ -53,3 +53,15 @@ form {
 .ship {
 	fill: white;
 }
+
+#modalContainer {
+	display: none;
+}
+
+#modalWindow {
+	position: fixed;
+	width: 25%;
+	border: 1px solid lightgray;
+	background-color: black;
+	padding: 0.3em;
+}

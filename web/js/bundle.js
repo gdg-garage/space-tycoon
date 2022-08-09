@@ -7975,13 +7975,42 @@ console.log(STC)
 var currentTick = new STC.CurrentTick()
 var zoom
 
-function handleZoom(e) {
-	d3.selectAll("#themap g").attr("transform", e.transform)
+function initDraw() {
+	zoom = d3.zoom()
+	.on("zoom", handleZoom)
+
+	d3.select("#themap")
+	.call(zoom)
 }
 
-function initDraw() {
-	zoom = d3.zoom().on("zoom", handleZoom)
-	d3.select("#themap").call(zoom)
+function handleZoom(e) {
+	d3.selectAll("#panzoom")
+	.attr("transform", e.transform)
+
+	modalClose()
+}
+
+function modalClose() {
+	d3.select("#modalContainer")
+	.style("display", "none")
+}
+
+function clickInfo(e) {
+	let d = this["__data__"]
+
+	d3.select("#modalContainer")
+	.style("display", "block")
+
+	d3.select("#modalWindow")
+	.style("left", e.x + "px")
+	.style("top", e.y + "px")
+	.on("click", modalClose)
+
+	d3.select("#modalTitle")
+	.html(d.name)
+
+	d3.select("#modalInfo")
+	.html(JSON.stringify(d))
 }
 
 function redraw(data) {
@@ -8007,21 +8036,25 @@ function redraw(data) {
 	.data(planets, d => d.id)
 	.join("circle")
 	.classed("planet", true)
-	.attr("cx", d => d.position[0] )
-	.attr("cy", d => d.position[1] )
+	.on("click", clickInfo)
+	.html(d => "<title>" + d.name + "</title>")
 	.attr("r", 7)
+	.attr("cx", d => d.position[0])
+	.attr("cy", d => d.position[1])
 
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
 	.join("circle")
 	.classed("ship", true)
+	.on("click", clickInfo)
+	.html(d => "<title>" + d.name + "</title>")
 	.attr("r", 5)
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("cx", d => d.position[0] )
-	.attr("cy", d => d.position[1] )
+	.attr("cx", d => d.position[0])
+	.attr("cy", d => d.position[1])
 }
 
 function refresh() {
@@ -8029,7 +8062,7 @@ function refresh() {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
-			console.log(data)
+			//console.log(data)
 			redraw(data)
 		}
 	})
