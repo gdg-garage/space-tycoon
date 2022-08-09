@@ -2118,6 +2118,11 @@ DECLARE star_a FLOAT;
 DECLARE star_d FLOAT;
 DECLARE star_x INT;
 DECLARE star_y INT;
+DECLARE planet_a FLOAT;
+DECLARE planet_d FLOAT;
+DECLARE planet_x INT;
+DECLARE planet_y INT;
+DECLARE planets_rot FLOAT;
 DECLARE id INT;
 
 DROP TEMPORARY TABLE IF EXISTS t_planet_names;
@@ -2125,19 +2130,24 @@ CREATE TEMPORARY TABLE t_planet_names
 SELECT name FROM d_names
 ORDER BY RAND();
 
-SET num_stars = RAND() * 100 + 100;
+SET num_stars = RAND() * 50 + 75; # average at 100
 SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
 	SET star_a = RAND() * 2 * PI();
-	SET star_d = (1 - RAND() * RAND()) * 2000 + 500; # averages at 2000
+	SET star_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
 	SET star_x = COS(star_a) * star_d;
 	SET star_y = SIN(star_a) * star_d;
-	SET num_planets = RAND() * RAND() * 5 + 1;
+	SET num_planets = RAND() * RAND() * 8 + 2; # average at 4
+	set planets_rot = RAND() * 2 * PI();
 	SET planet_index = 0;
 	WHILE planet_index < num_planets DO
-		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), star_x + (RAND() - 0.5) * 20, star_y + (RAND() - 0.5) * 20);
+		SET planet_a = planets_rot + cast(planet_index as float) / num_planets * 2 * PI() + RAND();
+		SET planet_d = (1 - RAND() * RAND()) * 20 + 20; # average at 35
+		SET planet_x = star_x + COS(planet_a) * planet_d;
+		SET planet_y = star_y + SIN(planet_a) * planet_d;
+		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), planet_x, planet_y);
 		SET id = LAST_INSERT_ID();
 		INSERT INTO t_planet (id) VALUES (id);
 		SET planet_index = planet_index + 1;
