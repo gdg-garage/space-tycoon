@@ -2227,7 +2227,8 @@ SET player_index = 0;
 WHILE player_index < player_count DO
 	SET player_x = (RAND() - 0.5) * 3000;
 	SET player_y = (RAND() - 0.5) * 3000;
-	INSERT INTO t_player (name, user, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
+	INSERT INTO t_player (name, user, money, color) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000,
+		CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]"));
 	SET player_id = LAST_INSERT_ID();
 	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
