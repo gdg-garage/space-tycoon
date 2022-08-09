@@ -10,29 +10,32 @@
 package stycoon
 
 type MoveCommand struct {
-	Command
 
-	Destination Destination `json:"destination,omitempty"`
+	Type string `json:"type"`
+
+	Target int64 `json:"target,omitempty"`
+
+	Resource int64 `json:"resource,omitempty"`
+
+	Amount int64 `json:"amount,omitempty"`
+
+	ShipClass int64 `json:"ship-class,omitempty"`
+
+	Name string `json:"name,omitempty"`
+
+	Destination Destination `json:"destination"`
 }
 
 // AssertMoveCommandRequired checks if the required fields are not zero-ed
 func AssertMoveCommandRequired(obj MoveCommand) error {
 	elements := map[string]interface{}{
-		"class": obj.Class,
-		"name": obj.Name,
-		"target": obj.Target,
-		"resource": obj.Resource,
-		"amount": obj.Amount,
-		"where": obj.Where,
+		"type": obj.Type,
+		"destination": obj.Destination,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
 			return &RequiredError{Field: name}
 		}
-	}
-
-	if err := AssertCommandRequired(obj.Command); err != nil {
-		return err
 	}
 
 	if err := AssertDestinationRequired(obj.Destination); err != nil {

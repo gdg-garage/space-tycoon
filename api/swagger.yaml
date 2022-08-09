@@ -186,6 +186,7 @@ paths:
 components:
   schemas:
     Command:
+      nullable: true
       required:
       - type
       properties:
@@ -258,9 +259,9 @@ components:
       allOf:
       - $ref: '#/components/schemas/Command'
       - required:
-        - amount
         - resource
         - target
+        - amount
         type: object
         properties:
           amount:
@@ -380,6 +381,11 @@ components:
       type: object
       additionalProperties:
         type: object
+        required:
+          - name
+          - resources
+          - position
+          - prev-position
         properties:
           name:
             type: string
@@ -627,12 +633,12 @@ components:
 
     TradingResource:
       allOf:
-      - $ref: '#/components/schemas/Resource'
-      - properties:
-          buy-price:
-            type: number
-            format: double
-          sell-price:
+        - $ref: '#/components/schemas/Resource'
+        - properties:
+            buy-price:
+              type: number
+              format: double
+            sell-price:
               type: number
               format: double
 
@@ -650,17 +656,29 @@ components:
       type: object
       additionalProperties:
         type: object
+        required:
+          - name
+          - color
+          - net-worth
         properties:
           name:
             type: string
           color:
             $ref: '#/components/schemas/Color'
-          stats:
-            $ref: '#/components/schemas/Stats'
+          net-worth:
+            $ref: '#/components/schemas/NetWorth'
     Ships:
       type: object
       additionalProperties:
         type: object
+        required:
+          - ship-class
+          - life
+          - name
+          - player
+          - position
+          - prev-position
+          - resources
         properties:
           ship-class:
             type: integer
@@ -741,8 +759,13 @@ components:
         }
       }
 
-    Stats:
+    NetWorth:
       type: object
+      required:
+        - money
+        - resources
+        - ships
+        - total
       properties:
         money:
           type: integer
@@ -766,13 +789,20 @@ components:
 
     Data:
       type: object
+      required:
+        - current-tick
+        - planets
+        - players
+        - ships
       properties:
         current-tick:
           $ref: '#/components/schemas/CurrentTick'
         planets:
           $ref: '#/components/schemas/Planets'
-        player:
-          $ref: '#/components/schemas/PlayerId'
+        player-id:
+          type: integer
+          format: int64
+          nullable: true
         players:
           $ref: '#/components/schemas/Players'
         ships:
