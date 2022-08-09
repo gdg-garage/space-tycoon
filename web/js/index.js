@@ -41,16 +41,19 @@ function redraw(data) {
 	.classed("planet", true)
 	.attr("cx", d => d.position[0] )
 	.attr("cy", d => d.position[1] )
-	.attr("r", 10)
+	.attr("r", 7)
 
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
 	.join("circle")
 	.classed("ship", true)
+	.attr("r", 5)
+	.transition()
+	.duration(1000)
+	.ease(d3.easeLinear)
 	.attr("cx", d => d.position[0] )
 	.attr("cy", d => d.position[1] )
-	.attr("r", 7)
 }
 
 function refresh() {

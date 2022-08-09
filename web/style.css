@@ -8,6 +8,20 @@ html, body {
 	flex-direction: column;
 }
 
+body {
+	background-color: #191970;
+	color: white;
+}
+
+a {
+	color: lightgray;
+	text-decoration-line: underline;
+}
+
+a:hover {
+	color: white;
+}
+
 nav {
 	display: inline-block;
 	padding: 0.3em 0.5em;
@@ -29,13 +43,13 @@ form {
 
 #themap {
 	flex-grow: 1;
-	background-color: lightgray;
+	background-color: #1a1a1a;
 }
 
 .planet {
-	fill: green;
+	fill: gray;
 }
 
 .ship {
-	fill: red;
+	fill: white;
 }
