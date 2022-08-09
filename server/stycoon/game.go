@@ -175,7 +175,8 @@ func (game *Game) setPlanetResourcePrices(resources *map[int]map[string]*Trading
 		}
 		if buy.Valid {
 			(*resources)[planetId][resourceIdStr].BuyPrice = buy.Float64
-		} else if sell.Valid {
+		}
+		if sell.Valid {
 			(*resources)[planetId][resourceIdStr].SellPrice = sell.Float64
 		}
 	}
