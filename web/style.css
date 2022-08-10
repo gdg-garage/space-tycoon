@@ -50,10 +50,6 @@ form {
 	fill: gray;
 }
 
-.ship {
-	fill: white;
-}
-
 #modalContainer {
 	display: none;
 }

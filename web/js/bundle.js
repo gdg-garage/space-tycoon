@@ -8120,6 +8120,7 @@ function redraw(data) {
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
+	.attr("fill", d => "rgb(" + data.players[d.player].color[0] + "," + data.players[d.player].color[1] + "," + data.players[d.player].color[2] + ")")
 	.attr("r", 5)
 	.transition()
 	.duration(1000)
