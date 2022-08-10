@@ -8261,19 +8261,23 @@ function refresh() {
 }
 
 function timerLoop() {
-	(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
-		if (error) {
-			setTimeout(timerLoop, 1000)
-			d3.select("#tickInfo").text(error)
-		} else {
-			setTimeout(timerLoop, data["time-left-ms"] || 300)
-			if (currentTick.tick != data.tick) {
-				d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
-				currentTick = data
-				refresh()
+	if (document.visibilityState === "visible") {
+		(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
+			if (error) {
+				setTimeout(timerLoop, 1000)
+				d3.select("#tickInfo").text(error)
+			} else {
+				setTimeout(timerLoop, data["time-left-ms"] || 300)
+				if (currentTick.tick != data.tick) {
+					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
+					currentTick = data
+					refresh()
+				}
 			}
-		}
-	})
+		})
+	} else {
+		setTimeout(timerLoop, 1000)
+	}
 }
 
 function parseCookies() {
