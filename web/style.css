@@ -80,3 +80,24 @@ form {
 	text-align: right;
 }
 
+.commodities tr:nth-child(odd) {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+.commodities tr:nth-child(even) {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+.amount {
+	text-align: right;
+}
+
+.buy {
+	text-align: right;
+	color: red;
+}
+
+.sell {
+	text-align: right;
+	color: green;
+}

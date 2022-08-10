@@ -8044,14 +8044,19 @@ STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 
 var currentTick = new STC.CurrentTick()
+var staticData
 var zoom
 
-function initDraw() {
-	zoom = d3.zoom()
-	.on("zoom", handleZoom)
-
-	d3.select("#themap")
-	.call(zoom)
+function bignum(n) {
+	if (!n)
+		return n
+	let exponents = ["", "K", "M", "G", "T", "P", "E"]
+	let i = 0
+	while (n >= 1000) {
+		n /= 1000
+		i++
+	}
+	return n.toFixed(0) + exponents[i]
 }
 
 function handleZoom(e) {
@@ -8078,20 +8083,38 @@ function clickInfo(e) {
 	.on("click", modalClose)
 
 	d3.select("#modalTitle")
-	.html(d.name)
+	.html("<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>")
 
+	let t = ""
+	if (d["ship-class"]) {
+		let c = staticData["ship-classes"][d["ship-class"]]
+		t += "<hr>"
+		t += "<table>"
+		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
+		t += "<tr><td>Class:<td>" + c.name
+		t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+		t += "</table>"
+	}
+	if (Object.keys(d.resources).length > 0) {
+		t += "<hr>"
+		t += "<table class=\"commodities\">"
+		for (let rid of Object.keys(d.resources)) {
+			let r = d.resources[rid]
+			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r["buy-price"]) || "") + "<td class=\"sell\">" + (bignum(r["sell-price"]) || "")
+		}
+		t += "</table>"
+	}
 	d3.select("#modalInfo")
-	.html(JSON.stringify(d))
+	.html(t)
 }
 
 function redraw(data) {
-	if (!zoom)
-		initDraw()
 
 	let planets = []
 	for (let pid of Object.keys(data.planets)) {
 		let p = data.planets[pid]
 		p.id = pid
+		p.data = data
 		planets.push(p)
 	}
 
@@ -8110,6 +8133,7 @@ function redraw(data) {
 	for (let sid of Object.keys(data.ships)) {
 		let s = data.ships[sid]
 		s.id = sid
+		s.data = data
 		ships.push(s)
 	}
 
@@ -8131,7 +8155,7 @@ function redraw(data) {
 	if (data["player-id"] > 0) {
 		let ps = data.players[data["player-id"]]["net-worth"]
 		d3.select("#playerInfo")
-		.html("ships: " + ps.ships + ", commodities: " + ps.resources + ", money: " + ps.money + ", total: " + ps.total)
+		.html("Ships: " + bignum(ps.ships) + ", Commodities: " + bignum(ps.resources) + ", Money: " + bignum(ps.money) + ", Total: " + bignum(ps.total))
 	} else {
 		d3.select("#playerInfo")
 		.html("")
@@ -8149,17 +8173,28 @@ function redraw(data) {
 	.selectAll("tr")
 	.data(players, d => d.id)
 	.join("tr")
-	.html(d => "<td>" + d.name + "<td>" + d["net-worth"].total)
+	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
 	.style("color", d => "rgb(" + d.color[0] + "," + d.color[1] + "," + d.color[2] + ")")
 }
 
 function refresh() {
+	if (!staticData) {
+		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				staticData = data
+			}
+		})
+	}
+
 	(new STC.DataApi()).dataGet(function(error, data, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
-			//console.log(data)
-			redraw(data)
+			if (staticData) {
+				redraw(data)
+			}
 		}
 	})
 }
@@ -8172,7 +8207,7 @@ function timerLoop() {
 		} else {
 			setTimeout(timerLoop, data["time-left-ms"] || 300)
 			if (currentTick.tick != data.tick) {
-				d3.select("#tickInfo").text("season: " + data.season + ", tick: " + data.tick)
+				d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 				currentTick = data
 				refresh()
 			}
@@ -8195,11 +8230,17 @@ function parseCookies() {
 
 function startLoop()
 {
+	zoom = d3.zoom()
+	.on("zoom", handleZoom)
+	d3.select("#themap")
+	.call(zoom)
+
 	let cookies = parseCookies()
 	let playerid = cookies["player-id"] || -1
 	if (playerid > 0) {
-		d3.select("#userInfo").node().innerHTML = "Player id: " + playerid + " <a href=\"logout.htm\">Log out</a>"
+		d3.select("#userInfo").node().innerHTML = "<a href=\"logout.htm\">Log out</a> Player id: " + playerid + ", "
 	}
+
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(timerLoop, 0)
 }
