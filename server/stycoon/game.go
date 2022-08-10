@@ -271,7 +271,7 @@ func (game *Game) getCommodityAmounts() (map[int]map[string]*TradingResource, er
 
 func (game *Game) setPlayers() error {
 	var players = make(map[string]PlayersValue)
-	rows, err := game.db.Query("select `id`, `name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player left join t_report_player_score score on t_player.id = score.player where score.tick  = ?", game.Tick.Tick-1)
+	rows, err := game.db.Query("select `id`, `name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player left join t_report_player_score as score on t_player.id = score.player and score.tick = ?", game.Tick.Tick-1)
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}

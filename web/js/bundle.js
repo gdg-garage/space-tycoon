@@ -8251,9 +8251,6 @@ function refresh() {
 			d3.select("#tickInfo").text(error)
 		} else {
 			if (staticData) {
-				if (data["players"] == null) {
-					return // workaround issue #62
-				}
 				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}

@@ -61,9 +61,10 @@ form {
 
 #modalWindow {
 	position: fixed;
-	width: 25%;
+	min-width: 20em;
 	padding: 0.3em;
 	border: 1px solid lightgray;
+	border-radius: 0px 10px 10px 10px;
 	background-color: rgba(0, 0, 0, 0.8);
 	color: lightgray;
 }
@@ -78,6 +79,7 @@ form {
 	bottom: 0px;
 	padding: 0.3em;
 	border: 1px solid lightgray;
+	border-radius: 10px 0px 0px 0px;
 	background-color: rgba(0, 0, 0, 0.8);
 }
 
