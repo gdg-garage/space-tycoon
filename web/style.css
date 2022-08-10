@@ -50,6 +50,11 @@ form {
 	fill: gray;
 }
 
+.line {
+	stroke: dimgray;
+	stroke-width: 0.1;
+}
+
 #modalContainer {
 	display: none;
 }

@@ -60,7 +60,12 @@ function clickInfo(e) {
 			t += "<table>"
 			t += "<tr><td>Command:<td>" + d.command.type
 			if (typeof d.command.target !== "undefined") {
-				t += "<tr><td>Target:<td>" + d.command.target
+				let o = d.data.objects[d.command.target]
+				if (typeof o !== "undefined") {
+					t += "<tr><td>Target:<td>" + o.name + " &lt;" + o.position + "&gt;"
+				} else {
+					t += "<tr><td>Target:<td>" + d.command.target
+				}
 			}
 			// todo coordinates instead of target
 			if (typeof d.command.resource !== "undefined") {
@@ -92,12 +97,15 @@ function clickInfo(e) {
 }
 
 function redraw(data) {
+	data.objects = {}
+
 	let planets = []
 	for (let pid of Object.keys(data.planets)) {
 		let p = data.planets[pid]
 		p.id = pid
 		p.data = data
 		planets.push(p)
+		data.objects[pid] = p
 	}
 
 	d3.select("#planets")
@@ -117,6 +125,7 @@ function redraw(data) {
 		s.id = sid
 		s.data = data
 		ships.push(s)
+		data.objects[sid] = s
 	}
 
 	d3.select("#ships")
@@ -133,6 +142,34 @@ function redraw(data) {
 	.ease(d3.easeLinear)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
+
+	let lines = []
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		if (typeof s.command !== "undefined") {
+			let o = data.objects[s.command.target]
+			if (typeof o !== "undefined") {
+				let l = {}
+				l.id = s.id
+				l.ship = s
+				l.target = o
+				lines.push(l)
+			}
+		}
+	}
+
+	d3.select("#lines")
+	.selectAll(".line")
+	.data(lines, d => d.id)
+	.join("line")
+	.classed("line", true)
+	.transition()
+	.duration(1000)
+	.ease(d3.easeLinear)
+	.attr("x1", d => d.ship.position[0])
+	.attr("y1", d => d.ship.position[1])
+	.attr("x2", d => d.target.position[0])
+	.attr("y2", d => d.target.position[1])
 
 	if (typeof data["player-id"] !== "undefined") {
 		let ps = data.players[data["player-id"]]["net-worth"]
