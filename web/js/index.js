@@ -250,12 +250,13 @@ function parseCookies() {
 	}, {})
 }
 
-function startLoop()
-{
+function startLoop() {
+	let size = d3.select("#themap").node().getBoundingClientRect()
 	zoom = d3.zoom()
 	.on("zoom", handleZoom)
 	d3.select("#themap")
 	.call(zoom)
+	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
 
 	let cookies = parseCookies()
 	let playerid = cookies["player-id"] || -1
