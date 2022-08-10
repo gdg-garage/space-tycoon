@@ -8094,6 +8094,25 @@ function clickInfo(e) {
 		t += "<tr><td>Class:<td>" + c.name
 		t += "<tr><td>Life:<td>" + d.life + " / " + c.life
 		t += "</table>"
+		if (typeof d.command !== "undefined") {
+			t += "<hr>"
+			t += "<table>"
+			t += "<tr><td>Command:<td>" + d.command.type
+			if (typeof d.command.target !== "undefined") {
+				t += "<tr><td>Target:<td>" + d.command.target
+			}
+			// todo coordinates instead of target
+			if (typeof d.command.resource !== "undefined") {
+				t += "<tr><td>Resource:<td>" + staticData["resource-names"][d.command.resource]
+			}
+			if (typeof d.command.amount !== "undefined") {
+				t += "<tr><td>Amount:<td class=\"amount\">" + d.command.amount
+			}
+			if (typeof d.command["class"] !== "undefined") {
+				t += "<tr><td>Class:<td>" + staticData["ship-classes"][d.command["class"]].name
+			}
+			t += "</table>"
+		}
 	}
 	if (Object.keys(d.resources).length > 0) {
 		t += "<hr>"
@@ -8195,7 +8214,10 @@ function refresh() {
 			d3.select("#tickInfo").text(error)
 		} else {
 			if (staticData) {
-				if (("player-id" in data) && !(data["player-id"] in data.players)) {
+				if (data["players"] == null) {
+					return // workaround issue #62
+				}
+				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}
 				redraw(data)
