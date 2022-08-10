@@ -47,7 +47,7 @@ function clickInfo(e) {
 	.html("<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>")
 
 	let t = ""
-	if (d["ship-class"]) {
+	if (typeof d["ship-class"] !== "undefined") {
 		let c = staticData["ship-classes"][d["ship-class"]]
 		t += "<hr>"
 		t += "<table>"
@@ -73,7 +73,6 @@ function clickInfo(e) {
 }
 
 function redraw(data) {
-
 	let planets = []
 	for (let pid of Object.keys(data.planets)) {
 		let p = data.planets[pid]
@@ -116,7 +115,7 @@ function redraw(data) {
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
 
-	if (data["player-id"] > 0) {
+	if (typeof data["player-id"] !== "undefined") {
 		let ps = data.players[data["player-id"]]["net-worth"]
 		d3.select("#playerInfo")
 		.html("Ships: " + bignum(ps.ships) + ", Commodities: " + bignum(ps.resources) + ", Money: " + bignum(ps.money) + ", Total: " + bignum(ps.total))
@@ -157,6 +156,9 @@ function refresh() {
 			d3.select("#tickInfo").text(error)
 		} else {
 			if (staticData) {
+				if (("player-id" in data) && !(data["player-id"] in data.players)) {
+					delete data["player-id"] // the supposedly logged-in player does not exist
+				}
 				redraw(data)
 			}
 		}
