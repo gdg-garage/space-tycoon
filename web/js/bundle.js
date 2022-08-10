@@ -8095,13 +8095,6 @@ function redraw(data) {
 		planets.push(p)
 	}
 
-	let ships = []
-	for (let sid of Object.keys(data.ships)) {
-		let s = data.ships[sid]
-		s.id = sid
-		ships.push(s)
-	}
-
 	d3.select("#planets")
 	.selectAll(".planet")
 	.data(planets, d => d.id)
@@ -8112,6 +8105,13 @@ function redraw(data) {
 	.attr("r", 7)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
+
+	let ships = []
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		s.id = sid
+		ships.push(s)
+	}
 
 	d3.select("#ships")
 	.selectAll(".ship")
@@ -8127,6 +8127,30 @@ function redraw(data) {
 	.ease(d3.easeLinear)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
+
+	if (data["player-id"] > 0) {
+		let ps = data.players[data["player-id"]]["net-worth"]
+		d3.select("#playerInfo")
+		.html("ships: " + ps.ships + ", commodities: " + ps.resources + ", money: " + ps.money + ", total: " + ps.total)
+	} else {
+		d3.select("#playerInfo")
+		.html("")
+	}
+
+	let players = []
+	for (let pid of Object.keys(data.players)) {
+		let p = data.players[pid]
+		p.id = pid
+		players.push(p)
+	}
+	players.sort((a, b) => d3.descending(a["net-worth"].total, b["net-worth"].total))
+
+	d3.select("#playersOverlay")
+	.selectAll("tr")
+	.data(players, d => d.id)
+	.join("tr")
+	.html(d => "<td>" + d.name + "<td>" + d["net-worth"].total)
+	.style("color", d => "rgb(" + d.color[0] + "," + d.color[1] + "," + d.color[2] + ")")
 }
 
 function refresh() {
