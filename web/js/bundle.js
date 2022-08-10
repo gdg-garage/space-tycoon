@@ -8098,6 +8098,9 @@ function clickInfo(e) {
 	if (Object.keys(d.resources).length > 0) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
+		if (!d["ship-class"]) {
+			t += "<tr><td><td>Available<td>Buy price<td>Sell price"
+		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
 			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r["buy-price"]) || "") + "<td class=\"sell\">" + (bignum(r["sell-price"]) || "")
