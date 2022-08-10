@@ -32,7 +32,6 @@ func Root(w http.ResponseWriter, req *http.Request) {
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func Data(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
@@ -65,5 +64,4 @@ func Data(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWrit
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
