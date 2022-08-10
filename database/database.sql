@@ -2118,6 +2118,11 @@ DECLARE star_a FLOAT;
 DECLARE star_d FLOAT;
 DECLARE star_x INT;
 DECLARE star_y INT;
+DECLARE planet_a FLOAT;
+DECLARE planet_d FLOAT;
+DECLARE planet_x INT;
+DECLARE planet_y INT;
+DECLARE planets_rot FLOAT;
 DECLARE id INT;
 
 DROP TEMPORARY TABLE IF EXISTS t_planet_names;
@@ -2125,19 +2130,24 @@ CREATE TEMPORARY TABLE t_planet_names
 SELECT name FROM d_names
 ORDER BY RAND();
 
-SET num_stars = RAND() * 100 + 100;
+SET num_stars = RAND() * 50 + 75; # average at 100
 SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
 	SET star_a = RAND() * 2 * PI();
-	SET star_d = (1 - RAND() * RAND()) * 2000 + 500; # averages at 2000
+	SET star_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
 	SET star_x = COS(star_a) * star_d;
 	SET star_y = SIN(star_a) * star_d;
-	SET num_planets = RAND() * RAND() * 5 + 1;
+	SET num_planets = RAND() * RAND() * 8 + 2; # average at 4
+	set planets_rot = RAND() * 2 * PI();
 	SET planet_index = 0;
 	WHILE planet_index < num_planets DO
-		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), star_x + (RAND() - 0.5) * 20, star_y + (RAND() - 0.5) * 20);
+		SET planet_a = planets_rot + cast(planet_index as float) / num_planets * 2 * PI() + RAND();
+		SET planet_d = (1 - RAND() * RAND()) * 20 + 20; # average at 35
+		SET planet_x = star_x + COS(planet_a) * planet_d;
+		SET planet_y = star_y + SIN(planet_a) * planet_d;
+		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), planet_x, planet_y);
 		SET id = LAST_INSERT_ID();
 		INSERT INTO t_planet (id) VALUES (id);
 		SET planet_index = planet_index + 1;
@@ -2217,7 +2227,8 @@ SET player_index = 0;
 WHILE player_index < player_count DO
 	SET player_x = (RAND() - 0.5) * 3000;
 	SET player_y = (RAND() - 0.5) * 3000;
-	INSERT INTO t_player (name, user, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
+	INSERT INTO t_player (name, user, money, color) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000,
+		CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]"));
 	SET player_id = LAST_INSERT_ID();
 	SET ship_count = RAND() * 20 + 40;
 	SET ship_index = 0;
@@ -2780,12 +2791,9 @@ CREATE PROCEDURE `p_report_player_score`()
 BEGIN
 
 INSERT INTO t_report_player_score
-SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1),
-t_player.money, v_player_commodities_worth.price, v_player_ships_worth.price,
-t_player.money + v_player_commodities_worth.price + v_player_ships_worth.price
+SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1), v.commodities, v.ships, v.money, v.total
 FROM t_player
-JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
-JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id;
+JOIN v_player_total_worth AS v ON v.player = t_player.id;
 
 INSERT INTO t_report_resource_price
 SELECT resource, (SELECT tick FROM t_game LIMIT 1), sell
@@ -3075,9 +3083,9 @@ DROP TABLE IF EXISTS `t_report_player_score`;
 CREATE TABLE IF NOT EXISTS `t_report_player_score` (
   `player` int(11) NOT NULL,
   `tick` int(11) NOT NULL,
-  `money` bigint(20) NOT NULL,
   `commodities` bigint(20) NOT NULL,
   `ships` bigint(20) NOT NULL,
+  `money` bigint(20) NOT NULL,
   `total` bigint(20) NOT NULL,
   PRIMARY KEY (`player`,`tick`) USING BTREE,
   CONSTRAINT `FK_t_report_player_score_t_player` FOREIGN KEY (`player`) REFERENCES `t_player` (`id`)
@@ -3168,7 +3176,7 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_commodities_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(21) NULL
+	`commodities` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_score
@@ -3176,7 +3184,7 @@ DROP VIEW IF EXISTS `v_player_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_score` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL,
+	`total` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3185,7 +3193,7 @@ DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_ships_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(21) NULL
+	`ships` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_total_worth
@@ -3193,7 +3201,10 @@ DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_total_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL
+	`commodities` BIGINT(21) NULL,
+	`ships` BIGINT(21) NULL,
+	`money` BIGINT(20) NOT NULL,
+	`total` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_resource_price
@@ -3219,7 +3230,7 @@ DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_best_worth` (
 	`user` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL
+	`total` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_user_score
@@ -3227,7 +3238,7 @@ DROP VIEW IF EXISTS `v_user_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_score` (
 	`user` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL,
+	`total` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3235,7 +3246,7 @@ CREATE TABLE `v_user_score` (
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, CAST(SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS INTEGER) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, CAST(SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS INTEGER) AS commodities
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_commodity ON t_commodity.object = t_object.id
@@ -3246,17 +3257,17 @@ GROUP BY t_player.id ;
 DROP VIEW IF EXISTS `v_player_score`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_score`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_score` AS SELECT a.player AS player, a.price AS price, COUNT(1) AS score
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_score` AS SELECT a.player AS player, a.total AS total, COUNT(1) AS score
 FROM v_player_total_worth AS a
-JOIN v_player_total_worth AS b ON a.price >= b.price
+JOIN v_player_total_worth AS b ON a.total >= b.total
 GROUP BY a.player
-ORDER BY a.price desc ;
+ORDER BY a.total desc ;
 
 -- Dumping structure for view space_tycoon.v_player_ships_worth
 DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_ships_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, CAST(SUM(ifnull(d_class.price, 0)) AS INTEGER) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, CAST(SUM(ifnull(d_class.price, 0)) AS INTEGER) AS ships
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_ship ON t_ship.id = t_object.id
@@ -3267,7 +3278,7 @@ GROUP BY t_player.id ;
 DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_total_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_total_worth` AS SELECT t_player.id AS player, v_player_commodities_worth.price + v_player_ships_worth.price + t_player.money AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_total_worth` AS SELECT t_player.id AS player, v_player_commodities_worth.commodities, v_player_ships_worth.ships, t_player.money, v_player_commodities_worth.commodities + v_player_ships_worth.ships + t_player.money AS total
 FROM t_player
 JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
 JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id ;
@@ -3295,21 +3306,21 @@ GROUP BY t_ship.id ;
 DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_user_best_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.price) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.total) AS total
 FROM v_player_total_worth
 JOIN t_player ON t_player.id = v_player_total_worth.player
 GROUP BY t_player.user
-ORDER BY price desc ;
+ORDER BY total desc ;
 
 -- Dumping structure for view space_tycoon.v_user_score
 DROP VIEW IF EXISTS `v_user_score`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_user_score`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.price AS price, COUNT(1) AS score
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.total AS total, COUNT(1) AS score
 FROM v_user_best_worth AS a
-JOIN v_user_best_worth AS b ON a.price >= b.price
+JOIN v_user_best_worth AS b ON a.total >= b.total
 GROUP BY a.user
-ORDER BY a.price desc ;
+ORDER BY a.total desc ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

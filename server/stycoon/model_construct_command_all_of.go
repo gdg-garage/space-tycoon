@@ -11,15 +11,13 @@ package stycoon
 
 type ConstructCommandAllOf struct {
 
-	Class string `json:"class"`
-
-	Name string `json:"name,omitempty"`
+	ShipClass int64 `json:"ship-class"`
 }
 
 // AssertConstructCommandAllOfRequired checks if the required fields are not zero-ed
 func AssertConstructCommandAllOfRequired(obj ConstructCommandAllOf) error {
 	elements := map[string]interface{}{
-		"class": obj.Class,
+		"ship-class": obj.ShipClass,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

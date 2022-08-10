@@ -10,33 +10,32 @@
 package stycoon
 
 type TradeCommand struct {
-	Command
+
+	Type string `json:"type"`
+
+	Target int64 `json:"target"`
 
 	Resource int64 `json:"resource"`
 
 	Amount int64 `json:"amount"`
 
-	Where int64 `json:"where"`
+	ShipClass int64 `json:"ship-class,omitempty"`
+
+	Name string `json:"name,omitempty"`
 }
 
 // AssertTradeCommandRequired checks if the required fields are not zero-ed
 func AssertTradeCommandRequired(obj TradeCommand) error {
 	elements := map[string]interface{}{
+		"type": obj.Type,
+		"target": obj.Target,
 		"resource": obj.Resource,
 		"amount": obj.Amount,
-		"where": obj.Where,
-		"class": obj.Class,
-		"name": obj.Name,
-		"target": obj.Target,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
 			return &RequiredError{Field: name}
 		}
-	}
-
-	if err := AssertCommandRequired(obj.Command); err != nil {
-		return err
 	}
 
 	return nil

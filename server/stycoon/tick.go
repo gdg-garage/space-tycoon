@@ -7,8 +7,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (game *Game) getGameTick() {
-	err := game.db.QueryRow("select * from t_game").Scan(&game.Tick.Season, &game.Tick.Tick)
+func (game *Game) setGameTick() {
+	err := game.db.QueryRow("select `season`, `tick` from t_game").Scan(&game.Tick.Season, &game.Tick.Tick)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error().Err(err).Msg("Update tick failed - t_game is empty")
@@ -19,13 +19,13 @@ func (game *Game) getGameTick() {
 	}
 }
 
-func (game *Game) getTickWait() time.Duration {
+func (game *Game) getRemainingTickTime() time.Duration {
 	return TickDuration - time.Since(game.lastTick)
 }
 
 func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
-	tickData.TimeLeftMs = game.getTickWait().Milliseconds()
+	tickData.TimeLeftMs = game.getRemainingTickTime().Milliseconds()
 	return tickData
 }
 
@@ -34,7 +34,7 @@ func (game *Game) EndTurn(tick int64) CurrentTick {
 		return game.GetGameTickState()
 	}
 	currentTick := game.Tick.Tick
-	time.Sleep(game.getTickWait())
+	time.Sleep(game.getRemainingTickTime())
 	tickState := game.GetGameTickState()
 	for tickState.Tick == currentTick {
 		time.Sleep(time.Millisecond)
