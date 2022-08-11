@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   `repair_price` int(11) NOT NULL COMMENT 'money required for repairing every tick',
   `damage` int(11) NOT NULL,
   `price` int(11) DEFAULT NULL COMMENT 'price to build new ship (also the value of the ship in score)',
+  `starting_count` int(11) DEFAULT 0 COMMENT 'number of ships of this class to spawn for new players',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 2` (`name`(255)),
   CONSTRAINT `positive numbers` CHECK (`speed` >= 0 and `cargo` >= 0 and `life` > 0 and `regen` >= 0 and `repair_life` >= 0 and `repair_price` >= 0 and `damage` >= 0 and (`price` is null or `price` > 0)),
@@ -41,14 +42,14 @@ CREATE TABLE IF NOT EXISTS `d_class` (
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
-INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`) VALUES
-	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL),
-	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000),
-	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000),
-	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000),
-	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000),
-	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000),
-	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000);
+INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`, `starting_count`) VALUES
+	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL, 1),
+	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000, 5),
+	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000, 5),
+	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000, 3),
+	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000, 3),
+	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000, 0),
+	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000, 0);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_names
@@ -2056,6 +2057,7 @@ CREATE FUNCTION `f_distance`(`id_a` INT,
 	`id_b` INT
 ) RETURNS int(11)
     READS SQL DATA
+    DETERMINISTIC
     SQL SECURITY INVOKER
 BEGIN
 DECLARE res INT;
@@ -2098,6 +2100,55 @@ DELETE FROM t_command;
 DELETE FROM t_ship;
 DELETE FROM t_object;
 DELETE FROM t_player;
+
+END//
+DELIMITER ;
+
+-- Dumping structure for function space_tycoon.p_create_player
+DROP FUNCTION IF EXISTS `p_create_player`;
+DELIMITER //
+CREATE FUNCTION `p_create_player`(`user_id` INT,
+	`pos_x` INT,
+	`pos_y` INT,
+	`player_name` TINYTEXT,
+	`color` TINYTEXT
+) RETURNS int(11)
+    SQL SECURITY INVOKER
+BEGIN
+
+DECLARE player_id INT;
+DECLARE ship_id INT;
+DECLARE ship_class INT;
+DECLARE ship_class_name TINYTEXT;
+DECLARE ship_life INT;
+DECLARE ships_count INT;
+DECLARE ship_index INT;
+DECLARE ship_index_total INT DEFAULT 1;
+DECLARE cursor_done INT DEFAULT FALSE;
+DECLARE classes_cursor CURSOR FOR SELECT id, name, life, starting_count FROM d_class;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET cursor_done = TRUE;
+
+INSERT INTO t_player (user, name, color) VALUES(user_id, player_name, color);
+SET player_id = LAST_INSERT_ID();
+
+OPEN classes_cursor;
+loop_through_classes: LOOP
+	FETCH classes_cursor INTO ship_class, ship_class_name, ship_life, ships_count;
+	IF cursor_done THEN
+		LEAVE loop_through_classes;
+	END IF;
+	SET ship_index = 0;
+	WHILE ship_index < ships_count DO
+		INSERT INTO t_object (owner, name, pos_x, pos_y, pos_x_prev, pos_y_prev) VALUES (player_id, CONCAT(player_name, ' - ', ship_index_total, ' ', ship_class_name), pos_x, pos_y, pos_x, pos_y);
+		SET ship_id = LAST_INSERT_ID();
+		INSERT INTO t_ship (id, class, life) VALUES (ship_id, ship_class, ship_life);
+		SET ship_index = ship_index + 1;
+		SET ship_index_total = ship_index_total + 1;
+	END WHILE;
+END LOOP;
+CLOSE classes_cursor;
+
+RETURN player_id;
 
 END//
 DELIMITER ;
@@ -2202,6 +2253,29 @@ JOIN t_price_supply_demand_avg;
 END//
 DELIMITER ;
 
+-- Dumping structure for procedure space_tycoon.p_generate_random_commands
+DROP PROCEDURE IF EXISTS `p_generate_random_commands`;
+DELIMITER //
+CREATE PROCEDURE `p_generate_random_commands`()
+    SQL SECURITY INVOKER
+BEGIN
+
+REPLACE INTO t_command (ship, type, target)
+SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
+FROM t_ship AS a
+JOIN t_object AS b ON b.id = a.id
+JOIN d_class ON d_class.id = a.class
+WHERE d_class.damage > 0;
+
+REPLACE INTO t_command (ship, type, target, resource, amount)
+SELECT t_ship.id, 'trade', (SELECT id FROM t_planet ORDER BY RAND() LIMIT 1), (SELECT id FROM d_resource ORDER BY RAND() LIMIT 1), RAND() * 10 + 5
+FROM t_ship
+JOIN d_class ON d_class.id = t_ship.class
+WHERE d_class.damage = 0;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_generate_random_players
 DROP PROCEDURE IF EXISTS `p_generate_random_players`;
 DELIMITER //
@@ -2209,55 +2283,36 @@ CREATE PROCEDURE `p_generate_random_players`()
     SQL SECURITY INVOKER
 BEGIN
 
-DECLARE player_count INT;
-DECLARE player_index INT;
-DECLARE player_id INT;
-DECLARE player_x INT;
-DECLARE player_y INT;
-DECLARE ship_count INT;
-DECLARE ship_index INT;
-DECLARE ship_id INT;
+DECLARE user_pass TINYTEXT DEFAULT "$2a$10$pvAWQjq/KAdZpnr4q51E3.RLE6AnPd8P92wRm8n5XsLd2tcjR1ePa"; # password: 123456
+DECLARE player_count INT DEFAULT RAND() * 5 + 5;
+DECLARE player_index INT DEFAULT 0;
+DECLARE player_offset INT;
+DECLARE start_a FLOAT;
+DECLARE start_d FLOAT;
+DECLARE start_x INT;
+DECLARE start_y INT;
+DECLARE user int;
+DECLARE name TINYTEXT;
+DECLARE color TINYTEXT;
 
-DELETE FROM d_user_score;
-DELETE FROM d_user;
-INSERT INTO d_user (name) VALUES ("tamagochi"), ("hu"), ("spaceman"), ("minecraft"), ("dragonborn");
+INSERT IGNORE INTO d_user (name, password) VALUES ("tamagochi", user_pass), ("the hu", user_pass), ("spaceman", user_pass), ("minecraft", user_pass), ("dragonborn", user_pass);
+
+SELECT COUNT(1) + 1 FROM t_player INTO player_offset;
 
 SET player_count = RAND() * 5 + 5;
-SET player_index = 0;
 WHILE player_index < player_count DO
-	SET player_x = (RAND() - 0.5) * 3000;
-	SET player_y = (RAND() - 0.5) * 3000;
-	INSERT INTO t_player (name, user, money, color) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000,
-		CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]"));
-	SET player_id = LAST_INSERT_ID();
-	SET ship_count = RAND() * 20 + 40;
-	SET ship_index = 0;
-	WHILE ship_index < ship_count DO
-		INSERT INTO t_object (owner, name, pos_x, pos_y) VALUES (player_id, CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
-		SET ship_id = LAST_INSERT_ID();
-		INSERT INTO t_ship (id, class, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), 0);
-		SET ship_index = ship_index + 1;
-	END WHILE;
+	SET start_a = RAND() * 2 * PI();
+	SET start_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
+	SET start_x = COS(start_a) * start_d;
+	SET start_y = SIN(start_a) * start_d;
+	SELECT id FROM d_user ORDER BY RAND() LIMIT 1 INTO user;
+	SET name = CONCAT('dummy ', player_index + player_offset);
+	SET color = CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]");
+	SELECT p_create_player(user, start_x, start_y, name, color);
 	SET player_index = player_index + 1;
 END WHILE;
 
-UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = d_class.life;
-
-INSERT IGNORE INTO t_command (ship, type, target)
-SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
-FROM t_ship AS a
-JOIN t_object AS b ON b.id = a.id
-JOIN d_class ON d_class.id = a.class
-WHERE d_class.damage > 0;
-
-INSERT INTO t_command (ship, type, target, resource, amount)
-SELECT t_ship.id, 'trade', (SELECT id FROM t_planet ORDER BY RAND() LIMIT 1), (SELECT id FROM d_resource ORDER BY RAND() LIMIT 1), RAND() * 10 + 5
-FROM t_ship
-JOIN d_class ON d_class.id = t_ship.class
-WHERE d_class.damage = 0
-ORDER BY RAND();
-
-UPDATE t_object SET pos_x_prev = pos_x, pos_y_prev = pos_y;
+CALL p_generate_random_commands;
 
 END//
 DELIMITER ;
@@ -3008,7 +3063,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) NOT NULL,
   `name` tinytext NOT NULL,
-  `money` bigint(20) NOT NULL DEFAULT 3000000,
+  `money` bigint(20) NOT NULL DEFAULT 5000000,
   `color` tinytext NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 3` (`name`(255)),
