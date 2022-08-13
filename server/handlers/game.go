@@ -3,47 +3,32 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
-	"io/ioutil"
 	"net/http"
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
-		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		log.Warn().Err(err).Msg("Error reading body")
-		http.Error(w, "can't read request body", http.StatusBadRequest)
-		return
-	}
-	r, err := json.Marshal(map[string]string{"greeting": "hello", "body": string(body)})
-	if err != nil {
-		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
-		return
-	}
-	_, err = w.Write(r)
-	if err != nil {
-		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Data(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
 		return
 	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
+		return
+	}
 	var gameData stycoon.Data
 	var err error
-	user, loggedErr := stycoon.LoggedUserFromSession(req, sessionManager)
+	user, loggedErr := stycoon.LoggedUserFromSession(req, game.SessionManager)
 	if loggedErr != nil {
 		gameData, err = game.GetData(nil)
 	} else {

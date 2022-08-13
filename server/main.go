@@ -46,22 +46,22 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
-	game, err := stycoon.NewGame(db)
+	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
+	game, err := stycoon.NewGame(db, sessionManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
-	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 
 	http.HandleFunc("/", handlers.Root)
 	// TODO: disable based on config
 	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateUser(db, w, r)
+		handlers.CreateUser(game, db, w, r)
 	})
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, sessionManager, w, r)
+		handlers.Login(game, db, w, r)
 	})
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, sessionManager, w, r)
+		handlers.Data(game, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)

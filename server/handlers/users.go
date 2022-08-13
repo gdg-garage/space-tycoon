@@ -5,13 +5,12 @@ import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 )
 
-func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
+func CreateUser(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only POST method is supported", http.StatusBadRequest)
@@ -42,6 +41,12 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
+	err = game.CreatePlayersForUsers()
+	if err != nil {
+		log.Warn().Err(err).Msg("Creating player for user failed")
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
 	r, err := json.Marshal(map[string]string{"status": "ok"})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
@@ -57,12 +62,14 @@ func CreateUser(db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only POST method is supported", http.StatusBadRequest)
 		return
 	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
@@ -94,7 +101,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
-	session, _ := sessionManager.Get(req, stycoon.SessionKey)
+	session, _ := game.SessionManager.Get(req, stycoon.SessionKey)
 	session.Values[stycoon.UsernameField] = userCredentials.Username
 	playerId, err := database.GetPLayerIdForUser(db, userId, userCredentials.Player)
 	if err != nil {
@@ -103,6 +110,7 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 		return
 	}
 	session.Values[stycoon.PlayerIdField] = playerId
+	session.Values[stycoon.SeasonField] = game.Tick.Season
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
