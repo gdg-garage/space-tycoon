@@ -13,7 +13,8 @@
   "author": "Tomáš Malý and the GDG Garage Prague Team",
   "license": "MIT",
   "dependencies": {
-    "space_tycoon_client": ""
+    "space_tycoon_client": "",
+    "hash-int": ""
   },
   "devDependencies": {
     "browserify": "",

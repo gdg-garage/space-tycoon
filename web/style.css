@@ -47,7 +47,13 @@ form {
 }
 
 .planet {
-	fill: gray;
+	stroke: lightblue;
+	stroke-width: 0.3;
+}
+
+.ship {
+	stroke: black;
+	stroke-width: 0.3;
 }
 
 .line {

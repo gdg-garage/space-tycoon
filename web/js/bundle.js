@@ -767,7 +767,7 @@ ApiClient.instance = new ApiClient();
 var _default = ApiClient;
 exports["default"] = _default;
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":55,"fs":54,"querystring":59,"superagent":47}],2:[function(require,module,exports){
+},{"buffer":55,"fs":54,"querystring":60,"superagent":47}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8038,6 +8038,7 @@ exports.cleanHeader = function (header, changesOrigin) {
 
 },{}],52:[function(require,module,exports){
 var STC = require("space_tycoon_client")
+var hashInt = require("hash-int")
 
 STC.ApiClient.instance.basePath = "http://localhost" // for development
 STC.ApiClient.instance.enableCookies = true
@@ -8135,6 +8136,19 @@ function clickInfo(e) {
 	.html(t)
 }
 
+function planetColor(d) {
+	let h1 = hashInt(d.id)
+	let h2 = hashInt(h1 + 123)
+	let h3 = hashInt(h2 + 741)
+	let c = [ h1 % 20 + 120, h2 % 20 + 120, h3 % 20 + 120 ]
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
+function shipColor(d) {
+	let c = d.data.players[d.player].color
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
 function redraw(data) {
 	data.objects = {}
 
@@ -8154,6 +8168,7 @@ function redraw(data) {
 	.classed("planet", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
+	.attr("fill", planetColor)
 	.attr("r", 7)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
@@ -8174,7 +8189,7 @@ function redraw(data) {
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
-	.attr("fill", d => "rgb(" + data.players[d.player].color[0] + "," + data.players[d.player].color[1] + "," + data.players[d.player].color[2] + ")")
+	.attr("fill", shipColor)
 	.attr("r", 5)
 	.transition()
 	.duration(1000)
@@ -8313,7 +8328,7 @@ function startLoop() {
 
 setTimeout(startLoop, 0)
 
-},{"space_tycoon_client":9}],53:[function(require,module,exports){
+},{"hash-int":56,"space_tycoon_client":9}],53:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -10248,7 +10263,31 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":53,"buffer":55,"ieee754":56}],56:[function(require,module,exports){
+},{"base64-js":53,"buffer":55,"ieee754":57}],56:[function(require,module,exports){
+"use strict"
+
+var A
+if(typeof Uint32Array === undefined) {
+  A = [ 0 ]
+} else {
+  A = new Uint32Array(1)
+}
+
+function hashInt(x) {
+  A[0]  = x|0
+  A[0] -= (A[0]<<6)
+  A[0] ^= (A[0]>>>17)
+  A[0] -= (A[0]<<9)
+  A[0] ^= (A[0]<<4)
+  A[0] -= (A[0]<<3)
+  A[0] ^= (A[0]<<10)
+  A[0] ^= (A[0]>>>15)
+  return A[0]
+}
+
+module.exports = hashInt
+
+},{}],57:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -10335,7 +10374,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10421,7 +10460,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10508,10 +10547,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":57,"./encode":58}]},{},[52]);
+},{"./decode":58,"./encode":59}]},{},[52]);

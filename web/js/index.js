@@ -1,4 +1,5 @@
 var STC = require("space_tycoon_client")
+var hashInt = require("hash-int")
 
 STC.ApiClient.instance.basePath = "http://localhost" // for development
 STC.ApiClient.instance.enableCookies = true
@@ -96,6 +97,19 @@ function clickInfo(e) {
 	.html(t)
 }
 
+function planetColor(d) {
+	let h1 = hashInt(d.id)
+	let h2 = hashInt(h1 + 123)
+	let h3 = hashInt(h2 + 741)
+	let c = [ h1 % 20 + 120, h2 % 20 + 120, h3 % 20 + 120 ]
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
+function shipColor(d) {
+	let c = d.data.players[d.player].color
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
 function redraw(data) {
 	data.objects = {}
 
@@ -115,6 +129,7 @@ function redraw(data) {
 	.classed("planet", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
+	.attr("fill", planetColor)
 	.attr("r", 7)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
@@ -135,7 +150,7 @@ function redraw(data) {
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
-	.attr("fill", d => "rgb(" + data.players[d.player].color[0] + "," + data.players[d.player].color[1] + "," + data.players[d.player].color[2] + ")")
+	.attr("fill", shipColor)
 	.attr("r", 5)
 	.transition()
 	.duration(1000)
