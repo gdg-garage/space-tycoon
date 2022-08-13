@@ -12,10 +12,12 @@ package stycoon
 type TradeCommand struct {
 	Type string `json:"type"`
 
+	// Positive value means buy, negative sell.
 	Amount *int64 `json:"amount"`
 
 	Resource *int64 `json:"resource"`
 
+	// Any planet or own ship.
 	Target *int64 `json:"target"`
 }
 
