@@ -43,7 +43,7 @@ func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) 
 		case "attack":
 			err = game.processAttack(int64(id), command)
 		case "trade":
-			err = game.processTrade(int64(id), user.PlayerId, command)
+			err = game.processTrade(int64(id), playerOwnedShips, command)
 		case "rename":
 			err = game.processRename(int64(id), command)
 		case "decommission":
