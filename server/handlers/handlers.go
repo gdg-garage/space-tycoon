@@ -85,8 +85,11 @@ func Commands(game *stycoon.Game, sessionManager sessions.Store, w http.Response
 		http.Error(w, "only for logged users", http.StatusForbidden)
 		return
 	}
-	errs := game.ProcessCommands(commands, user)
-	if len(errs) > 0 {
+	errs, processsingErr := game.ProcessCommands(commands, user)
+	if processsingErr != nil {
+		log.Warn().Err(processsingErr).Msg("Command processing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+	} else if len(errs) > 0 {
 		b, err := json.Marshal(errs)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
