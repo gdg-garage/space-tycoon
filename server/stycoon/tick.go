@@ -26,6 +26,9 @@ func (game *Game) getRemainingTickTime() time.Duration {
 func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
 	tickData.TimeLeftMs = game.getRemainingTickTime().Milliseconds()
+	if tickData.TimeLeftMs == 0 {
+		tickData.TimeLeftMs = TickDuration.Milliseconds()
+	}
 	return tickData
 }
 
