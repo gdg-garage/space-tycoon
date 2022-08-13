@@ -298,6 +298,14 @@ components:
       - resource
       - target
       - type
+    
+    RepairCommand:
+      type: object
+      properties:
+        type:
+          type: string
+      required:
+        - type
 
     Destination:
       type: object

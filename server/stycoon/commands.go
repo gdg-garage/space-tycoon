@@ -48,6 +48,8 @@ func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) 
 			err = game.processRename(int64(id), command)
 		case "decommission":
 			err = game.processDecommission(int64(id), command)
+		case "repair":
+			err = game.processRepair(int64(id), command)
 		case "stop":
 			err = game.processStop(int64(id))
 		default:

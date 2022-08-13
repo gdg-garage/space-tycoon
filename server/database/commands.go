@@ -30,6 +30,12 @@ func ReplaceTradeCommand(db *sql.DB, id int64, commandType string, target int64,
 	return err
 }
 
+func ReplaceRepairCommand(db *sql.DB, id int64, commandType string) error {
+	log.Info().Msgf("replace into t_command (ship, type) values (%d, %s)", id, commandType)
+	_, err := db.Exec(`replace into t_command (ship, type) values (?, ?)`, id, commandType)
+	return err
+}
+
 func ReplaceDecommissionCommand(db *sql.DB, id int64, commandType string) error {
 	log.Info().Msgf("replace into t_command (ship, type) values (%d, %s)", id, commandType)
 	_, err := db.Exec(`replace into t_command (ship, type) values (?, ?)`, id, commandType)
