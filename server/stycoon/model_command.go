@@ -10,20 +10,17 @@
 package stycoon
 
 type Command struct {
-
 	Type string `json:"type"`
 
-	Target *int64 `json:"target,omitempty"`
+	Target int64 `json:"target,omitempty"`
 
-	Destination *Destination `json:"destination,omitempty"`
+	Resource int64 `json:"resource,omitempty"`
 
-	Resource *int64 `json:"resource,omitempty"`
+	Amount int64 `json:"amount,omitempty"`
 
-	Amount *int64 `json:"amount,omitempty"`
+	ShipClass int64 `json:"ship-class,omitempty"`
 
-	ShipClass *int64 `json:"ship-class,omitempty"`
-
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 // AssertCommandRequired checks if the required fields are not zero-ed
@@ -37,11 +34,6 @@ func AssertCommandRequired(obj Command) error {
 		}
 	}
 
-	if obj.Destination != nil {
-		if err := AssertDestinationRequired(*obj.Destination); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

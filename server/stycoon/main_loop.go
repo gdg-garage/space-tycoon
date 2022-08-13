@@ -33,7 +33,11 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			start := time.Now()
 			game.callUpdate()
 			game.lastTick = time.Now()
-			game.getGameTick()
+			game.setGameTick()
+			err := game.setPlayers()
+			if err != nil {
+				log.Error().Err(err).Msg("Players fetch failed")
+			}
 			log.Info().Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():
 			wg.Done()

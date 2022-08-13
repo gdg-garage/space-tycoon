@@ -47,8 +47,11 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
+	game, err := stycoon.NewGame(db)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Game object init failed")
+	}
 	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
-	game := stycoon.NewGame(db)
 
 	http.HandleFunc("/", handlers.Root)
 	// TODO: disable based on config
@@ -58,20 +61,20 @@ func main() {
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(db, sessionManager, w, r)
 	})
-	http.HandleFunc("/player-scores", func(w http.ResponseWriter, r *http.Request) {
-		handlers.PlayerScores(game, w, r)
+	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+		handlers.Data(game, sessionManager, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
+	})
+	http.HandleFunc("/static-data", func(w http.ResponseWriter, r *http.Request) {
+		handlers.StaticGameData(game, w, r)
 	})
 	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
 	})
 	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Commands(game, sessionManager, w, r)
-	})
-	http.HandleFunc("/internal", func(w http.ResponseWriter, r *http.Request) {
-		handlers.InternalPage(sessionManager, w, r)
 	})
 
 	wg := &sync.WaitGroup{}

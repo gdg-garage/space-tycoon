@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `d_class` (
   `repair_price` int(11) NOT NULL COMMENT 'money required for repairing every tick',
   `damage` int(11) NOT NULL,
   `price` int(11) DEFAULT NULL COMMENT 'price to build new ship (also the value of the ship in score)',
+  `starting_count` int(11) DEFAULT 0 COMMENT 'number of ships of this class to spawn for new players',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 2` (`name`(255)),
   CONSTRAINT `positive numbers` CHECK (`speed` >= 0 and `cargo` >= 0 and `life` > 0 and `regen` >= 0 and `repair_life` >= 0 and `repair_price` >= 0 and `damage` >= 0 and (`price` is null or `price` > 0)),
@@ -41,14 +42,14 @@ CREATE TABLE IF NOT EXISTS `d_class` (
 
 -- Dumping data for table space_tycoon.d_class: ~7 rows (approximately)
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
-INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`) VALUES
-	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL),
-	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000),
-	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000),
-	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000),
-	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000),
-	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000),
-	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000);
+INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`, `starting_count`) VALUES
+	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL, 1),
+	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000, 5),
+	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000, 5),
+	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000, 3),
+	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000, 3),
+	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000, 0),
+	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000, 0);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.d_names
@@ -2056,6 +2057,7 @@ CREATE FUNCTION `f_distance`(`id_a` INT,
 	`id_b` INT
 ) RETURNS int(11)
     READS SQL DATA
+    DETERMINISTIC
     SQL SECURITY INVOKER
 BEGIN
 DECLARE res INT;
@@ -2102,6 +2104,55 @@ DELETE FROM t_player;
 END//
 DELIMITER ;
 
+-- Dumping structure for function space_tycoon.p_create_player
+DROP FUNCTION IF EXISTS `p_create_player`;
+DELIMITER //
+CREATE FUNCTION `p_create_player`(`user_id` INT,
+	`pos_x` INT,
+	`pos_y` INT,
+	`player_name` TINYTEXT,
+	`color` TINYTEXT
+) RETURNS int(11)
+    SQL SECURITY INVOKER
+BEGIN
+
+DECLARE player_id INT;
+DECLARE ship_id INT;
+DECLARE ship_class INT;
+DECLARE ship_class_name TINYTEXT;
+DECLARE ship_life INT;
+DECLARE ships_count INT;
+DECLARE ship_index INT;
+DECLARE ship_index_total INT DEFAULT 1;
+DECLARE cursor_done INT DEFAULT FALSE;
+DECLARE classes_cursor CURSOR FOR SELECT id, name, life, starting_count FROM d_class;
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET cursor_done = TRUE;
+
+INSERT INTO t_player (user, name, color) VALUES(user_id, player_name, color);
+SET player_id = LAST_INSERT_ID();
+
+OPEN classes_cursor;
+loop_through_classes: LOOP
+	FETCH classes_cursor INTO ship_class, ship_class_name, ship_life, ships_count;
+	IF cursor_done THEN
+		LEAVE loop_through_classes;
+	END IF;
+	SET ship_index = 0;
+	WHILE ship_index < ships_count DO
+		INSERT INTO t_object (owner, name, pos_x, pos_y, pos_x_prev, pos_y_prev) VALUES (player_id, CONCAT(player_name, ' - ', ship_index_total, ' ', ship_class_name), pos_x, pos_y, pos_x, pos_y);
+		SET ship_id = LAST_INSERT_ID();
+		INSERT INTO t_ship (id, class, life) VALUES (ship_id, ship_class, ship_life);
+		SET ship_index = ship_index + 1;
+		SET ship_index_total = ship_index_total + 1;
+	END WHILE;
+END LOOP;
+CLOSE classes_cursor;
+
+RETURN player_id;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_generate_planets
 DROP PROCEDURE IF EXISTS `p_generate_planets`;
 DELIMITER //
@@ -2118,6 +2169,11 @@ DECLARE star_a FLOAT;
 DECLARE star_d FLOAT;
 DECLARE star_x INT;
 DECLARE star_y INT;
+DECLARE planet_a FLOAT;
+DECLARE planet_d FLOAT;
+DECLARE planet_x INT;
+DECLARE planet_y INT;
+DECLARE planets_rot FLOAT;
 DECLARE id INT;
 
 DROP TEMPORARY TABLE IF EXISTS t_planet_names;
@@ -2125,19 +2181,24 @@ CREATE TEMPORARY TABLE t_planet_names
 SELECT name FROM d_names
 ORDER BY RAND();
 
-SET num_stars = RAND() * 100 + 100;
+SET num_stars = RAND() * 50 + 75; # average at 100
 SET star_index = 0;
 SET name_index = 0;
 
 WHILE star_index < num_stars DO
 	SET star_a = RAND() * 2 * PI();
-	SET star_d = (1 - RAND() * RAND()) * 2000 + 500; # averages at 2000
+	SET star_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
 	SET star_x = COS(star_a) * star_d;
 	SET star_y = SIN(star_a) * star_d;
-	SET num_planets = RAND() * RAND() * 5 + 1;
+	SET num_planets = RAND() * RAND() * 8 + 2; # average at 4
+	set planets_rot = RAND() * 2 * PI();
 	SET planet_index = 0;
 	WHILE planet_index < num_planets DO
-		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), star_x + (RAND() - 0.5) * 20, star_y + (RAND() - 0.5) * 20);
+		SET planet_a = planets_rot + cast(planet_index as float) / num_planets * 2 * PI() + RAND();
+		SET planet_d = (1 - RAND() * RAND()) * 20 + 20; # average at 35
+		SET planet_x = star_x + COS(planet_a) * planet_d;
+		SET planet_y = star_y + SIN(planet_a) * planet_d;
+		INSERT INTO t_object (name, pos_x, pos_y) VALUES ((SELECT name FROM t_planet_names LIMIT 1 OFFSET name_index), planet_x, planet_y);
 		SET id = LAST_INSERT_ID();
 		INSERT INTO t_planet (id) VALUES (id);
 		SET planet_index = planet_index + 1;
@@ -2192,6 +2253,29 @@ JOIN t_price_supply_demand_avg;
 END//
 DELIMITER ;
 
+-- Dumping structure for procedure space_tycoon.p_generate_random_commands
+DROP PROCEDURE IF EXISTS `p_generate_random_commands`;
+DELIMITER //
+CREATE PROCEDURE `p_generate_random_commands`()
+    SQL SECURITY INVOKER
+BEGIN
+
+REPLACE INTO t_command (ship, type, target)
+SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
+FROM t_ship AS a
+JOIN t_object AS b ON b.id = a.id
+JOIN d_class ON d_class.id = a.class
+WHERE d_class.damage > 0;
+
+REPLACE INTO t_command (ship, type, target, resource, amount)
+SELECT t_ship.id, 'trade', (SELECT id FROM t_planet ORDER BY RAND() LIMIT 1), (SELECT id FROM d_resource ORDER BY RAND() LIMIT 1), RAND() * 10 + 5
+FROM t_ship
+JOIN d_class ON d_class.id = t_ship.class
+WHERE d_class.damage = 0;
+
+END//
+DELIMITER ;
+
 -- Dumping structure for procedure space_tycoon.p_generate_random_players
 DROP PROCEDURE IF EXISTS `p_generate_random_players`;
 DELIMITER //
@@ -2199,54 +2283,36 @@ CREATE PROCEDURE `p_generate_random_players`()
     SQL SECURITY INVOKER
 BEGIN
 
-DECLARE player_count INT;
-DECLARE player_index INT;
-DECLARE player_id INT;
-DECLARE player_x INT;
-DECLARE player_y INT;
-DECLARE ship_count INT;
-DECLARE ship_index INT;
-DECLARE ship_id INT;
+DECLARE user_pass TINYTEXT DEFAULT "$2a$10$pvAWQjq/KAdZpnr4q51E3.RLE6AnPd8P92wRm8n5XsLd2tcjR1ePa"; # password: 123456
+DECLARE player_count INT DEFAULT RAND() * 5 + 5;
+DECLARE player_index INT DEFAULT 0;
+DECLARE player_offset INT;
+DECLARE start_a FLOAT;
+DECLARE start_d FLOAT;
+DECLARE start_x INT;
+DECLARE start_y INT;
+DECLARE user int;
+DECLARE name TINYTEXT;
+DECLARE color TINYTEXT;
 
-DELETE FROM d_user_score;
-DELETE FROM d_user;
-INSERT INTO d_user (name) VALUES ("tamagochi"), ("hu"), ("spaceman"), ("minecraft"), ("dragonborn");
+INSERT IGNORE INTO d_user (name, password) VALUES ("tamagochi", user_pass), ("the hu", user_pass), ("spaceman", user_pass), ("minecraft", user_pass), ("dragonborn", user_pass);
+
+SELECT COUNT(1) + 1 FROM t_player INTO player_offset;
 
 SET player_count = RAND() * 5 + 5;
-SET player_index = 0;
 WHILE player_index < player_count DO
-	SET player_x = (RAND() - 0.5) * 3000;
-	SET player_y = (RAND() - 0.5) * 3000;
-	INSERT INTO t_player (name, user, money) VALUES (CONCAT('AI-', player_index), (SELECT id FROM d_user ORDER BY RAND() LIMIT 1), RAND() * 10000000 + 10000);
-	SET player_id = LAST_INSERT_ID();
-	SET ship_count = RAND() * 20 + 40;
-	SET ship_index = 0;
-	WHILE ship_index < ship_count DO
-		INSERT INTO t_object (owner, name, pos_x, pos_y) VALUES (player_id, CONCAT('AI-', player_index, '-', ship_index), player_x, player_y);
-		SET ship_id = LAST_INSERT_ID();
-		INSERT INTO t_ship (id, class, life) VALUES (ship_id, (SELECT id FROM d_class ORDER BY RAND() LIMIT 1), 0);
-		SET ship_index = ship_index + 1;
-	END WHILE;
+	SET start_a = RAND() * 2 * PI();
+	SET start_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
+	SET start_x = COS(start_a) * start_d;
+	SET start_y = SIN(start_a) * start_d;
+	SELECT id FROM d_user ORDER BY RAND() LIMIT 1 INTO user;
+	SET name = CONCAT('dummy ', player_index + player_offset);
+	SET color = CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]");
+	SELECT p_create_player(user, start_x, start_y, name, color);
 	SET player_index = player_index + 1;
 END WHILE;
 
-UPDATE t_ship JOIN d_class ON d_class.id = t_ship.class SET t_ship.life = d_class.life;
-
-INSERT IGNORE INTO t_command (ship, type, target)
-SELECT a.id, 'attack', (SELECT c.id FROM t_ship AS c JOIN t_object AS d ON d.id = c.id WHERE d.owner <> b.owner ORDER BY RAND() LIMIT 1)
-FROM t_ship AS a
-JOIN t_object AS b ON b.id = a.id
-JOIN d_class ON d_class.id = a.class
-WHERE d_class.damage > 0;
-
-INSERT INTO t_command (ship, type, target, resource, amount)
-SELECT t_ship.id, 'trade', (SELECT id FROM t_planet ORDER BY RAND() LIMIT 1), (SELECT id FROM d_resource ORDER BY RAND() LIMIT 1), RAND() * 10 + 5
-FROM t_ship
-JOIN d_class ON d_class.id = t_ship.class
-WHERE d_class.damage = 0
-ORDER BY RAND();
-
-UPDATE t_object SET pos_x_prev = pos_x, pos_y_prev = pos_y;
+CALL p_generate_random_commands;
 
 END//
 DELIMITER ;
@@ -2780,12 +2846,9 @@ CREATE PROCEDURE `p_report_player_score`()
 BEGIN
 
 INSERT INTO t_report_player_score
-SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1),
-t_player.money, v_player_commodities_worth.price, v_player_ships_worth.price,
-t_player.money + v_player_commodities_worth.price + v_player_ships_worth.price
+SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1), v.commodities, v.ships, v.money, v.total
 FROM t_player
-JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
-JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id;
+JOIN v_player_total_worth AS v ON v.player = t_player.id;
 
 INSERT INTO t_report_resource_price
 SELECT resource, (SELECT tick FROM t_game LIMIT 1), sell
@@ -3000,7 +3063,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) NOT NULL,
   `name` tinytext NOT NULL,
-  `money` bigint(20) NOT NULL DEFAULT 3000000,
+  `money` bigint(20) NOT NULL DEFAULT 5000000,
   `color` tinytext NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 3` (`name`(255)),
@@ -3075,9 +3138,9 @@ DROP TABLE IF EXISTS `t_report_player_score`;
 CREATE TABLE IF NOT EXISTS `t_report_player_score` (
   `player` int(11) NOT NULL,
   `tick` int(11) NOT NULL,
-  `money` bigint(20) NOT NULL,
   `commodities` bigint(20) NOT NULL,
   `ships` bigint(20) NOT NULL,
+  `money` bigint(20) NOT NULL,
   `total` bigint(20) NOT NULL,
   PRIMARY KEY (`player`,`tick`) USING BTREE,
   CONSTRAINT `FK_t_report_player_score_t_player` FOREIGN KEY (`player`) REFERENCES `t_player` (`id`)
@@ -3168,7 +3231,7 @@ DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_commodities_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(21) NULL
+	`commodities` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_score
@@ -3176,7 +3239,7 @@ DROP VIEW IF EXISTS `v_player_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_score` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL,
+	`total` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3185,7 +3248,7 @@ DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_ships_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(21) NULL
+	`ships` BIGINT(21) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_player_total_worth
@@ -3193,7 +3256,10 @@ DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_player_total_worth` (
 	`player` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL
+	`commodities` BIGINT(21) NULL,
+	`ships` BIGINT(21) NULL,
+	`money` BIGINT(20) NOT NULL,
+	`total` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_resource_price
@@ -3219,7 +3285,7 @@ DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_best_worth` (
 	`user` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL
+	`total` BIGINT(23) NULL
 ) ENGINE=MyISAM;
 
 -- Dumping structure for view space_tycoon.v_user_score
@@ -3227,7 +3293,7 @@ DROP VIEW IF EXISTS `v_user_score`;
 -- Creating temporary table to overcome VIEW dependency errors
 CREATE TABLE `v_user_score` (
 	`user` INT(11) NOT NULL,
-	`price` BIGINT(23) NULL,
+	`total` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
@@ -3235,7 +3301,7 @@ CREATE TABLE `v_user_score` (
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_commodities_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, CAST(SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS INTEGER) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_commodities_worth` AS SELECT t_player.id AS player, CAST(SUM(IFNULL(t_commodity.amount * v_resource_price.sell, 0)) AS INTEGER) AS commodities
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_commodity ON t_commodity.object = t_object.id
@@ -3246,17 +3312,17 @@ GROUP BY t_player.id ;
 DROP VIEW IF EXISTS `v_player_score`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_score`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_score` AS SELECT a.player AS player, a.price AS price, COUNT(1) AS score
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_score` AS SELECT a.player AS player, a.total AS total, COUNT(1) AS score
 FROM v_player_total_worth AS a
-JOIN v_player_total_worth AS b ON a.price >= b.price
+JOIN v_player_total_worth AS b ON a.total >= b.total
 GROUP BY a.player
-ORDER BY a.price desc ;
+ORDER BY a.total desc ;
 
 -- Dumping structure for view space_tycoon.v_player_ships_worth
 DROP VIEW IF EXISTS `v_player_ships_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_ships_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, CAST(SUM(ifnull(d_class.price, 0)) AS INTEGER) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_ships_worth` AS SELECT t_player.id AS player, CAST(SUM(ifnull(d_class.price, 0)) AS INTEGER) AS ships
 FROM t_player
 LEFT JOIN t_object ON t_object.owner = t_player.id
 LEFT JOIN t_ship ON t_ship.id = t_object.id
@@ -3267,7 +3333,7 @@ GROUP BY t_player.id ;
 DROP VIEW IF EXISTS `v_player_total_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_player_total_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_total_worth` AS SELECT t_player.id AS player, v_player_commodities_worth.price + v_player_ships_worth.price + t_player.money AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_player_total_worth` AS SELECT t_player.id AS player, v_player_commodities_worth.commodities, v_player_ships_worth.ships, t_player.money, v_player_commodities_worth.commodities + v_player_ships_worth.ships + t_player.money AS total
 FROM t_player
 JOIN v_player_commodities_worth ON v_player_commodities_worth.player = t_player.id
 JOIN v_player_ships_worth ON v_player_ships_worth.player = t_player.id ;
@@ -3295,21 +3361,21 @@ GROUP BY t_ship.id ;
 DROP VIEW IF EXISTS `v_user_best_worth`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_user_best_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.price) AS price
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.total) AS total
 FROM v_player_total_worth
 JOIN t_player ON t_player.id = v_player_total_worth.player
 GROUP BY t_player.user
-ORDER BY price desc ;
+ORDER BY total desc ;
 
 -- Dumping structure for view space_tycoon.v_user_score
 DROP VIEW IF EXISTS `v_user_score`;
 -- Removing temporary table and create final VIEW structure
 DROP TABLE IF EXISTS `v_user_score`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.price AS price, COUNT(1) AS score
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.total AS total, COUNT(1) AS score
 FROM v_user_best_worth AS a
-JOIN v_user_best_worth AS b ON a.price >= b.price
+JOIN v_user_best_worth AS b ON a.total >= b.total
 GROUP BY a.user
-ORDER BY a.price desc ;
+ORDER BY a.total desc ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
