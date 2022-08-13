@@ -10,6 +10,7 @@
 package stycoon
 
 type ShipsValue struct {
+
 	ShipClass int64 `json:"ship-class"`
 
 	Life int64 `json:"life"`
@@ -18,9 +19,9 @@ type ShipsValue struct {
 
 	Player int64 `json:"player"`
 
-	Position []int64 `json:"position"`
+	Position *[]int64 `json:"position"`
 
-	PrevPosition []int64 `json:"prev-position"`
+	PrevPosition *[]int64 `json:"prev-position"`
 
 	Resources map[string]Resource `json:"resources"`
 
@@ -30,13 +31,13 @@ type ShipsValue struct {
 // AssertShipsValueRequired checks if the required fields are not zero-ed
 func AssertShipsValueRequired(obj ShipsValue) error {
 	elements := map[string]interface{}{
-		"ship-class":    obj.ShipClass,
-		"life":          obj.Life,
-		"name":          obj.Name,
-		"player":        obj.Player,
-		"position":      obj.Position,
+		"ship-class": obj.ShipClass,
+		"life": obj.Life,
+		"name": obj.Name,
+		"player": obj.Player,
+		"position": obj.Position,
 		"prev-position": obj.PrevPosition,
-		"resources":     obj.Resources,
+		"resources": obj.Resources,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
