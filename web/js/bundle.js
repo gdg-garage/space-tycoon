@@ -8149,6 +8149,10 @@ function shipColor(d) {
 	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
 }
 
+function shipHref(d) {
+	return "#class-" + staticData["ship-classes"][d["ship-class"]].name
+}
+
 function redraw(data) {
 	data.objects = {}
 
@@ -8185,17 +8189,17 @@ function redraw(data) {
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
-	.join("circle")
+	.join("use")
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
+	.attr("href", shipHref)
 	.attr("fill", shipColor)
-	.attr("r", 5)
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("cx", d => d.position[0])
-	.attr("cy", d => d.position[1])
+	.attr("x", d => d.position[0])
+	.attr("y", d => d.position[1])
 
 	let lines = []
 	for (let sid of Object.keys(data.ships)) {

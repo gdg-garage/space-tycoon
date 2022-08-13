@@ -48,12 +48,12 @@ form {
 
 .planet {
 	stroke: lightblue;
-	stroke-width: 0.3;
+	stroke-width: 0.2;
 }
 
 .ship {
-	stroke: black;
-	stroke-width: 0.3;
+	stroke: white;
+	stroke-width: 0.5;
 }
 
 .line {
