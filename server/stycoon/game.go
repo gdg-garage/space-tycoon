@@ -12,7 +12,8 @@ import (
 type Game struct {
 	Tick                 CurrentTick
 	db                   *sql.DB
-	lastTick             time.Time
+	lastTickEstimate     time.Time
+	lastTickReal         time.Time
 	ResourceNames        map[string]string
 	ShipClasses          map[string]StaticDataShipClassesValue
 	SerializedStaticData []byte
@@ -21,8 +22,9 @@ type Game struct {
 
 func NewGame(db *sql.DB) (*Game, error) {
 	game := Game{
-		db:       db,
-		lastTick: time.Now(),
+		db:               db,
+		lastTickEstimate: time.Now(),
+		lastTickReal:     time.Now(),
 	}
 	game.setGameTick()
 	err := game.SetShipClasses()

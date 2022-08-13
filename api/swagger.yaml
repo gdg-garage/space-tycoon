@@ -825,7 +825,7 @@ components:
         tick:
           type: integer
           format: int64
-        time-left-ms:
+        min-time-left-ms:
           type: integer
           format: int64
         season:
@@ -833,7 +833,7 @@ components:
           format: int64
       required:
       - tick
-      - time-left-ms
+      - min-time-left-ms
       - season
       example:
         {

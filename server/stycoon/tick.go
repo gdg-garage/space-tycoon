@@ -20,20 +20,20 @@ func (game *Game) setGameTick() {
 }
 
 func (game *Game) getRemainingTickTime() time.Duration {
-	return TickDuration - time.Since(game.lastTick)
+	if game.lastTickEstimate.After(game.lastTickReal) {
+		return 0
+	}
+	return TickDuration - time.Since(game.lastTickEstimate)
 }
 
 func (game *Game) GetGameTickState() CurrentTick {
 	tickData := game.Tick
-	tickData.TimeLeftMs = game.getRemainingTickTime().Milliseconds()
-	if tickData.TimeLeftMs == 0 {
-		tickData.TimeLeftMs = TickDuration.Milliseconds()
-	}
+	tickData.MinTimeLeftMs = game.getRemainingTickTime().Milliseconds()
 	return tickData
 }
 
-func (game *Game) EndTurn(tick int64) CurrentTick {
-	if tick < game.Tick.Tick {
+func (game *Game) EndTurn(userTick int64) CurrentTick {
+	if userTick < game.Tick.Tick {
 		return game.GetGameTickState()
 	}
 	currentTick := game.Tick.Tick

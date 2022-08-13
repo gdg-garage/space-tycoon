@@ -31,8 +31,9 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 		select {
 		case <-ticker.C:
 			start := time.Now()
+			game.lastTickEstimate = time.Now()
 			game.callUpdate()
-			game.lastTick = time.Now()
+			game.lastTickReal = time.Now()
 			game.setGameTick()
 			err := game.setPlayers()
 			if err != nil {
