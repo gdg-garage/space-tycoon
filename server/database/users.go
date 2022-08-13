@@ -70,3 +70,16 @@ func GetPlayerOwnedShips(db *sql.DB, playerId int64) (map[int64]struct{}, error)
 	}
 	return ownedShips, nil
 }
+
+func CheckIfObjectIsShipAndGetOwner(db *sql.DB, id int64) (bool, int64, error) {
+	rows, err := db.Query("select `owner` from t_object join t_ship on t_ship.id = t_object.id where t_object.id = ?", id)
+	if err != nil {
+		return false, 0, fmt.Errorf("query failed %v", err)
+	}
+	for rows.Next() {
+		var owner int64
+		rows.Scan(&owner)
+		return true, owner, nil
+	}
+	return false, 0, nil
+}

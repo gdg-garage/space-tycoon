@@ -1,6 +1,8 @@
 package stycoon
 
 import (
+	"fmt"
+
 	"github.com/gdg-garage/space-tycoon/server/database"
 )
 
@@ -13,12 +15,21 @@ func NewTradeCommand(command Command) *TradeCommand {
 	}
 }
 
-func (game *Game) processTrade(id int64, command Command) error {
+func (game *Game) processTrade(id int64, playerId int64, command Command) error {
 	c := NewTradeCommand(command)
 	err := AssertTradeCommandRequired(*c)
 	if err != nil {
 		return err
 	}
-	// TODO should we validate trading with own ships?
+
+	targetIsShip, owner, err := database.CheckIfObjectIsShipAndGetOwner(game.db, id)
+	if err != nil {
+		return err
+	}
+	if targetIsShip {
+		if owner != playerId {
+			return fmt.Errorf("trading with another players ship is forbidden")
+		}
+	}
 	return database.ReplaceTradeCommand(game.db, id, command.Type, *c.Target, *c.Resource, *c.Amount)
 }
