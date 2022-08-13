@@ -28,6 +28,8 @@ tags:
   description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
 - name: reports
   description: Fetch statistical data about all players.
+- name: history
+  description: Historical data for given tick and season.
 paths:
   /login:
     post:
@@ -182,6 +184,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /history:
+    post:
+      tags:
+        - history
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/HistoryIdentifier'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryEntry'
+        "403":
+          description: Please login again
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: NotFound
+          content: { }
+        "405":
+          description: Invalid input
+          content: { }
 
 components:
   schemas:
@@ -424,7 +455,7 @@ components:
             }
           }
         }
- 
+
     PlayerId:
       type: object
       properties:
@@ -447,7 +478,7 @@ components:
           format: int64
         killed:
           type: boolean
-      example: 
+      example:
         combat: {
           tick: 126,
           attacker: 15,
@@ -555,7 +586,7 @@ components:
               additionalProperties:
                 type: integer
                 format: int64
-      example: 
+      example:
         1: {
           money: {
             125: 123456,
@@ -786,7 +817,7 @@ components:
           format: int64
         ships:
           type: integer
-          format: int64        
+          format: int64
         total:
           type: integer
           format: int64
@@ -854,6 +885,38 @@ components:
         {
           tick: 3600
         }
+
+    HistoryIdentifier:
+      type: object
+      properties:
+        tick:
+          type: integer
+          format: int64
+        season:
+          type: integer
+          format: int64
+      required:
+        - tick
+        - season
+      example:
+        {
+          tick: 165,
+          season: 13,
+        }
+
+    HistoryEntry:
+      type: object
+      properties:
+        static-data:
+          $ref: '#/components/schemas/StaticData'
+        data:
+          $ref: '#/components/schemas/Data'
+        reports:
+          $ref: '#/components/schemas/Reports'
+      required:
+        - static-data
+        - data
+        - reports
 
     Error:
       required:

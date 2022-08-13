@@ -38,6 +38,12 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")
 			}
+			go func(game *Game) {
+				err := game.report()
+				if err != nil {
+					log.Warn().Err(err).Msg("history report failed")
+				}
+			}(game)
 			log.Info().Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():
 			wg.Done()

@@ -2038,6 +2038,18 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
+DROP TABLE IF EXISTS `d_history`;
+CREATE TABLE `d_history`
+(
+    `season`      int(11) NOT NULL,
+    `tick`        int(11) NOT NULL,
+    `reports`     longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`reports`)),
+    `data`        longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
+    `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`static-data`)),
+    PRIMARY KEY (`season`, `tick`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb3;
+
 -- Dumping data for table space_tycoon.d_user_score: ~0 rows (approximately)
 /*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
 /*!40000 ALTER TABLE `d_user_score` ENABLE KEYS */;

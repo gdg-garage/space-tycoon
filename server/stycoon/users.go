@@ -51,3 +51,15 @@ func LoggedUserFromSession(req *http.Request, sessionManager sessions.Store) (Lo
 	}
 	return user, nil
 }
+
+func MaybeGetLoggedPlayerId(req *http.Request, sessionManager sessions.Store) *int64 {
+	user, err := LoggedUserFromSession(req, sessionManager)
+	if err != nil {
+		return nil
+	}
+	// To be extra sure that none can get -1 (which is allowed to ge everything)
+	if user.PlayerId <= 0 {
+		return nil
+	}
+	return &user.PlayerId
+}

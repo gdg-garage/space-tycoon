@@ -42,7 +42,12 @@ func NewGame(db *sql.DB) (*Game, error) {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		return &game, err
 	}
-
+	go func(game *Game) {
+		err := game.reportStaticData()
+		if err != nil {
+			log.Warn().Err(err).Msg("Reporting season failed")
+		}
+	}(&game)
 	return &game, nil
 }
 
@@ -165,7 +170,14 @@ func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*Tradi
 
 func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
 	commands := make(map[int]Command)
-	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
+	var rows *sql.Rows
+	var err error
+	// return all commands for history report
+	if playerId == -1 {
+		rows, err = game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id")
+	} else {
+		rows, err = game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
+	}
 	if err != nil {
 		return commands, err
 	}
