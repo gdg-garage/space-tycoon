@@ -6,7 +6,7 @@ import (
 )
 
 func (game *Game) reportStaticData() error {
-	_, err := game.db.Exec("insert into d_history (`season`, `tick`, `static-data`) values (?, ?, ?)", game.Tick.Season, -1, game.SerializedStaticData)
+	_, err := game.db.Exec("insert into d_static_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
 	return err
 }
 
@@ -46,7 +46,7 @@ func FilterCommands(playerId *int64, ships *map[string]ShipsValue) {
 func (game *Game) History(id HistoryIdentifier, playerId *int64) (HistoryEntry, error) {
 	var entry HistoryEntry
 	var staticData sql.NullString
-	err := game.db.QueryRow("select `static-data` from d_history where `season` = ? and `tick` = -1", id.Season).Scan(&staticData)
+	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", id.Season).Scan(&staticData)
 	if err != nil {
 		return entry, err
 	}
