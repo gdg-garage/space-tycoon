@@ -30,11 +30,8 @@ func FilterCommands(playerId *int64, ships *map[string]ShipsValue) {
 		if ship.Command == nil {
 			continue
 		}
-		shouldRemove := true
 		if playerId != nil && *playerId == ship.Player {
-			shouldRemove = false
-		}
-		if !shouldRemove {
+			// Player is allowed to see owned ship commands
 			continue
 		}
 		filteredShip := ship

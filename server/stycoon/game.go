@@ -173,10 +173,11 @@ func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
 	var rows *sql.Rows
 	var err error
 	// return all commands for history report
+	allCommandsQuery := "select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id"
 	if playerId == -1 {
-		rows, err = game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id")
+		rows, err = game.db.Query(allCommandsQuery)
 	} else {
-		rows, err = game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
+		rows, err = game.db.Query(allCommandsQuery+" where object.`owner` = ?", playerId)
 	}
 	if err != nil {
 		return commands, err
