@@ -39,6 +39,7 @@ func (game *Game) nextSeason() {
 
 func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 	ticker := time.NewTicker(TickDuration)
+	// TODO make this configurable
 	seasonDuration := 2 * int64(time.Hour.Seconds())
 	defer ticker.Stop()
 
