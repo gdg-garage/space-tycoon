@@ -11,6 +11,9 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
+
 	"github.com/rs/zerolog/log"
 )
 
