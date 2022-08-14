@@ -52,17 +52,21 @@ func main() {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
 	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
+	game, err := stycoon.NewGame(db, sessionManager)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Game object init failed")
+	}
 
 	http.HandleFunc("/", handlers.Root)
 	// TODO: disable based on config
 	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateUser(db, w, r)
+		handlers.CreateUser(game, db, w, r)
 	})
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, sessionManager, w, r)
+		handlers.Login(game, db, w, r)
 	})
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, sessionManager, w, r)
+		handlers.Data(game, w, r)
 	})
 	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
@@ -74,7 +78,7 @@ func main() {
 		handlers.EndTurn(game, w, r)
 	})
 	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Commands(game, sessionManager, w, r)
+		handlers.Commands(game, w, r)
 	})
 
 	wg := &sync.WaitGroup{}
@@ -84,7 +88,6 @@ func main() {
 
 	wg.Add(1)
 	go game.MainLoop(ctx, wg)
-	// TODO add code for starting new season
 
 	serve(ctx, wg)
 

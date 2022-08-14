@@ -1,15 +1,22 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
 	"github.com/rs/zerolog/log"
-	"net/http"
 )
 
 func StaticGameData(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
 		return
 	}
 	_, err := w.Write(game.SerializedStaticData)

@@ -21,6 +21,10 @@ func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) 
 	if err != nil {
 		return res, fmt.Errorf("unable fetch ships owned by player: %v", err)
 	}
+	planetIDs, err := database.GetPlanetIDs(game.db)
+	if err != nil {
+		return res, fmt.Errorf("unable fetch planets: %v", err)
+	}
 	for strId, command := range commands {
 		id, err := strconv.Atoi(strId)
 		if err != nil {
@@ -43,7 +47,7 @@ func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) 
 		case "attack":
 			err = game.processAttack(int64(id), command)
 		case "trade":
-			err = game.processTrade(int64(id), playerOwnedShips, command)
+			err = game.processTrade(int64(id), playerOwnedShips, planetIDs, command)
 		case "rename":
 			err = game.processRename(int64(id), command)
 		case "decommission":
