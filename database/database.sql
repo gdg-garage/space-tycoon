@@ -2043,8 +2043,8 @@ CREATE TABLE `d_history`
 (
     `season`      int(11) NOT NULL,
     `tick`        int(11) NOT NULL,
-    `reports`     longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`reports`)),
-    `data`        longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
+    `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`reports`)),
+    `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
 
     PRIMARY KEY (`season`, `tick`)
 ) ENGINE = InnoDB
@@ -2054,7 +2054,7 @@ DROP TABLE IF EXISTS `d_static_history`;
 CREATE TABLE `d_static_history`
 (
     `season`      int(11) NOT NULL,
-    `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`static-data`)),
+    `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),
 
     PRIMARY KEY (`season`)
 ) ENGINE = InnoDB
