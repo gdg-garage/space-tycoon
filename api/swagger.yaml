@@ -12,27 +12,16 @@ externalDocs:
   description: Find out more about Space Tycoon game
   url: https://github.com/gdg-garage/space-tycoon
 servers:
-- url: https://space-tycoon.garage-trip.cz/api/
+  - url: https://space-tycoon.garage-trip.cz/api/
 tags:
-- name: login
-  description: Get user session
-- name: static-data
-  description: Data that do not change during entire season, such as ships classes.
-- name: data
-  description: "Dynamic game data (scores, prices, spaceship positions)"
-- name: commands
-  description: Specify commands for your ships
-- name: current-tick
-  description: Returns the current tick, season and the approximate time until the next tick.
-- name: end-turn
-  description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
-- name: reports
-  description: Fetch statistical data about all players.
+  - name: game
+    description: Interact with the game
 paths:
   /login:
     post:
+      summary: Get user session
       tags:
-      - login
+        - game
       requestBody:
         content:
           '*/*':
@@ -65,7 +54,8 @@ paths:
   /static-data:
     get:
       tags:
-      - static-data
+        - game
+      summary: Data that do not change during entire season, such as ships classes.
       responses:
         "200":
           description: OK
@@ -81,8 +71,9 @@ paths:
                 $ref: '#/components/schemas/Error'
   /data:
     get:
+      summary: "Dynamic game data (scores, prices, spaceship positions)"
       tags:
-      - data
+        - game
       responses:
         "200":
           description: OK
@@ -98,8 +89,9 @@ paths:
                 $ref: '#/components/schemas/Error'
   /commands:
     post:
+      summary: Specify commands for your ships
       tags:
-      - commands
+        - game
       requestBody:
         content:
           '*/*':
@@ -109,7 +101,7 @@ paths:
       responses:
         "200":
           description: OK
-          content: {}
+          content: { }
         "403":
           description: Please login again
           content:
@@ -124,8 +116,9 @@ paths:
                 $ref: '#/components/schemas/CommandError'
   /end-turn:
     post:
+      summary: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
       tags:
-      - end-turn
+        - game
       requestBody:
         content:
           '*/*':
@@ -147,11 +140,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         "405":
           description: Invalid input
-          content: {}
+          content: { }
   /current-tick:
     get:
+      summary: Returns the current tick, season and the approximate time until the next tick.
       tags:
-      - current-tick
+        - game
       responses:
         "200":
           description: OK
@@ -167,8 +161,9 @@ paths:
                 $ref: '#/components/schemas/Error'
   /reports:
     get:
+      summary: Fetch statistical data about all players.
       tags:
-      - reports
+        - game
       responses:
         "200":
           description: OK
@@ -188,7 +183,7 @@ components:
     Command:
       nullable: true
       required:
-      - type
+        - type
       properties:
         type:
           type: string
@@ -243,7 +238,7 @@ components:
 
     DecommissionCommand:
       type: object
-      properties: 
+      properties:
         type:
           type: string
       required:
@@ -294,10 +289,10 @@ components:
           nullable: true
           description: Any planet or own ship.
       required:
-      - amount
-      - resource
-      - target
-      - type
+        - amount
+        - resource
+        - target
+        - type
     
     RepairCommand:
       type: object
@@ -321,7 +316,7 @@ components:
       format: int64
       nullable: true
       example: 234
-      
+
     Coordinates:
       type: array
       items:
@@ -330,7 +325,7 @@ components:
       minItems: 2
       maxItems: 2
       nullable: true
-      example: [10, 20]
+      example: [ 10, 20 ]
 
     Commands:
       type: object
@@ -338,9 +333,9 @@ components:
         $ref: '#/components/schemas/Command'
     Credentials:
       required:
-      - username
-      - password
-      - player
+        - username
+        - password
+        - player
       type: object
       properties:
         username:
@@ -412,8 +407,8 @@ components:
           }
         }
         resource-names: {
-         "1": "spice melange",
-         "2": "pokeballs"
+          "1": "spice melange",
+          "2": "pokeballs"
         }
 
     Color:
@@ -425,7 +420,7 @@ components:
       maxItems: 3
       minimum: 0
       maximum: 255
-      example: [0, 255, 255]
+      example: [ 0, 255, 255 ]
 
     Planets:
       type: object
@@ -449,8 +444,8 @@ components:
         {
           10: {
             name: Aldebaran,
-            position: [-13, 25],
-            prev-position: [-13, 25],
+            position: [ -13, 25 ],
+            prev-position: [ -13, 25 ],
             resources: {
               1: {
                 amount: 0,
@@ -463,7 +458,7 @@ components:
             }
           }
         }
- 
+
     PlayerId:
       type: object
       properties:
@@ -486,7 +481,7 @@ components:
           format: int64
         killed:
           type: boolean
-      example: 
+      example:
         combat: {
           tick: 126,
           attacker: 15,
@@ -594,7 +589,7 @@ components:
               additionalProperties:
                 type: integer
                 format: int64
-      example: 
+      example:
         1: {
           money: {
             125: 123456,
@@ -752,8 +747,8 @@ components:
       example: {
         12: {
           name: Milenium Falcon,
-          position: [-13, 25],
-          prev-position: [-12, 27],
+          position: [ -13, 25 ],
+          prev-position: [ -12, 27 ],
           resources: {
             1: {
               amount: 5
@@ -774,31 +769,31 @@ components:
         },
         15: {
           name: Nostromo,
-          position: [-13, 25],
-          prev-position: [-12, 27],
-          resources: {},
+          position: [ -13, 25 ],
+          prev-position: [ -12, 27 ],
+          resources: { },
           ship-class: 1,
           player: 1,
           life: 1000,
         },
         17: {
           name: Invisible Hand I,
-          position: [10, 10],
-          prevPos: [5, 5],
-          resources: {},
+          position: [ 10, 10 ],
+          prevPos: [ 5, 5 ],
+          resources: { },
           ship-class: 2,
           player: 3,
           life: 200,
           command: {
             type: move,
-            coordinates: [131, 128],
+            coordinates: [ 131, 128 ],
           }
         },
         19: {
           name: Invisible Hand II,
-          position: [5, 5],
-          prev-position: [0, 0],
-          resources: {},
+          position: [ 5, 5 ],
+          prev-position: [ 0, 0 ],
+          resources: { },
           ship-class: 2,
           player: 3,
           life: 200,
@@ -825,7 +820,7 @@ components:
           format: int64
         ships:
           type: integer
-          format: int64        
+          format: int64
         total:
           type: integer
           format: int64
@@ -871,9 +866,9 @@ components:
           type: integer
           format: int64
       required:
-      - tick
-      - time-left-ms
-      - season
+        - tick
+        - time-left-ms
+        - season
       example:
         {
           tick: 165,
@@ -888,7 +883,7 @@ components:
           type: integer
           format: int64
       required:
-      - tick
+        - tick
       example:
         {
           tick: 3600
@@ -896,12 +891,12 @@ components:
 
     Error:
       required:
-      - message
+        - message
       type: object
       properties:
         message:
           type: string
-          
+
     CommandError:
       type: object
       additionalProperties:
