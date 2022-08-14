@@ -60,6 +60,9 @@ func main() {
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(db, sessionManager, w, r)
 	})
+	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+		handlers.Logout(sessionManager, w, r)
+	})
 	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
 		handlers.Data(game, sessionManager, w, r)
 	})

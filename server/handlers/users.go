@@ -124,3 +124,19 @@ func Login(db *sql.DB, sessionManager sessions.Store, w http.ResponseWriter, req
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
+
+func Logout(sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
+	session, _ := sessionManager.Get(req, stycoon.SessionKey)
+	session.Options.MaxAge = -1
+	err := session.Save(req, w)
+	if err != nil {
+		log.Warn().Err(err).Msg("Session store failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

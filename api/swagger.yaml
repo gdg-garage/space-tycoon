@@ -16,6 +16,8 @@ servers:
 tags:
 - name: login
   description: Get user session
+- name: logout
+  description: Remove user session
 - name: static-data
   description: Data that do not change during entire season, such as ships classes.
 - name: data
@@ -50,6 +52,8 @@ paths:
                   player-id:
                     type: integer
                     format: int64
+        "400":
+          description: Invalid input
         "403":
           description: Invalid name or password
           content:
@@ -62,6 +66,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /logout:
+    get:
+      tags:
+        - logout
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid input
   /static-data:
     get:
       tags:
@@ -73,6 +86,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -90,6 +105,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -110,6 +127,8 @@ paths:
         "200":
           description: OK
           content: {}
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -139,6 +158,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -159,6 +180,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -176,6 +199,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
