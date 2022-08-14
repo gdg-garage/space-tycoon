@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-
-	"github.com/rs/zerolog/log"
 )
 
 type Game struct {

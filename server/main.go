@@ -74,7 +74,7 @@ func main() {
 		handlers.EndTurn(game, w, r)
 	})
 	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Commands(game, sessionManager, w, r)
+		handlers.Commands(game, w, r)
 	})
 
 	wg := &sync.WaitGroup{}
@@ -84,7 +84,6 @@ func main() {
 
 	wg.Add(1)
 	go game.MainLoop(ctx, wg)
-	// TODO add code for starting new season
 
 	serve(ctx, wg)
 

@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/rs/zerolog/log"
-	"net/http"
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
@@ -56,7 +55,18 @@ func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Commands(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		return
+	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
+		return
+	}
 	// read
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
@@ -72,7 +82,7 @@ func Commands(game *stycoon.Game, sessionManager sessions.Store, w http.Response
 		return
 	}
 	// process
-	user, err := stycoon.LoggedUserFromSession(req, sessionManager)
+	user, err := stycoon.LoggedUserFromSession(req, game.SessionManager)
 	if err != nil {
 		log.Warn().Err(err).Msg("User is not logged in")
 		http.Error(w, "only for logged users", http.StatusForbidden)
