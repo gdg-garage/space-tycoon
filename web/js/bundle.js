@@ -767,7 +767,7 @@ ApiClient.instance = new ApiClient();
 var _default = ApiClient;
 exports["default"] = _default;
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":55,"fs":54,"querystring":60,"superagent":47}],2:[function(require,module,exports){
+},{"buffer":52,"fs":51,"querystring":57,"superagent":44}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -846,7 +846,7 @@ var CommandsApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = CommandsApi;
-},{"../ApiClient":1,"../model/Command":13,"../model/Error":21}],3:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Command":12,"../model/Error":20}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -920,7 +920,7 @@ var CurrentTickApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = CurrentTickApi;
-},{"../ApiClient":1,"../model/CurrentTick":17,"../model/Error":21}],4:[function(require,module,exports){
+},{"../ApiClient":1,"../model/CurrentTick":15,"../model/Error":20}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -994,7 +994,7 @@ var DataApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = DataApi;
-},{"../ApiClient":1,"../model/Data":18,"../model/Error":21}],5:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Data":16,"../model/Error":20}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1076,7 +1076,7 @@ var EndTurnApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = EndTurnApi;
-},{"../ApiClient":1,"../model/CurrentTick":17,"../model/EndTurn":20,"../model/Error":21}],6:[function(require,module,exports){
+},{"../ApiClient":1,"../model/CurrentTick":15,"../model/EndTurn":19,"../model/Error":20}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1158,7 +1158,7 @@ var LoginApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = LoginApi;
-},{"../ApiClient":1,"../model/Credentials":16,"../model/Error":21,"../model/LoginPost200Response":22}],7:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Credentials":14,"../model/Error":20,"../model/LoginPost200Response":21}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1232,7 +1232,7 @@ var ReportsApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = ReportsApi;
-},{"../ApiClient":1,"../model/Error":21,"../model/Reports":33}],8:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Error":20,"../model/Reports":31}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1306,7 +1306,7 @@ var StaticDataApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = StaticDataApi;
-},{"../ApiClient":1,"../model/Error":21,"../model/StaticData":37}],9:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Error":20,"../model/StaticData":35}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1322,12 +1322,6 @@ Object.defineProperty(exports, "AttackCommand", {
   enumerable: true,
   get: function get() {
     return _AttackCommand["default"];
-  }
-});
-Object.defineProperty(exports, "AttackCommandAllOf", {
-  enumerable: true,
-  get: function get() {
-    return _AttackCommandAllOf["default"];
   }
 });
 Object.defineProperty(exports, "Combat", {
@@ -1352,12 +1346,6 @@ Object.defineProperty(exports, "ConstructCommand", {
   enumerable: true,
   get: function get() {
     return _ConstructCommand["default"];
-  }
-});
-Object.defineProperty(exports, "ConstructCommandAllOf", {
-  enumerable: true,
-  get: function get() {
-    return _ConstructCommandAllOf["default"];
   }
 });
 Object.defineProperty(exports, "Credentials", {
@@ -1388,6 +1376,12 @@ Object.defineProperty(exports, "DataApi", {
   enumerable: true,
   get: function get() {
     return _DataApi["default"];
+  }
+});
+Object.defineProperty(exports, "DecommissionCommand", {
+  enumerable: true,
+  get: function get() {
+    return _DecommissionCommand["default"];
   }
 });
 Object.defineProperty(exports, "Destination", {
@@ -1432,12 +1426,6 @@ Object.defineProperty(exports, "MoveCommand", {
     return _MoveCommand["default"];
   }
 });
-Object.defineProperty(exports, "MoveCommandAllOf", {
-  enumerable: true,
-  get: function get() {
-    return _MoveCommandAllOf["default"];
-  }
-});
 Object.defineProperty(exports, "NetWorth", {
   enumerable: true,
   get: function get() {
@@ -1480,10 +1468,10 @@ Object.defineProperty(exports, "RenameCommand", {
     return _RenameCommand["default"];
   }
 });
-Object.defineProperty(exports, "RenameCommandAllOf", {
+Object.defineProperty(exports, "RepairCommand", {
   enumerable: true,
   get: function get() {
-    return _RenameCommandAllOf["default"];
+    return _RepairCommand["default"];
   }
 });
 Object.defineProperty(exports, "Reports", {
@@ -1546,12 +1534,6 @@ Object.defineProperty(exports, "TradeCommand", {
     return _TradeCommand["default"];
   }
 });
-Object.defineProperty(exports, "TradeCommandAllOf", {
-  enumerable: true,
-  get: function get() {
-    return _TradeCommandAllOf["default"];
-  }
-});
 Object.defineProperty(exports, "TradingResource", {
   enumerable: true,
   get: function get() {
@@ -1569,21 +1551,19 @@ var _ApiClient = _interopRequireDefault(require("./ApiClient"));
 
 var _AttackCommand = _interopRequireDefault(require("./model/AttackCommand"));
 
-var _AttackCommandAllOf = _interopRequireDefault(require("./model/AttackCommandAllOf"));
-
 var _Combat = _interopRequireDefault(require("./model/Combat"));
 
 var _Command = _interopRequireDefault(require("./model/Command"));
 
 var _ConstructCommand = _interopRequireDefault(require("./model/ConstructCommand"));
 
-var _ConstructCommandAllOf = _interopRequireDefault(require("./model/ConstructCommandAllOf"));
-
 var _Credentials = _interopRequireDefault(require("./model/Credentials"));
 
 var _CurrentTick = _interopRequireDefault(require("./model/CurrentTick"));
 
 var _Data = _interopRequireDefault(require("./model/Data"));
+
+var _DecommissionCommand = _interopRequireDefault(require("./model/DecommissionCommand"));
 
 var _Destination = _interopRequireDefault(require("./model/Destination"));
 
@@ -1594,8 +1574,6 @@ var _Error = _interopRequireDefault(require("./model/Error"));
 var _LoginPost200Response = _interopRequireDefault(require("./model/LoginPost200Response"));
 
 var _MoveCommand = _interopRequireDefault(require("./model/MoveCommand"));
-
-var _MoveCommandAllOf = _interopRequireDefault(require("./model/MoveCommandAllOf"));
 
 var _NetWorth = _interopRequireDefault(require("./model/NetWorth"));
 
@@ -1611,7 +1589,7 @@ var _Profiling = _interopRequireDefault(require("./model/Profiling"));
 
 var _RenameCommand = _interopRequireDefault(require("./model/RenameCommand"));
 
-var _RenameCommandAllOf = _interopRequireDefault(require("./model/RenameCommandAllOf"));
+var _RepairCommand = _interopRequireDefault(require("./model/RepairCommand"));
 
 var _Reports = _interopRequireDefault(require("./model/Reports"));
 
@@ -1628,8 +1606,6 @@ var _StaticDataShipClassesValue = _interopRequireDefault(require("./model/Static
 var _Trade = _interopRequireDefault(require("./model/Trade"));
 
 var _TradeCommand = _interopRequireDefault(require("./model/TradeCommand"));
-
-var _TradeCommandAllOf = _interopRequireDefault(require("./model/TradeCommandAllOf"));
 
 var _TradingResource = _interopRequireDefault(require("./model/TradingResource"));
 
@@ -1650,7 +1626,7 @@ var _ReportsApi = _interopRequireDefault(require("./api/ReportsApi"));
 var _StaticDataApi = _interopRequireDefault(require("./api/StaticDataApi"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-},{"./ApiClient":1,"./api/CommandsApi":2,"./api/CurrentTickApi":3,"./api/DataApi":4,"./api/EndTurnApi":5,"./api/LoginApi":6,"./api/ReportsApi":7,"./api/StaticDataApi":8,"./model/AttackCommand":10,"./model/AttackCommandAllOf":11,"./model/Combat":12,"./model/Command":13,"./model/ConstructCommand":14,"./model/ConstructCommandAllOf":15,"./model/Credentials":16,"./model/CurrentTick":17,"./model/Data":18,"./model/Destination":19,"./model/EndTurn":20,"./model/Error":21,"./model/LoginPost200Response":22,"./model/MoveCommand":23,"./model/MoveCommandAllOf":24,"./model/NetWorth":25,"./model/PlanetsValue":26,"./model/PlayerId":27,"./model/PlayersValue":28,"./model/PriceValue":29,"./model/Profiling":30,"./model/RenameCommand":31,"./model/RenameCommandAllOf":32,"./model/Reports":33,"./model/Resource":34,"./model/ScoreValue":35,"./model/ShipsValue":36,"./model/StaticData":37,"./model/StaticDataShipClassesValue":38,"./model/Trade":39,"./model/TradeCommand":40,"./model/TradeCommandAllOf":41,"./model/TradingResource":42,"./model/TradingResourceAllOf":43}],10:[function(require,module,exports){
+},{"./ApiClient":1,"./api/CommandsApi":2,"./api/CurrentTickApi":3,"./api/DataApi":4,"./api/EndTurnApi":5,"./api/LoginApi":6,"./api/ReportsApi":7,"./api/StaticDataApi":8,"./model/AttackCommand":10,"./model/Combat":11,"./model/Command":12,"./model/ConstructCommand":13,"./model/Credentials":14,"./model/CurrentTick":15,"./model/Data":16,"./model/DecommissionCommand":17,"./model/Destination":18,"./model/EndTurn":19,"./model/Error":20,"./model/LoginPost200Response":21,"./model/MoveCommand":22,"./model/NetWorth":23,"./model/PlanetsValue":24,"./model/PlayerId":25,"./model/PlayersValue":26,"./model/PriceValue":27,"./model/Profiling":28,"./model/RenameCommand":29,"./model/RepairCommand":30,"./model/Reports":31,"./model/Resource":32,"./model/ScoreValue":33,"./model/ShipsValue":34,"./model/StaticData":35,"./model/StaticDataShipClassesValue":36,"./model/Trade":37,"./model/TradeCommand":38,"./model/TradingResource":39,"./model/TradingResourceAllOf":40}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1659,10 +1635,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _AttackCommandAllOf = _interopRequireDefault(require("./AttackCommandAllOf"));
-
-var _Command = _interopRequireDefault(require("./Command"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -1681,17 +1653,11 @@ var AttackCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>AttackCommand</code>.
    * @alias module:model/AttackCommand
-   * @implements module:model/Command
-   * @implements module:model/AttackCommandAllOf
    * @param type {String} 
    * @param target {Number} 
    */
   function AttackCommand(type, target) {
     _classCallCheck(this, AttackCommand);
-
-    _Command["default"].initialize(this, type);
-
-    _AttackCommandAllOf["default"].initialize(this, target);
 
     AttackCommand.initialize(this, type, target);
   }
@@ -1722,32 +1688,12 @@ var AttackCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new AttackCommand();
 
-        _Command["default"].constructFromObject(data, obj);
-
-        _AttackCommandAllOf["default"].constructFromObject(data, obj);
-
         if (data.hasOwnProperty('type')) {
           obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
 
         if (data.hasOwnProperty('target')) {
           obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
-        }
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
-        }
-
-        if (data.hasOwnProperty('name')) {
-          obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
         }
       }
 
@@ -1768,145 +1714,9 @@ AttackCommand.prototype['type'] = undefined;
  */
 
 AttackCommand.prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-AttackCommand.prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-AttackCommand.prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-AttackCommand.prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-AttackCommand.prototype['name'] = undefined; // Implement Command interface:
-
-/**
- * @member {String} type
- */
-
-_Command["default"].prototype['type'] = undefined;
-/**
- * @member {Number} target
- */
-
-_Command["default"].prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_Command["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-_Command["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-_Command["default"].prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-_Command["default"].prototype['name'] = undefined; // Implement AttackCommandAllOf interface:
-
-/**
- * @member {Number} target
- */
-
-_AttackCommandAllOf["default"].prototype['target'] = undefined;
 var _default = AttackCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./AttackCommandAllOf":11,"./Command":13}],11:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
- * The AttackCommandAllOf model module.
- * @module model/AttackCommandAllOf
- * @version 1.0.0
- */
-var AttackCommandAllOf = /*#__PURE__*/function () {
-  /**
-   * Constructs a new <code>AttackCommandAllOf</code>.
-   * @alias module:model/AttackCommandAllOf
-   * @param target {Number} 
-   */
-  function AttackCommandAllOf(target) {
-    _classCallCheck(this, AttackCommandAllOf);
-
-    AttackCommandAllOf.initialize(this, target);
-  }
-  /**
-   * Initializes the fields of this object.
-   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
-   * Only for internal use.
-   */
-
-
-  _createClass(AttackCommandAllOf, null, [{
-    key: "initialize",
-    value: function initialize(obj, target) {
-      obj['target'] = target;
-    }
-    /**
-     * Constructs a <code>AttackCommandAllOf</code> from a plain JavaScript object, optionally creating a new instance.
-     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
-     * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/AttackCommandAllOf} obj Optional instance to populate.
-     * @return {module:model/AttackCommandAllOf} The populated <code>AttackCommandAllOf</code> instance.
-     */
-
-  }, {
-    key: "constructFromObject",
-    value: function constructFromObject(data, obj) {
-      if (data) {
-        obj = obj || new AttackCommandAllOf();
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-      }
-
-      return obj;
-    }
-  }]);
-
-  return AttackCommandAllOf;
-}();
-/**
- * @member {Number} target
- */
-
-
-AttackCommandAllOf.prototype['target'] = undefined;
-var _default = AttackCommandAllOf;
-exports["default"] = _default;
-},{"../ApiClient":1}],12:[function(require,module,exports){
+},{"../ApiClient":1}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2009,7 +1819,7 @@ Combat.prototype['defender'] = undefined;
 Combat.prototype['killed'] = undefined;
 var _default = Combat;
 exports["default"] = _default;
-},{"../ApiClient":1}],13:[function(require,module,exports){
+},{"../ApiClient":1}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2018,6 +1828,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
+
+var _Destination = _interopRequireDefault(require("./Destination"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -2077,6 +1889,10 @@ var Command = /*#__PURE__*/function () {
           obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
         }
 
+        if (data.hasOwnProperty('destination')) {
+          obj['destination'] = _Destination["default"].constructFromObject(data['destination']);
+        }
+
         if (data.hasOwnProperty('resource')) {
           obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
         }
@@ -2112,6 +1928,11 @@ Command.prototype['type'] = undefined;
 
 Command.prototype['target'] = undefined;
 /**
+ * @member {module:model/Destination} destination
+ */
+
+Command.prototype['destination'] = undefined;
+/**
  * @member {Number} resource
  */
 
@@ -2133,7 +1954,7 @@ Command.prototype['ship-class'] = undefined;
 Command.prototype['name'] = undefined;
 var _default = Command;
 exports["default"] = _default;
-},{"../ApiClient":1}],14:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":18}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2142,10 +1963,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _Command = _interopRequireDefault(require("./Command"));
-
-var _ConstructCommandAllOf = _interopRequireDefault(require("./ConstructCommandAllOf"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -2164,19 +1981,13 @@ var ConstructCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>ConstructCommand</code>.
    * @alias module:model/ConstructCommand
-   * @implements module:model/Command
-   * @implements module:model/ConstructCommandAllOf
-   * @param type {String} 
    * @param shipClass {Number} 
+   * @param type {String} 
    */
-  function ConstructCommand(type, shipClass) {
+  function ConstructCommand(shipClass, type) {
     _classCallCheck(this, ConstructCommand);
 
-    _Command["default"].initialize(this, type);
-
-    _ConstructCommandAllOf["default"].initialize(this, shipClass);
-
-    ConstructCommand.initialize(this, type, shipClass);
+    ConstructCommand.initialize(this, shipClass, type);
   }
   /**
    * Initializes the fields of this object.
@@ -2187,9 +1998,9 @@ var ConstructCommand = /*#__PURE__*/function () {
 
   _createClass(ConstructCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, shipClass) {
-      obj['type'] = type;
+    value: function initialize(obj, shipClass, type) {
       obj['ship-class'] = shipClass;
+      obj['type'] = type;
     }
     /**
      * Constructs a <code>ConstructCommand</code> from a plain JavaScript object, optionally creating a new instance.
@@ -2205,32 +2016,12 @@ var ConstructCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new ConstructCommand();
 
-        _Command["default"].constructFromObject(data, obj);
-
-        _ConstructCommandAllOf["default"].constructFromObject(data, obj);
-
-        if (data.hasOwnProperty('type')) {
-          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
-        }
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
         if (data.hasOwnProperty('ship-class')) {
           obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
         }
 
-        if (data.hasOwnProperty('name')) {
-          obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
       }
 
@@ -2241,155 +2032,19 @@ var ConstructCommand = /*#__PURE__*/function () {
   return ConstructCommand;
 }();
 /**
- * @member {String} type
- */
-
-
-ConstructCommand.prototype['type'] = undefined;
-/**
- * @member {Number} target
- */
-
-ConstructCommand.prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-ConstructCommand.prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-ConstructCommand.prototype['amount'] = undefined;
-/**
  * @member {Number} ship-class
  */
+
 
 ConstructCommand.prototype['ship-class'] = undefined;
 /**
- * @member {String} name
- */
-
-ConstructCommand.prototype['name'] = undefined; // Implement Command interface:
-
-/**
  * @member {String} type
  */
 
-_Command["default"].prototype['type'] = undefined;
-/**
- * @member {Number} target
- */
-
-_Command["default"].prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_Command["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-_Command["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-_Command["default"].prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-_Command["default"].prototype['name'] = undefined; // Implement ConstructCommandAllOf interface:
-
-/**
- * @member {Number} ship-class
- */
-
-_ConstructCommandAllOf["default"].prototype['ship-class'] = undefined;
+ConstructCommand.prototype['type'] = undefined;
 var _default = ConstructCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":13,"./ConstructCommandAllOf":15}],15:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
- * The ConstructCommandAllOf model module.
- * @module model/ConstructCommandAllOf
- * @version 1.0.0
- */
-var ConstructCommandAllOf = /*#__PURE__*/function () {
-  /**
-   * Constructs a new <code>ConstructCommandAllOf</code>.
-   * @alias module:model/ConstructCommandAllOf
-   * @param shipClass {Number} 
-   */
-  function ConstructCommandAllOf(shipClass) {
-    _classCallCheck(this, ConstructCommandAllOf);
-
-    ConstructCommandAllOf.initialize(this, shipClass);
-  }
-  /**
-   * Initializes the fields of this object.
-   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
-   * Only for internal use.
-   */
-
-
-  _createClass(ConstructCommandAllOf, null, [{
-    key: "initialize",
-    value: function initialize(obj, shipClass) {
-      obj['ship-class'] = shipClass;
-    }
-    /**
-     * Constructs a <code>ConstructCommandAllOf</code> from a plain JavaScript object, optionally creating a new instance.
-     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
-     * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/ConstructCommandAllOf} obj Optional instance to populate.
-     * @return {module:model/ConstructCommandAllOf} The populated <code>ConstructCommandAllOf</code> instance.
-     */
-
-  }, {
-    key: "constructFromObject",
-    value: function constructFromObject(data, obj) {
-      if (data) {
-        obj = obj || new ConstructCommandAllOf();
-
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
-        }
-      }
-
-      return obj;
-    }
-  }]);
-
-  return ConstructCommandAllOf;
-}();
-/**
- * @member {Number} ship-class
- */
-
-
-ConstructCommandAllOf.prototype['ship-class'] = undefined;
-var _default = ConstructCommandAllOf;
-exports["default"] = _default;
-},{"../ApiClient":1}],16:[function(require,module,exports){
+},{"../ApiClient":1}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2490,7 +2145,7 @@ Credentials.prototype['password'] = undefined;
 Credentials.prototype['player'] = undefined;
 var _default = Credentials;
 exports["default"] = _default;
-},{"../ApiClient":1}],17:[function(require,module,exports){
+},{"../ApiClient":1}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2591,7 +2246,7 @@ CurrentTick.prototype['time-left-ms'] = undefined;
 CurrentTick.prototype['season'] = undefined;
 var _default = CurrentTick;
 exports["default"] = _default;
-},{"../ApiClient":1}],18:[function(require,module,exports){
+},{"../ApiClient":1}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2726,7 +2381,86 @@ Data.prototype['players'] = undefined;
 Data.prototype['ships'] = undefined;
 var _default = Data;
 exports["default"] = _default;
-},{"../ApiClient":1,"./CurrentTick":17,"./PlanetsValue":26,"./PlayersValue":28,"./ShipsValue":36}],19:[function(require,module,exports){
+},{"../ApiClient":1,"./CurrentTick":15,"./PlanetsValue":24,"./PlayersValue":26,"./ShipsValue":34}],17:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _ApiClient = _interopRequireDefault(require("../ApiClient"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+/**
+ * The DecommissionCommand model module.
+ * @module model/DecommissionCommand
+ * @version 1.0.0
+ */
+var DecommissionCommand = /*#__PURE__*/function () {
+  /**
+   * Constructs a new <code>DecommissionCommand</code>.
+   * @alias module:model/DecommissionCommand
+   * @param type {String} 
+   */
+  function DecommissionCommand(type) {
+    _classCallCheck(this, DecommissionCommand);
+
+    DecommissionCommand.initialize(this, type);
+  }
+  /**
+   * Initializes the fields of this object.
+   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
+   * Only for internal use.
+   */
+
+
+  _createClass(DecommissionCommand, null, [{
+    key: "initialize",
+    value: function initialize(obj, type) {
+      obj['type'] = type;
+    }
+    /**
+     * Constructs a <code>DecommissionCommand</code> from a plain JavaScript object, optionally creating a new instance.
+     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
+     * @param {Object} data The plain JavaScript object bearing properties of interest.
+     * @param {module:model/DecommissionCommand} obj Optional instance to populate.
+     * @return {module:model/DecommissionCommand} The populated <code>DecommissionCommand</code> instance.
+     */
+
+  }, {
+    key: "constructFromObject",
+    value: function constructFromObject(data, obj) {
+      if (data) {
+        obj = obj || new DecommissionCommand();
+
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
+        }
+      }
+
+      return obj;
+    }
+  }]);
+
+  return DecommissionCommand;
+}();
+/**
+ * @member {String} type
+ */
+
+
+DecommissionCommand.prototype['type'] = undefined;
+var _default = DecommissionCommand;
+exports["default"] = _default;
+},{"../ApiClient":1}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2782,6 +2516,14 @@ var Destination = /*#__PURE__*/function () {
     value: function constructFromObject(data, obj) {
       if (data) {
         obj = obj || new Destination();
+
+        if (data.hasOwnProperty('coordinates')) {
+          obj['coordinates'] = _ApiClient["default"].convertToType(data['coordinates'], ['Number']);
+        }
+
+        if (data.hasOwnProperty('target')) {
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
+        }
       }
 
       return obj;
@@ -2790,10 +2532,20 @@ var Destination = /*#__PURE__*/function () {
 
   return Destination;
 }();
+/**
+ * @member {Array.<Number>} coordinates
+ */
 
+
+Destination.prototype['coordinates'] = undefined;
+/**
+ * @member {Number} target
+ */
+
+Destination.prototype['target'] = undefined;
 var _default = Destination;
 exports["default"] = _default;
-},{"../ApiClient":1}],20:[function(require,module,exports){
+},{"../ApiClient":1}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2872,7 +2624,7 @@ var EndTurn = /*#__PURE__*/function () {
 EndTurn.prototype['tick'] = undefined;
 var _default = EndTurn;
 exports["default"] = _default;
-},{"../ApiClient":1}],21:[function(require,module,exports){
+},{"../ApiClient":1}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2951,7 +2703,7 @@ var Error = /*#__PURE__*/function () {
 Error.prototype['message'] = undefined;
 var _default = Error;
 exports["default"] = _default;
-},{"../ApiClient":1}],22:[function(require,module,exports){
+},{"../ApiClient":1}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3027,7 +2779,7 @@ var LoginPost200Response = /*#__PURE__*/function () {
 LoginPost200Response.prototype['player-id'] = undefined;
 var _default = LoginPost200Response;
 exports["default"] = _default;
-},{"../ApiClient":1}],23:[function(require,module,exports){
+},{"../ApiClient":1}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3037,11 +2789,7 @@ exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
-var _Command = _interopRequireDefault(require("./Command"));
-
 var _Destination = _interopRequireDefault(require("./Destination"));
-
-var _MoveCommandAllOf = _interopRequireDefault(require("./MoveCommandAllOf"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -3060,17 +2808,11 @@ var MoveCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>MoveCommand</code>.
    * @alias module:model/MoveCommand
-   * @implements module:model/Command
-   * @implements module:model/MoveCommandAllOf
    * @param type {String} 
    * @param destination {module:model/Destination} 
    */
   function MoveCommand(type, destination) {
     _classCallCheck(this, MoveCommand);
-
-    _Command["default"].initialize(this, type);
-
-    _MoveCommandAllOf["default"].initialize(this, destination);
 
     MoveCommand.initialize(this, type, destination);
   }
@@ -3101,32 +2843,8 @@ var MoveCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new MoveCommand();
 
-        _Command["default"].constructFromObject(data, obj);
-
-        _MoveCommandAllOf["default"].constructFromObject(data, obj);
-
         if (data.hasOwnProperty('type')) {
           obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
-        }
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
-        }
-
-        if (data.hasOwnProperty('name')) {
-          obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
         }
 
         if (data.hasOwnProperty('destination')) {
@@ -3147,156 +2865,13 @@ var MoveCommand = /*#__PURE__*/function () {
 
 MoveCommand.prototype['type'] = undefined;
 /**
- * @member {Number} target
- */
-
-MoveCommand.prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-MoveCommand.prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-MoveCommand.prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-MoveCommand.prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-MoveCommand.prototype['name'] = undefined;
-/**
  * @member {module:model/Destination} destination
  */
 
-MoveCommand.prototype['destination'] = undefined; // Implement Command interface:
-
-/**
- * @member {String} type
- */
-
-_Command["default"].prototype['type'] = undefined;
-/**
- * @member {Number} target
- */
-
-_Command["default"].prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_Command["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-_Command["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-_Command["default"].prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-_Command["default"].prototype['name'] = undefined; // Implement MoveCommandAllOf interface:
-
-/**
- * @member {module:model/Destination} destination
- */
-
-_MoveCommandAllOf["default"].prototype['destination'] = undefined;
+MoveCommand.prototype['destination'] = undefined;
 var _default = MoveCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":13,"./Destination":19,"./MoveCommandAllOf":24}],24:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _Destination = _interopRequireDefault(require("./Destination"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
- * The MoveCommandAllOf model module.
- * @module model/MoveCommandAllOf
- * @version 1.0.0
- */
-var MoveCommandAllOf = /*#__PURE__*/function () {
-  /**
-   * Constructs a new <code>MoveCommandAllOf</code>.
-   * @alias module:model/MoveCommandAllOf
-   * @param destination {module:model/Destination} 
-   */
-  function MoveCommandAllOf(destination) {
-    _classCallCheck(this, MoveCommandAllOf);
-
-    MoveCommandAllOf.initialize(this, destination);
-  }
-  /**
-   * Initializes the fields of this object.
-   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
-   * Only for internal use.
-   */
-
-
-  _createClass(MoveCommandAllOf, null, [{
-    key: "initialize",
-    value: function initialize(obj, destination) {
-      obj['destination'] = destination;
-    }
-    /**
-     * Constructs a <code>MoveCommandAllOf</code> from a plain JavaScript object, optionally creating a new instance.
-     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
-     * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/MoveCommandAllOf} obj Optional instance to populate.
-     * @return {module:model/MoveCommandAllOf} The populated <code>MoveCommandAllOf</code> instance.
-     */
-
-  }, {
-    key: "constructFromObject",
-    value: function constructFromObject(data, obj) {
-      if (data) {
-        obj = obj || new MoveCommandAllOf();
-
-        if (data.hasOwnProperty('destination')) {
-          obj['destination'] = _Destination["default"].constructFromObject(data['destination']);
-        }
-      }
-
-      return obj;
-    }
-  }]);
-
-  return MoveCommandAllOf;
-}();
-/**
- * @member {module:model/Destination} destination
- */
-
-
-MoveCommandAllOf.prototype['destination'] = undefined;
-var _default = MoveCommandAllOf;
-exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":19}],25:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":18}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3408,7 +2983,7 @@ NetWorth.prototype['ships'] = undefined;
 NetWorth.prototype['total'] = undefined;
 var _default = NetWorth;
 exports["default"] = _default;
-},{"../ApiClient":1}],26:[function(require,module,exports){
+},{"../ApiClient":1}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3524,7 +3099,7 @@ PlanetsValue.prototype['position'] = undefined;
 PlanetsValue.prototype['prev-position'] = undefined;
 var _default = PlanetsValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./TradingResource":42}],27:[function(require,module,exports){
+},{"../ApiClient":1,"./TradingResource":39}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3600,7 +3175,7 @@ var PlayerId = /*#__PURE__*/function () {
 PlayerId.prototype['id'] = undefined;
 var _default = PlayerId;
 exports["default"] = _default;
-},{"../ApiClient":1}],28:[function(require,module,exports){
+},{"../ApiClient":1}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3703,7 +3278,7 @@ PlayersValue.prototype['color'] = undefined;
 PlayersValue.prototype['net-worth'] = undefined;
 var _default = PlayersValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./NetWorth":25}],29:[function(require,module,exports){
+},{"../ApiClient":1,"./NetWorth":23}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3824,7 +3399,7 @@ PriceValue.prototype['amount'] = undefined;
 PriceValue.prototype['price'] = undefined;
 var _default = PriceValue;
 exports["default"] = _default;
-},{"../ApiClient":1}],30:[function(require,module,exports){
+},{"../ApiClient":1}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3990,7 +3565,7 @@ Profiling.prototype['overall'] = undefined;
 Profiling.prototype['at'] = undefined;
 var _default = Profiling;
 exports["default"] = _default;
-},{"../ApiClient":1}],31:[function(require,module,exports){
+},{"../ApiClient":1}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3999,10 +3574,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _Command = _interopRequireDefault(require("./Command"));
-
-var _RenameCommandAllOf = _interopRequireDefault(require("./RenameCommandAllOf"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -4021,17 +3592,11 @@ var RenameCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>RenameCommand</code>.
    * @alias module:model/RenameCommand
-   * @implements module:model/Command
-   * @implements module:model/RenameCommandAllOf
    * @param type {String} 
    * @param name {String} 
    */
   function RenameCommand(type, name) {
     _classCallCheck(this, RenameCommand);
-
-    _Command["default"].initialize(this, type);
-
-    _RenameCommandAllOf["default"].initialize(this, name);
 
     RenameCommand.initialize(this, type, name);
   }
@@ -4062,28 +3627,8 @@ var RenameCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new RenameCommand();
 
-        _Command["default"].constructFromObject(data, obj);
-
-        _RenameCommandAllOf["default"].constructFromObject(data, obj);
-
         if (data.hasOwnProperty('type')) {
           obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
-        }
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
         }
 
         if (data.hasOwnProperty('name')) {
@@ -4104,70 +3649,13 @@ var RenameCommand = /*#__PURE__*/function () {
 
 RenameCommand.prototype['type'] = undefined;
 /**
- * @member {Number} target
- */
-
-RenameCommand.prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-RenameCommand.prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-RenameCommand.prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-RenameCommand.prototype['ship-class'] = undefined;
-/**
  * @member {String} name
  */
 
-RenameCommand.prototype['name'] = undefined; // Implement Command interface:
-
-/**
- * @member {String} type
- */
-
-_Command["default"].prototype['type'] = undefined;
-/**
- * @member {Number} target
- */
-
-_Command["default"].prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_Command["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-_Command["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-_Command["default"].prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-_Command["default"].prototype['name'] = undefined; // Implement RenameCommandAllOf interface:
-
-/**
- * @member {String} name
- */
-
-_RenameCommandAllOf["default"].prototype['name'] = undefined;
+RenameCommand.prototype['name'] = undefined;
 var _default = RenameCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":13,"./RenameCommandAllOf":32}],32:[function(require,module,exports){
+},{"../ApiClient":1}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4186,20 +3674,20 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
 /**
- * The RenameCommandAllOf model module.
- * @module model/RenameCommandAllOf
+ * The RepairCommand model module.
+ * @module model/RepairCommand
  * @version 1.0.0
  */
-var RenameCommandAllOf = /*#__PURE__*/function () {
+var RepairCommand = /*#__PURE__*/function () {
   /**
-   * Constructs a new <code>RenameCommandAllOf</code>.
-   * @alias module:model/RenameCommandAllOf
-   * @param name {String} 
+   * Constructs a new <code>RepairCommand</code>.
+   * @alias module:model/RepairCommand
+   * @param type {String} 
    */
-  function RenameCommandAllOf(name) {
-    _classCallCheck(this, RenameCommandAllOf);
+  function RepairCommand(type) {
+    _classCallCheck(this, RepairCommand);
 
-    RenameCommandAllOf.initialize(this, name);
+    RepairCommand.initialize(this, type);
   }
   /**
    * Initializes the fields of this object.
@@ -4208,27 +3696,27 @@ var RenameCommandAllOf = /*#__PURE__*/function () {
    */
 
 
-  _createClass(RenameCommandAllOf, null, [{
+  _createClass(RepairCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, name) {
-      obj['name'] = name;
+    value: function initialize(obj, type) {
+      obj['type'] = type;
     }
     /**
-     * Constructs a <code>RenameCommandAllOf</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>RepairCommand</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/RenameCommandAllOf} obj Optional instance to populate.
-     * @return {module:model/RenameCommandAllOf} The populated <code>RenameCommandAllOf</code> instance.
+     * @param {module:model/RepairCommand} obj Optional instance to populate.
+     * @return {module:model/RepairCommand} The populated <code>RepairCommand</code> instance.
      */
 
   }, {
     key: "constructFromObject",
     value: function constructFromObject(data, obj) {
       if (data) {
-        obj = obj || new RenameCommandAllOf();
+        obj = obj || new RepairCommand();
 
-        if (data.hasOwnProperty('name')) {
-          obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
       }
 
@@ -4236,17 +3724,17 @@ var RenameCommandAllOf = /*#__PURE__*/function () {
     }
   }]);
 
-  return RenameCommandAllOf;
+  return RepairCommand;
 }();
 /**
- * @member {String} name
+ * @member {String} type
  */
 
 
-RenameCommandAllOf.prototype['name'] = undefined;
-var _default = RenameCommandAllOf;
+RepairCommand.prototype['type'] = undefined;
+var _default = RepairCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],33:[function(require,module,exports){
+},{"../ApiClient":1}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4370,7 +3858,7 @@ Reports.prototype['scores'] = undefined;
 Reports.prototype['trade'] = undefined;
 var _default = Reports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":12,"./PriceValue":29,"./Profiling":30,"./ScoreValue":35,"./Trade":39}],34:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":11,"./PriceValue":27,"./Profiling":28,"./ScoreValue":33,"./Trade":37}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4449,7 +3937,7 @@ var Resource = /*#__PURE__*/function () {
 Resource.prototype['amount'] = undefined;
 var _default = Resource;
 exports["default"] = _default;
-},{"../ApiClient":1}],35:[function(require,module,exports){
+},{"../ApiClient":1}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4560,7 +4048,7 @@ ScoreValue.prototype['ships'] = undefined;
 ScoreValue.prototype['total'] = undefined;
 var _default = ScoreValue;
 exports["default"] = _default;
-},{"../ApiClient":1}],36:[function(require,module,exports){
+},{"../ApiClient":1}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4720,7 +4208,7 @@ ShipsValue.prototype['resources'] = undefined;
 ShipsValue.prototype['command'] = undefined;
 var _default = ShipsValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":13,"./Resource":34}],37:[function(require,module,exports){
+},{"../ApiClient":1,"./Command":12,"./Resource":32}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4811,7 +4299,7 @@ StaticData.prototype['ship-classes'] = undefined;
 StaticData.prototype['resource-names'] = undefined;
 var _default = StaticData;
 exports["default"] = _default;
-},{"../ApiClient":1,"./StaticDataShipClassesValue":38}],38:[function(require,module,exports){
+},{"../ApiClient":1,"./StaticDataShipClassesValue":36}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4958,7 +4446,7 @@ StaticDataShipClassesValue.prototype['damage'] = undefined;
 StaticDataShipClassesValue.prototype['price'] = undefined;
 var _default = StaticDataShipClassesValue;
 exports["default"] = _default;
-},{"../ApiClient":1}],39:[function(require,module,exports){
+},{"../ApiClient":1}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5079,7 +4567,7 @@ Trade.prototype['amount'] = undefined;
 Trade.prototype['price'] = undefined;
 var _default = Trade;
 exports["default"] = _default;
-},{"../ApiClient":1}],40:[function(require,module,exports){
+},{"../ApiClient":1}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5088,10 +4576,6 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _Command = _interopRequireDefault(require("./Command"));
-
-var _TradeCommandAllOf = _interopRequireDefault(require("./TradeCommandAllOf"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -5110,21 +4594,15 @@ var TradeCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>TradeCommand</code>.
    * @alias module:model/TradeCommand
-   * @implements module:model/Command
-   * @implements module:model/TradeCommandAllOf
    * @param type {String} 
-   * @param target {Number} 
+   * @param amount {Number} Positive value means buy, negative sell.
    * @param resource {Number} 
-   * @param amount {Number} 
+   * @param target {Number} Any planet or own ship.
    */
-  function TradeCommand(type, target, resource, amount) {
+  function TradeCommand(type, amount, resource, target) {
     _classCallCheck(this, TradeCommand);
 
-    _Command["default"].initialize(this, type);
-
-    _TradeCommandAllOf["default"].initialize(this, amount, resource, target);
-
-    TradeCommand.initialize(this, type, target, resource, amount);
+    TradeCommand.initialize(this, type, amount, resource, target);
   }
   /**
    * Initializes the fields of this object.
@@ -5135,11 +4613,11 @@ var TradeCommand = /*#__PURE__*/function () {
 
   _createClass(TradeCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, target, resource, amount) {
+    value: function initialize(obj, type, amount, resource, target) {
       obj['type'] = type;
-      obj['target'] = target;
-      obj['resource'] = resource;
       obj['amount'] = amount;
+      obj['resource'] = resource;
+      obj['target'] = target;
     }
     /**
      * Constructs a <code>TradeCommand</code> from a plain JavaScript object, optionally creating a new instance.
@@ -5155,32 +4633,20 @@ var TradeCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new TradeCommand();
 
-        _Command["default"].constructFromObject(data, obj);
-
-        _TradeCommandAllOf["default"].constructFromObject(data, obj);
-
         if (data.hasOwnProperty('type')) {
           obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
         }
 
         if (data.hasOwnProperty('amount')) {
           obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
         }
 
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
+        if (data.hasOwnProperty('resource')) {
+          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
         }
 
-        if (data.hasOwnProperty('name')) {
-          obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
+        if (data.hasOwnProperty('target')) {
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
         }
       }
 
@@ -5197,181 +4663,25 @@ var TradeCommand = /*#__PURE__*/function () {
 
 TradeCommand.prototype['type'] = undefined;
 /**
- * @member {Number} target
+ * Positive value means buy, negative sell.
+ * @member {Number} amount
  */
 
-TradeCommand.prototype['target'] = undefined;
+TradeCommand.prototype['amount'] = undefined;
 /**
  * @member {Number} resource
  */
 
 TradeCommand.prototype['resource'] = undefined;
 /**
- * @member {Number} amount
- */
-
-TradeCommand.prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-TradeCommand.prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-TradeCommand.prototype['name'] = undefined; // Implement Command interface:
-
-/**
- * @member {String} type
- */
-
-_Command["default"].prototype['type'] = undefined;
-/**
+ * Any planet or own ship.
  * @member {Number} target
  */
 
-_Command["default"].prototype['target'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_Command["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-_Command["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} ship-class
- */
-
-_Command["default"].prototype['ship-class'] = undefined;
-/**
- * @member {String} name
- */
-
-_Command["default"].prototype['name'] = undefined; // Implement TradeCommandAllOf interface:
-
-/**
- * @member {Number} amount
- */
-
-_TradeCommandAllOf["default"].prototype['amount'] = undefined;
-/**
- * @member {Number} resource
- */
-
-_TradeCommandAllOf["default"].prototype['resource'] = undefined;
-/**
- * @member {Number} target
- */
-
-_TradeCommandAllOf["default"].prototype['target'] = undefined;
+TradeCommand.prototype['target'] = undefined;
 var _default = TradeCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":13,"./TradeCommandAllOf":41}],41:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
- * The TradeCommandAllOf model module.
- * @module model/TradeCommandAllOf
- * @version 1.0.0
- */
-var TradeCommandAllOf = /*#__PURE__*/function () {
-  /**
-   * Constructs a new <code>TradeCommandAllOf</code>.
-   * @alias module:model/TradeCommandAllOf
-   * @param amount {Number} 
-   * @param resource {Number} 
-   * @param target {Number} 
-   */
-  function TradeCommandAllOf(amount, resource, target) {
-    _classCallCheck(this, TradeCommandAllOf);
-
-    TradeCommandAllOf.initialize(this, amount, resource, target);
-  }
-  /**
-   * Initializes the fields of this object.
-   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
-   * Only for internal use.
-   */
-
-
-  _createClass(TradeCommandAllOf, null, [{
-    key: "initialize",
-    value: function initialize(obj, amount, resource, target) {
-      obj['amount'] = amount;
-      obj['resource'] = resource;
-      obj['target'] = target;
-    }
-    /**
-     * Constructs a <code>TradeCommandAllOf</code> from a plain JavaScript object, optionally creating a new instance.
-     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
-     * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/TradeCommandAllOf} obj Optional instance to populate.
-     * @return {module:model/TradeCommandAllOf} The populated <code>TradeCommandAllOf</code> instance.
-     */
-
-  }, {
-    key: "constructFromObject",
-    value: function constructFromObject(data, obj) {
-      if (data) {
-        obj = obj || new TradeCommandAllOf();
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
-        }
-
-        if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
-        }
-      }
-
-      return obj;
-    }
-  }]);
-
-  return TradeCommandAllOf;
-}();
-/**
- * @member {Number} amount
- */
-
-
-TradeCommandAllOf.prototype['amount'] = undefined;
-/**
- * @member {Number} resource
- */
-
-TradeCommandAllOf.prototype['resource'] = undefined;
-/**
- * @member {Number} target
- */
-
-TradeCommandAllOf.prototype['target'] = undefined;
-var _default = TradeCommandAllOf;
-exports["default"] = _default;
-},{"../ApiClient":1}],42:[function(require,module,exports){
+},{"../ApiClient":1}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5499,7 +4809,7 @@ _TradingResourceAllOf["default"].prototype['buy-price'] = undefined;
 _TradingResourceAllOf["default"].prototype['sell-price'] = undefined;
 var _default = TradingResource;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Resource":34,"./TradingResourceAllOf":43}],43:[function(require,module,exports){
+},{"../ApiClient":1,"./Resource":32,"./TradingResourceAllOf":40}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5584,7 +4894,7 @@ TradingResourceAllOf.prototype['buy-price'] = undefined;
 TradingResourceAllOf.prototype['sell-price'] = undefined;
 var _default = TradingResourceAllOf;
 exports["default"] = _default;
-},{"../ApiClient":1}],44:[function(require,module,exports){
+},{"../ApiClient":1}],41:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -5761,7 +5071,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],45:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 module.exports = stringify
 stringify.default = stringify
 stringify.stable = deterministicStringify
@@ -5992,7 +5302,7 @@ function replaceGetterValues (replacer) {
   }
 }
 
-},{}],46:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 "use strict";
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -6035,7 +5345,7 @@ Agent.prototype._setDefaults = function (req) {
 
 module.exports = Agent;
 
-},{}],47:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7056,7 +6366,7 @@ request.put = function (url, data, fn) {
   return req;
 };
 
-},{"./agent-base":46,"./is-object":48,"./request-base":49,"./response-base":50,"component-emitter":44,"fast-safe-stringify":45}],48:[function(require,module,exports){
+},{"./agent-base":43,"./is-object":45,"./request-base":46,"./response-base":47,"component-emitter":41,"fast-safe-stringify":42}],45:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7074,7 +6384,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],49:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7832,7 +7142,7 @@ RequestBase.prototype._setTimeouts = function () {
   }
 };
 
-},{"./is-object":48}],50:[function(require,module,exports){
+},{"./is-object":45}],47:[function(require,module,exports){
 "use strict";
 
 /**
@@ -7964,7 +7274,7 @@ ResponseBase.prototype._setStatusProperties = function (status) {
   this.unprocessableEntity = status === 422;
 };
 
-},{"./utils":51}],51:[function(require,module,exports){
+},{"./utils":48}],48:[function(require,module,exports){
 "use strict";
 
 /**
@@ -8036,7 +7346,7 @@ exports.cleanHeader = function (header, changesOrigin) {
   return header;
 };
 
-},{}],52:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var STC = require("space_tycoon_client")
 var hashInt = require("hash-int")
 
@@ -8332,7 +7642,7 @@ function startLoop() {
 
 setTimeout(startLoop, 0)
 
-},{"hash-int":56,"space_tycoon_client":9}],53:[function(require,module,exports){
+},{"hash-int":53,"space_tycoon_client":9}],50:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -8484,9 +7794,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],54:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 
-},{}],55:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -10267,7 +9577,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":53,"buffer":55,"ieee754":57}],56:[function(require,module,exports){
+},{"base64-js":50,"buffer":52,"ieee754":54}],53:[function(require,module,exports){
 "use strict"
 
 var A
@@ -10291,7 +9601,7 @@ function hashInt(x) {
 
 module.exports = hashInt
 
-},{}],57:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -10378,7 +9688,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],58:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10464,7 +9774,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],59:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10551,10 +9861,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],60:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":58,"./encode":59}]},{},[52]);
+},{"./decode":55,"./encode":56}]},{},[49]);
