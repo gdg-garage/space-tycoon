@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 type Game struct {
@@ -21,6 +22,7 @@ type Game struct {
 	Ready                sync.RWMutex
 	players              map[string]PlayersValue
 	SessionManager       sessions.Store
+	Reports              Reports
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {

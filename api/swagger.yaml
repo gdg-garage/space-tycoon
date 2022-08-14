@@ -533,67 +533,46 @@ components:
       type: object
       additionalProperties:
         type: object
-        properties:
-          tick:
-            type: integer
-            format: int64
-          buyer:
-            type: integer
-            format: int64
-          seller:
-            type: integer
-            format: int64
-          resource:
-            type: integer
-            format: int64
-          amount:
-            type: integer
-            format: int64
-          price:
-            type: integer
-            format: int64
-      example:
+        additionalProperties:
+          type: integer
+          format: int64
+      example: {
         1: {
-          tick: 10,
-          buyer: 2,
-          seller: 3,
-          resource: 30,
-          amount: 21,
-          price: 60,
+          125: 400,
+          126: 450,
+          127: 450,
+          128: 500
+        },
+        5: {
+          127: 200,
+          128: 200
         }
+      }
     Score:
       type: object
       additionalProperties:
         type: object
         properties:
           money:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           resources:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           ships:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           total:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
       example: 
         1: {
           money: {
@@ -660,13 +639,9 @@ components:
             $ref: '#/components/schemas/Profiling'
         prices:
           description: Prices are average across all planets.
-          type: array
-          items:
-            $ref: '#/components/schemas/Price'
+          $ref: '#/components/schemas/Price'
         scores:
-          type: array
-          items:
-            $ref: '#/components/schemas/Score'
+          $ref: '#/components/schemas/Score'
         trade:
           type: array
           items:
