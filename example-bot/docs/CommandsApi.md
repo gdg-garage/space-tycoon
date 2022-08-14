@@ -21,6 +21,7 @@ import space_tycoon_client
 from space_tycoon_client.api import commands_api
 from space_tycoon_client.model.commands import Commands
 from space_tycoon_client.model.error import Error
+from space_tycoon_client.model.command_error import CommandError
 from pprint import pprint
 # Defining the host is optional and defaults to https://space-tycoon.garage-trip.cz/api
 # See configuration.py for a list of all supported configuration parameters.

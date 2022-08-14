@@ -124,8 +124,17 @@ class ShipsValue(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, ship_class, life, name, player, position, prev_position, resources, *args, **kwargs):  # noqa: E501
         """ShipsValue - a model defined in OpenAPI
+
+        Args:
+            ship_class (int):
+            life (int):
+            name (str):
+            player (int):
+            position (Coordinates):
+            prev_position (Coordinates):
+            resources (Resources):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -158,13 +167,6 @@ class ShipsValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            ship_class (int): [optional]  # noqa: E501
-            life (int): [optional]  # noqa: E501
-            name (str): [optional]  # noqa: E501
-            player (int): [optional]  # noqa: E501
-            position (Coordinates): [optional]  # noqa: E501
-            prev_position (Coordinates): [optional]  # noqa: E501
-            resources (Resources): [optional]  # noqa: E501
             command (Command): [optional]  # noqa: E501
         """
 
@@ -197,6 +199,13 @@ class ShipsValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.ship_class = ship_class
+        self.life = life
+        self.name = name
+        self.player = player
+        self.position = position
+        self.prev_position = prev_position
+        self.resources = resources
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -217,8 +226,17 @@ class ShipsValue(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, *args, **kwargs):  # noqa: E501
+    def __init__(self, ship_class, life, name, player, position, prev_position, resources, *args, **kwargs):  # noqa: E501
         """ShipsValue - a model defined in OpenAPI
+
+        Args:
+            ship_class (int):
+            life (int):
+            name (str):
+            player (int):
+            position (Coordinates):
+            prev_position (Coordinates):
+            resources (Resources):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -251,13 +269,6 @@ class ShipsValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            ship_class (int): [optional]  # noqa: E501
-            life (int): [optional]  # noqa: E501
-            name (str): [optional]  # noqa: E501
-            player (int): [optional]  # noqa: E501
-            position (Coordinates): [optional]  # noqa: E501
-            prev_position (Coordinates): [optional]  # noqa: E501
-            resources (Resources): [optional]  # noqa: E501
             command (Command): [optional]  # noqa: E501
         """
 
@@ -288,6 +299,13 @@ class ShipsValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.ship_class = ship_class
+        self.life = life
+        self.name = name
+        self.player = player
+        self.position = position
+        self.prev_position = prev_position
+        self.resources = resources
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \

@@ -81,9 +81,9 @@ class CurrentTick(ModelNormal):
                 and the value is attribute type.
         """
         return {
+            'tick': (int,),  # noqa: E501
             'time_left_ms': (int,),  # noqa: E501
             'season': (int,),  # noqa: E501
-            'tick': (int,),  # noqa: E501
         }
 
     @cached_property
@@ -92,9 +92,9 @@ class CurrentTick(ModelNormal):
 
 
     attribute_map = {
+        'tick': 'tick',  # noqa: E501
         'time_left_ms': 'time-left-ms',  # noqa: E501
         'season': 'season',  # noqa: E501
-        'tick': 'tick',  # noqa: E501
     }
 
     read_only_vars = {
@@ -104,10 +104,11 @@ class CurrentTick(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, time_left_ms, season, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, tick, time_left_ms, season, *args, **kwargs):  # noqa: E501
         """CurrentTick - a model defined in OpenAPI
 
         Args:
+            tick (int):
             time_left_ms (int):
             season (int):
 
@@ -142,7 +143,6 @@ class CurrentTick(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            tick (int): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -174,6 +174,7 @@ class CurrentTick(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.tick = tick
         self.time_left_ms = time_left_ms
         self.season = season
         for var_name, var_value in kwargs.items():
@@ -196,10 +197,11 @@ class CurrentTick(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, time_left_ms, season, *args, **kwargs):  # noqa: E501
+    def __init__(self, tick, time_left_ms, season, *args, **kwargs):  # noqa: E501
         """CurrentTick - a model defined in OpenAPI
 
         Args:
+            tick (int):
             time_left_ms (int):
             season (int):
 
@@ -234,7 +236,6 @@ class CurrentTick(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            tick (int): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -264,6 +265,7 @@ class CurrentTick(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.tick = tick
         self.time_left_ms = time_left_ms
         self.season = season
         for var_name, var_value in kwargs.items():

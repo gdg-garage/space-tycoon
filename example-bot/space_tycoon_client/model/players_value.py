@@ -31,9 +31,9 @@ from space_tycoon_client.exceptions import ApiAttributeError
 
 def lazy_import():
     from space_tycoon_client.model.color import Color
-    from space_tycoon_client.model.stats import Stats
+    from space_tycoon_client.model.net_worth import NetWorth
     globals()['Color'] = Color
-    globals()['Stats'] = Stats
+    globals()['NetWorth'] = NetWorth
 
 
 class PlayersValue(ModelNormal):
@@ -91,7 +91,7 @@ class PlayersValue(ModelNormal):
         return {
             'name': (str,),  # noqa: E501
             'color': (Color,),  # noqa: E501
-            'stats': (Stats,),  # noqa: E501
+            'net_worth': (NetWorth,),  # noqa: E501
         }
 
     @cached_property
@@ -102,7 +102,7 @@ class PlayersValue(ModelNormal):
     attribute_map = {
         'name': 'name',  # noqa: E501
         'color': 'color',  # noqa: E501
-        'stats': 'stats',  # noqa: E501
+        'net_worth': 'net-worth',  # noqa: E501
     }
 
     read_only_vars = {
@@ -112,8 +112,13 @@ class PlayersValue(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, name, color, net_worth, *args, **kwargs):  # noqa: E501
         """PlayersValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            color (Color):
+            net_worth (NetWorth):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -146,9 +151,6 @@ class PlayersValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            color (Color): [optional]  # noqa: E501
-            stats (Stats): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -180,6 +182,9 @@ class PlayersValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.color = color
+        self.net_worth = net_worth
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -200,8 +205,13 @@ class PlayersValue(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, *args, **kwargs):  # noqa: E501
+    def __init__(self, name, color, net_worth, *args, **kwargs):  # noqa: E501
         """PlayersValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            color (Color):
+            net_worth (NetWorth):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -234,9 +244,6 @@ class PlayersValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            color (Color): [optional]  # noqa: E501
-            stats (Stats): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -266,6 +273,9 @@ class PlayersValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.color = color
+        self.net_worth = net_worth
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \

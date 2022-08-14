@@ -32,12 +32,10 @@ from space_tycoon_client.exceptions import ApiAttributeError
 def lazy_import():
     from space_tycoon_client.model.current_tick import CurrentTick
     from space_tycoon_client.model.planets import Planets
-    from space_tycoon_client.model.player_id import PlayerId
     from space_tycoon_client.model.players import Players
     from space_tycoon_client.model.ships import Ships
     globals()['CurrentTick'] = CurrentTick
     globals()['Planets'] = Planets
-    globals()['PlayerId'] = PlayerId
     globals()['Players'] = Players
     globals()['Ships'] = Ships
 
@@ -97,9 +95,9 @@ class Data(ModelNormal):
         return {
             'current_tick': (CurrentTick,),  # noqa: E501
             'planets': (Planets,),  # noqa: E501
-            'player': (PlayerId,),  # noqa: E501
             'players': (Players,),  # noqa: E501
             'ships': (Ships,),  # noqa: E501
+            'player_id': (int, none_type,),  # noqa: E501
         }
 
     @cached_property
@@ -110,9 +108,9 @@ class Data(ModelNormal):
     attribute_map = {
         'current_tick': 'current-tick',  # noqa: E501
         'planets': 'planets',  # noqa: E501
-        'player': 'player',  # noqa: E501
         'players': 'players',  # noqa: E501
         'ships': 'ships',  # noqa: E501
+        'player_id': 'player-id',  # noqa: E501
     }
 
     read_only_vars = {
@@ -122,8 +120,14 @@ class Data(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, current_tick, planets, players, ships, *args, **kwargs):  # noqa: E501
         """Data - a model defined in OpenAPI
+
+        Args:
+            current_tick (CurrentTick):
+            planets (Planets):
+            players (Players):
+            ships (Ships):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -156,11 +160,7 @@ class Data(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            current_tick (CurrentTick): [optional]  # noqa: E501
-            planets (Planets): [optional]  # noqa: E501
-            player (PlayerId): [optional]  # noqa: E501
-            players (Players): [optional]  # noqa: E501
-            ships (Ships): [optional]  # noqa: E501
+            player_id (int, none_type): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -192,6 +192,10 @@ class Data(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.current_tick = current_tick
+        self.planets = planets
+        self.players = players
+        self.ships = ships
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -212,8 +216,14 @@ class Data(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, *args, **kwargs):  # noqa: E501
+    def __init__(self, current_tick, planets, players, ships, *args, **kwargs):  # noqa: E501
         """Data - a model defined in OpenAPI
+
+        Args:
+            current_tick (CurrentTick):
+            planets (Planets):
+            players (Players):
+            ships (Ships):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -246,11 +256,7 @@ class Data(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            current_tick (CurrentTick): [optional]  # noqa: E501
-            planets (Planets): [optional]  # noqa: E501
-            player (PlayerId): [optional]  # noqa: E501
-            players (Players): [optional]  # noqa: E501
-            ships (Ships): [optional]  # noqa: E501
+            player_id (int, none_type): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -280,6 +286,10 @@ class Data(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.current_tick = current_tick
+        self.planets = planets
+        self.players = players
+        self.ships = ships
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \

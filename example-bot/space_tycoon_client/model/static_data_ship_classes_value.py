@@ -87,6 +87,7 @@ class StaticDataShipClassesValue(ModelNormal):
             'cargo_capacity': (int,),  # noqa: E501
             'life': (int,),  # noqa: E501
             'damage': (int,),  # noqa: E501
+            'price': (int,),  # noqa: E501
         }
 
     @cached_property
@@ -101,6 +102,7 @@ class StaticDataShipClassesValue(ModelNormal):
         'cargo_capacity': 'cargo-capacity',  # noqa: E501
         'life': 'life',  # noqa: E501
         'damage': 'damage',  # noqa: E501
+        'price': 'price',  # noqa: E501
     }
 
     read_only_vars = {
@@ -110,8 +112,17 @@ class StaticDataShipClassesValue(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, name, shipyard, speed, cargo_capacity, life, damage, price, *args, **kwargs):  # noqa: E501
         """StaticDataShipClassesValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            shipyard (bool): whether ships of this class are allowed to construct new ships
+            speed (float):
+            cargo_capacity (int): maximum number of resources the ship can carry - sum over all types of resources
+            life (int):
+            damage (int):
+            price (int):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -144,12 +155,6 @@ class StaticDataShipClassesValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            shipyard (bool): whether ships of this class are allowed to construct new ships. [optional]  # noqa: E501
-            speed (float): [optional]  # noqa: E501
-            cargo_capacity (int): maximum number of resources the ship can carry - sum over all types of resources. [optional]  # noqa: E501
-            life (int): [optional]  # noqa: E501
-            damage (int): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -181,6 +186,13 @@ class StaticDataShipClassesValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.shipyard = shipyard
+        self.speed = speed
+        self.cargo_capacity = cargo_capacity
+        self.life = life
+        self.damage = damage
+        self.price = price
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -201,8 +213,17 @@ class StaticDataShipClassesValue(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, *args, **kwargs):  # noqa: E501
+    def __init__(self, name, shipyard, speed, cargo_capacity, life, damage, price, *args, **kwargs):  # noqa: E501
         """StaticDataShipClassesValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            shipyard (bool): whether ships of this class are allowed to construct new ships
+            speed (float):
+            cargo_capacity (int): maximum number of resources the ship can carry - sum over all types of resources
+            life (int):
+            damage (int):
+            price (int):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -235,12 +256,6 @@ class StaticDataShipClassesValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            shipyard (bool): whether ships of this class are allowed to construct new ships. [optional]  # noqa: E501
-            speed (float): [optional]  # noqa: E501
-            cargo_capacity (int): maximum number of resources the ship can carry - sum over all types of resources. [optional]  # noqa: E501
-            life (int): [optional]  # noqa: E501
-            damage (int): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -270,6 +285,13 @@ class StaticDataShipClassesValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.shipyard = shipyard
+        self.speed = speed
+        self.cargo_capacity = cargo_capacity
+        self.life = life
+        self.damage = damage
+        self.price = price
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \

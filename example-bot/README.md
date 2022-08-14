@@ -51,6 +51,7 @@ import time
 import space_tycoon_client
 from pprint import pprint
 from space_tycoon_client.api import commands_api
+from space_tycoon_client.model.command_error import CommandError
 from space_tycoon_client.model.commands import Commands
 from space_tycoon_client.model.error import Error
 # Defining the host is optional and defaults to https://space-tycoon.garage-trip.cz/api
@@ -93,13 +94,12 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [AttackCommand](docs/AttackCommand.md)
- - [AttackCommandAllOf](docs/AttackCommandAllOf.md)
  - [Color](docs/Color.md)
  - [Combat](docs/Combat.md)
  - [Command](docs/Command.md)
+ - [CommandError](docs/CommandError.md)
  - [Commands](docs/Commands.md)
  - [ConstructCommand](docs/ConstructCommand.md)
- - [ConstructCommandAllOf](docs/ConstructCommandAllOf.md)
  - [Coordinates](docs/Coordinates.md)
  - [Credentials](docs/Credentials.md)
  - [CurrentTick](docs/CurrentTick.md)
@@ -110,7 +110,7 @@ Class | Method | HTTP request | Description
  - [Error](docs/Error.md)
  - [LoginPost200Response](docs/LoginPost200Response.md)
  - [MoveCommand](docs/MoveCommand.md)
- - [MoveCommandAllOf](docs/MoveCommandAllOf.md)
+ - [NetWorth](docs/NetWorth.md)
  - [Planets](docs/Planets.md)
  - [PlanetsValue](docs/PlanetsValue.md)
  - [PlayerId](docs/PlayerId.md)
@@ -120,7 +120,7 @@ Class | Method | HTTP request | Description
  - [PriceValue](docs/PriceValue.md)
  - [Profiling](docs/Profiling.md)
  - [RenameCommand](docs/RenameCommand.md)
- - [RenameCommandAllOf](docs/RenameCommandAllOf.md)
+ - [RepairCommand](docs/RepairCommand.md)
  - [Reports](docs/Reports.md)
  - [Resource](docs/Resource.md)
  - [Resources](docs/Resources.md)
@@ -130,11 +130,8 @@ Class | Method | HTTP request | Description
  - [ShipsValue](docs/ShipsValue.md)
  - [StaticData](docs/StaticData.md)
  - [StaticDataShipClassesValue](docs/StaticDataShipClassesValue.md)
- - [Stats](docs/Stats.md)
- - [StopCommand](docs/StopCommand.md)
  - [Trade](docs/Trade.md)
  - [TradeCommand](docs/TradeCommand.md)
- - [TradeCommandAllOf](docs/TradeCommandAllOf.md)
  - [TradingResource](docs/TradingResource.md)
  - [TradingResourceAllOf](docs/TradingResourceAllOf.md)
  - [TradingResources](docs/TradingResources.md)

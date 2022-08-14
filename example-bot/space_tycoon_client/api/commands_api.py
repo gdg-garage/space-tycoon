@@ -21,6 +21,7 @@ from space_tycoon_client.model_utils import (  # noqa: F401
     none_type,
     validate_and_convert_types
 )
+from space_tycoon_client.model.command_error import CommandError
 from space_tycoon_client.model.commands import Commands
 from space_tycoon_client.model.error import Error
 

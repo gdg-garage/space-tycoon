@@ -114,8 +114,14 @@ class PlanetsValue(ModelNormal):
 
     @classmethod
     @convert_js_args_to_python_args
-    def _from_openapi_data(cls, *args, **kwargs):  # noqa: E501
+    def _from_openapi_data(cls, name, resources, position, prev_position, *args, **kwargs):  # noqa: E501
         """PlanetsValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            resources (TradingResources):
+            position (Coordinates):
+            prev_position (Coordinates):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -148,10 +154,6 @@ class PlanetsValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            resources (TradingResources): [optional]  # noqa: E501
-            position (Coordinates): [optional]  # noqa: E501
-            prev_position (Coordinates): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -183,6 +185,10 @@ class PlanetsValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.resources = resources
+        self.position = position
+        self.prev_position = prev_position
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \
@@ -203,8 +209,14 @@ class PlanetsValue(ModelNormal):
     ])
 
     @convert_js_args_to_python_args
-    def __init__(self, *args, **kwargs):  # noqa: E501
+    def __init__(self, name, resources, position, prev_position, *args, **kwargs):  # noqa: E501
         """PlanetsValue - a model defined in OpenAPI
+
+        Args:
+            name (str):
+            resources (TradingResources):
+            position (Coordinates):
+            prev_position (Coordinates):
 
         Keyword Args:
             _check_type (bool): if True, values for parameters in openapi_types
@@ -237,10 +249,6 @@ class PlanetsValue(ModelNormal):
                                 Animal class but this time we won't travel
                                 through its discriminator because we passed in
                                 _visited_composed_classes = (Animal,)
-            name (str): [optional]  # noqa: E501
-            resources (TradingResources): [optional]  # noqa: E501
-            position (Coordinates): [optional]  # noqa: E501
-            prev_position (Coordinates): [optional]  # noqa: E501
         """
 
         _check_type = kwargs.pop('_check_type', True)
@@ -270,6 +278,10 @@ class PlanetsValue(ModelNormal):
         self._configuration = _configuration
         self._visited_composed_classes = _visited_composed_classes + (self.__class__,)
 
+        self.name = name
+        self.resources = resources
+        self.position = position
+        self.prev_position = prev_position
         for var_name, var_value in kwargs.items():
             if var_name not in self.attribute_map and \
                         self._configuration is not None and \

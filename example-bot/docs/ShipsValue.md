@@ -4,13 +4,13 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ship_class** | **int** |  | [optional] 
-**life** | **int** |  | [optional] 
-**name** | **str** |  | [optional] 
-**player** | **int** |  | [optional] 
-**position** | [**Coordinates**](Coordinates.md) |  | [optional] 
-**prev_position** | [**Coordinates**](Coordinates.md) |  | [optional] 
-**resources** | [**Resources**](Resources.md) |  | [optional] 
+**ship_class** | **int** |  | 
+**life** | **int** |  | 
+**name** | **str** |  | 
+**player** | **int** |  | 
+**position** | [**Coordinates**](Coordinates.md) |  | 
+**prev_position** | [**Coordinates**](Coordinates.md) |  | 
+**resources** | [**Resources**](Resources.md) |  | 
 **command** | [**Command**](Command.md) |  | [optional] 
 **any string name** | **bool, date, datetime, dict, float, int, list, str, none_type** | any string name can be used but the value must be the correct type | [optional]
 
