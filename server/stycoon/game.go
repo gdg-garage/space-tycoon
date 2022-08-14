@@ -58,6 +58,7 @@ func (game *Game) Init() error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating default players failed")
 	}
+	game.getReportsSinceSeasonStart()
 	return nil
 }
 
