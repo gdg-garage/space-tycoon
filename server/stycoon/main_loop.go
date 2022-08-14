@@ -34,6 +34,7 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			game.callUpdate()
 			game.lastTick = time.Now()
 			game.setGameTick()
+			go game.getReportsForPreviousTick()
 			err := game.setPlayers()
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")

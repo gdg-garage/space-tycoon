@@ -18,6 +18,7 @@ type Game struct {
 	ShipClasses          map[string]StaticDataShipClassesValue
 	SerializedStaticData []byte
 	players              map[string]PlayersValue
+	Reports              Reports
 }
 
 func NewGame(db *sql.DB) (*Game, error) {
