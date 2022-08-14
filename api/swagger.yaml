@@ -34,11 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  player-id:
-                    type: integer
-                    format: int64
+                $ref: '#/components/schemas/PlayerId'
         "403":
           description: Invalid name or password
           content:
@@ -293,7 +289,7 @@ components:
         - resource
         - target
         - type
-    
+
     RepairCommand:
       type: object
       properties:
