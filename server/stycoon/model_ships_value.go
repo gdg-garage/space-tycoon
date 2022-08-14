@@ -19,9 +19,9 @@ type ShipsValue struct {
 
 	Player int64 `json:"player"`
 
-	Position []int64 `json:"position"`
+	Position *[]int64 `json:"position"`
 
-	PrevPosition []int64 `json:"prev-position"`
+	PrevPosition *[]int64 `json:"prev-position"`
 
 	Resources map[string]Resource `json:"resources"`
 
