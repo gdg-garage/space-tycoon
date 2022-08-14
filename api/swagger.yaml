@@ -347,37 +347,7 @@ components:
         ship-classes:
           type: object
           additionalProperties:
-            type: object
-            required:
-              - name
-              - shipyard
-              - speed
-              - cargo-capacity
-              - life
-              - damage
-              - price
-            properties:
-              name:
-                type: string
-              shipyard:
-                type: boolean
-                description: "whether ships of this class are allowed to construct new ships"
-              speed:
-                type: number
-                format: double
-              cargo-capacity:
-                type: integer
-                format: int64
-                description: "maximum number of resources the ship can carry - sum over all types of resources"
-              life:
-                type: integer
-                format: int64
-              damage:
-                type: integer
-                format: int64
-              price:
-                type: integer
-                format: int64
+            $ref: '#/components/schemas/ShipClass'
         resource-names:
           type: object
           additionalProperties:
@@ -418,39 +388,35 @@ components:
       maximum: 255
       example: [ 0, 255, 255 ]
 
-    Planets:
+    Planet:
       type: object
-      additionalProperties:
-        type: object
-        required:
-          - name
-          - resources
-          - position
-          - prev-position
-        properties:
-          name:
-            type: string
-          resources:
-            $ref: '#/components/schemas/TradingResources'
-          position:
-            $ref: '#/components/schemas/Coordinates'
-          prev-position:
-            $ref: '#/components/schemas/Coordinates'
+      required:
+        - name
+        - resources
+        - position
+        - prev-position
+      properties:
+        name:
+          type: string
+        resources:
+          $ref: '#/components/schemas/TradingResources'
+        position:
+          $ref: '#/components/schemas/Coordinates'
+        prev-position:
+          $ref: '#/components/schemas/Coordinates'
       example:
         {
-          10: {
-            name: Aldebaran,
-            position: [ -13, 25 ],
-            prev-position: [ -13, 25 ],
-            resources: {
-              1: {
-                amount: 0,
-                buy-price: 500
-              },
-              5: {
-                amount: 20,
-                sell-price: 230.5
-              }
+          name: Aldebaran,
+          position: [ -13, 25 ],
+          prev-position: [ -13, 25 ],
+          resources: {
+            1: {
+              amount: 0,
+              buy-price: 500
+            },
+            5: {
+              amount: 20,
+              sell-price: 230.5
             }
           }
         }
@@ -463,6 +429,7 @@ components:
           format: int64
       example:
         id: 3
+
     Combat:
       type: object
       properties:
@@ -484,6 +451,7 @@ components:
           defender: 12,
           killed: false
         }
+
     Profiling:
       type: object
       properties:
@@ -520,6 +488,7 @@ components:
         at:
           type: integer
           format: int64
+
     Price:
       type: object
       additionalProperties:
@@ -552,6 +521,7 @@ components:
           amount: 21,
           price: 60,
         }
+
     Score:
       type: object
       additionalProperties:
@@ -608,6 +578,7 @@ components:
             127: 123564
           }
         }
+
     Trade:
       type: object
       properties:
@@ -637,6 +608,7 @@ components:
         amount: 5,
         price: 450
       }
+
     Reports:
       type: object
       properties:
@@ -693,110 +665,70 @@ components:
       additionalProperties:
         $ref: '#/components/schemas/TradingResource'
 
-    Players:
+    Player:
       type: object
-      additionalProperties:
-        type: object
-        required:
-          - name
-          - color
-          - net-worth
-        properties:
-          name:
-            type: string
-          color:
-            $ref: '#/components/schemas/Color'
-          net-worth:
-            $ref: '#/components/schemas/NetWorth'
-    Ships:
+      required:
+        - name
+        - color
+        - net-worth
+      properties:
+        name:
+          type: string
+        color:
+          $ref: '#/components/schemas/Color'
+        net-worth:
+          $ref: '#/components/schemas/NetWorth'
+
+    Ship:
       type: object
-      additionalProperties:
-        type: object
-        required:
-          - ship-class
-          - life
-          - name
-          - player
-          - position
-          - prev-position
-          - resources
-        properties:
-          ship-class:
-            type: integer
-            format: int64
-          life:
-            type: integer
-            format: int64
-          name:
-            type: string
-          player:
-            type: integer
-            format: int64
-          position:
-            $ref: '#/components/schemas/Coordinates'
-          prev-position:
-            $ref: '#/components/schemas/Coordinates'
-          resources:
-            $ref: '#/components/schemas/Resources'
-          command:
-            $ref: '#/components/schemas/Command'
+      required:
+        - ship-class
+        - life
+        - name
+        - player
+        - position
+        - prev-position
+        - resources
+      properties:
+        ship-class:
+          type: integer
+          format: int64
+        life:
+          type: integer
+          format: int64
+        name:
+          type: string
+        player:
+          type: integer
+          format: int64
+        position:
+          $ref: '#/components/schemas/Coordinates'
+        prev-position:
+          $ref: '#/components/schemas/Coordinates'
+        resources:
+          $ref: '#/components/schemas/Resources'
+        command:
+          $ref: '#/components/schemas/Command'
       example: {
-        12: {
-          name: Milenium Falcon,
-          position: [ -13, 25 ],
-          prev-position: [ -12, 27 ],
-          resources: {
-            1: {
-              amount: 5
-            },
-            5: {
-              amount: 7
-            },
+        name: Milenium Falcon,
+        position: [ -13, 25 ],
+        prev-position: [ -12, 27 ],
+        resources: {
+          1: {
+            amount: 5
           },
-          ship-class: 2,
-          player: 3,
-          life: 189,
-          command: {
-            type: trade,
-            target: 10,
-            resource: 5,
-            amount: -7,
+          5: {
+            amount: 7
           },
         },
-        15: {
-          name: Nostromo,
-          position: [ -13, 25 ],
-          prev-position: [ -12, 27 ],
-          resources: { },
-          ship-class: 1,
-          player: 1,
-          life: 1000,
-        },
-        17: {
-          name: Invisible Hand I,
-          position: [ 10, 10 ],
-          prevPos: [ 5, 5 ],
-          resources: { },
-          ship-class: 2,
-          player: 3,
-          life: 200,
-          command: {
-            type: move,
-            coordinates: [ 131, 128 ],
-          }
-        },
-        19: {
-          name: Invisible Hand II,
-          position: [ 5, 5 ],
-          prev-position: [ 0, 0 ],
-          resources: { },
-          ship-class: 2,
-          player: 3,
-          life: 200,
-          command: {
-            type: move,
-            target: 17,
-          }
+        ship-class: 2,
+        player: 3,
+        life: 189,
+        command: {
+          type: trade,
+          target: 10,
+          resource: 5,
+          amount: -7,
         }
       }
 
@@ -839,15 +771,99 @@ components:
         current-tick:
           $ref: '#/components/schemas/CurrentTick'
         planets:
-          $ref: '#/components/schemas/Planets'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Planet'
         player-id:
           type: integer
           format: int64
           nullable: true
         players:
-          $ref: '#/components/schemas/Players'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Player'
         ships:
-          $ref: '#/components/schemas/Ships'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Ship'
+      example: {
+        planets: {
+          10: {
+            name: Aldebaran,
+            position: [ -13, 25 ],
+            prev-position: [ -13, 25 ],
+            resources: {
+              1: {
+                amount: 0,
+                buy-price: 500
+              },
+              5: {
+                amount: 20,
+                sell-price: 230.5
+              }
+            }
+          }
+        },
+        ships: {
+          12: {
+            name: Milenium Falcon,
+            position: [ -13, 25 ],
+            prev-position: [ -12, 27 ],
+            resources: {
+              1: {
+                amount: 5
+              },
+              5: {
+                amount: 7
+              },
+            },
+            ship-class: 2,
+            player: 3,
+            life: 189,
+            command: {
+              type: trade,
+              target: 10,
+              resource: 5,
+              amount: -7,
+            },
+          },
+          15: {
+            name: Nostromo,
+            position: [ -13, 25 ],
+            prev-position: [ -12, 27 ],
+            resources: { },
+            ship-class: 1,
+            player: 1,
+            life: 1000,
+          },
+          17: {
+            name: Invisible Hand I,
+            position: [ 10, 10 ],
+            prevPos: [ 5, 5 ],
+            resources: { },
+            ship-class: 2,
+            player: 3,
+            life: 200,
+            command: {
+              type: move,
+              coordinates: [ 131, 128 ],
+            }
+          },
+          19: {
+            name: Invisible Hand II,
+            position: [ 5, 5 ],
+            prev-position: [ 0, 0 ],
+            resources: { },
+            ship-class: 2,
+            player: 3,
+            life: 200,
+            command: {
+              type: move,
+              target: 17,
+            }
+          }
+        }
+      }
 
     CurrentTick:
       type: object
@@ -901,4 +917,45 @@ components:
       example: {
         '1': "required field 'destination' is zero value",
         '4': "move command: forbidden to specify both coordinates and target"
+      }
+
+    ShipClass:
+      type: object
+      required:
+        - name
+        - shipyard
+        - speed
+        - cargo-capacity
+        - life
+        - damage
+        - price
+      properties:
+        name:
+          type: string
+        shipyard:
+          type: boolean
+          description: "whether ships of this class are allowed to construct new ships"
+        speed:
+          type: number
+          format: double
+        cargo-capacity:
+          type: integer
+          format: int64
+          description: "maximum number of resources the ship can carry - sum over all types of resources"
+        life:
+          type: integer
+          format: int64
+        damage:
+          type: integer
+          format: int64
+        price:
+          type: integer
+          format: int64
+      example: {
+        name: "mothership",
+        shipyard: true,
+        speed: 10,
+        cargo-capacity: 100,
+        life: 360,
+        damage: 30,
       }

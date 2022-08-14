@@ -7,12 +7,12 @@ import (
 )
 
 func (game *Game) SetShipClasses() error {
-	shipClasses := make(map[string]StaticDataShipClassesValue)
+	shipClasses := make(map[string]ShipClass)
 	rows, err := game.db.Query("select `id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `damage`, `price` from d_class")
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var shipClass StaticDataShipClassesValue
+	var shipClass ShipClass
 	var id int
 	var shipyard []uint8
 	var price sql.NullInt64

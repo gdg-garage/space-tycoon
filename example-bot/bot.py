@@ -1,73 +1,112 @@
-from pprint import pprint
+import math
+from collections import Counter
+from typing import Dict
 
-import space_tycoon_client
-from space_tycoon_client.api import end_turn_api
-from space_tycoon_client.api import login_api
-from space_tycoon_client.api import static_data_api
-from space_tycoon_client.model.credentials import Credentials
-from space_tycoon_client.model.current_tick import CurrentTick
-from space_tycoon_client.model.end_turn import EndTurn
-
-
-def login(api_client):
-    api_instance = login_api.LoginApi(api_client)
-    credentials = Credentials(
-        username="tivvit",
-        password="12345",
-        player="tivvit",
-    )
-
-    try:
-        api_response = api_instance.login_post(credentials)
-        pprint(api_response)
-    except space_tycoon_client.ApiException as e:
-        print("Exception when calling LoginApi->login_post: %s\n" % e)
+from space_tycoon_client import ApiClient
+from space_tycoon_client import Configuration
+from space_tycoon_client import GameApi
+from space_tycoon_client.models.construct_command import ConstructCommand
+from space_tycoon_client.models.credentials import Credentials
+from space_tycoon_client.models.current_tick import CurrentTick
+from space_tycoon_client.models.data import Data
+from space_tycoon_client.models.end_turn import EndTurn
+from space_tycoon_client.models.player import Player
+from space_tycoon_client.models.player_id import PlayerId
+from space_tycoon_client.models.ship import Ship
+from space_tycoon_client.models.static_data import StaticData
+from space_tycoon_client.rest import ApiException
 
 
-def static_data(api_client):
-    api_instance = static_data_api.StaticDataApi(api_client)
+class Game:
+    def __init__(self, api_client: GameApi):
+        self.client = api_client
+        self.player_id = self.login()
+        self.static_data: StaticData = self.client.static_data_get()
+        self.data: Data = self.client.data_get()
+        self.tick = self.data.current_tick.tick
+        self.season = self.data.current_tick.season
 
-    # example, this endpoint has no required or optional parameters
-    try:
-        return api_instance.static_data_get()
-    except space_tycoon_client.ApiException as e:
-        print("Exception when calling StaticDataApi->static_data_get: %s\n" % e)
+        # this part is custom logic, feel free to edit / delete
+        if str(self.player_id) not in self.data.players:
+            raise Exception("Logged as non-existent player")
+        self.me: Player = self.data.players[str(self.player_id)]
+        self.named_ship_classes = {ship_cls.name: ship_cls_id for ship_cls_id, ship_cls in
+                                   self.static_data.ship_classes.items()}
+        print(f"playing as [{self.me.name}] id: {self.player_id}")
 
+    def game_loop(self):
+        while True:
+            try:
+                print(f"tick {self.tick} season {self.season}")
+                self.data: Data = self.client.data_get()
+                print(f"I am {self.data.player_id}")
+                self.game_logic()
+                current_tick: CurrentTick = self.client.end_turn_post(EndTurn(
+                    tick=self.tick,
+                ))
+                self.tick = current_tick.tick
+            except ApiException as e:
+                if e.status == 403:
+                    print(f"New season started or login expired: {e}")
+                    break
+                else:
+                    raise e
+            except Exception as e:
+                print(f"Game logic error {e}")
 
-def game_loop(api_client, game_static_data):
-    tick = -1
-    while True:
-        try:
-            print(f"tick {tick}")
-            current_tick: CurrentTick = end_turn_api.EndTurnApi(api_client).end_turn_post(EndTurn(
-                tick=tick,
-            ))
-            tick = current_tick.tick
-        except space_tycoon_client.ForbiddenException as e:
-            print(f"New season started or login expired: {e}")
-            break
-        except space_tycoon_client.ApiException as e:
-            print("Exception when calling StaticDataApi->static_data_get: %s\n" % e)
+    def game_logic(self):
+        my_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
+                                self.data.ships.items() if ship.player == self.player_id}
+        ship_type_cnt = Counter(
+            (self.static_data.ship_classes[str(ship.ship_class)].name for ship in my_ships.values()))
+        pretty_ship_type_cnt = ', '.join(f"{k}:{v}" for k, v in ship_type_cnt.most_common())
+        print(f"I have {len(my_ships)} ships ({pretty_ship_type_cnt})")
+        print(f"I have {self.me.net_worth.total}$")
+        buffer = 100000
+        mothership_id = [ship_id for ship_id, ship in my_ships.items() if
+                         str(ship.ship_class) == self.named_ship_classes["mothership"]]
+        if len(mothership_id) != 1:
+            print("mothership is gone :(")
+            return
+        mothership_id = mothership_id[0]
+        shipper_class_id = self.named_ship_classes["shipper"]
+        commands = {}
+        if self.me.net_worth.total - buffer > self.static_data.ship_classes[shipper_class_id].price:
+            num_shippers_to_buy = math.floor((self.me.net_worth.total - buffer) / self.static_data.ship_classes[
+                shipper_class_id].price)
+            print(f"I may buy {num_shippers_to_buy} shipper(s)")
+            commands[mothership_id] = ConstructCommand(ship_class=int(shipper_class_id), type="construct")
+        print(self.client.commands_post(commands))
+        # todo send shippers to buy something
+
+    def login(self) -> int:
+        user, status, headers = self.client.login_post_with_http_info(Credentials(
+            username="tivvit",
+            password="12345",
+            player="tivvit",
+        ), _return_http_data_only=False)
+        self.client.api_client.cookie = headers['Set-Cookie']
+        user: PlayerId = user
+        return user.id
 
 
 def main_loop(api_client):
+    game_api = GameApi(api_client=api_client)
     while True:
-        print("new season started")
-        login(api_client)
-        static_game_data = static_data(api_client)
-        pprint(static_game_data)
-        # todo handle new season
-        game_loop(api_client, static_game_data)
+        try:
+            game = Game(game_api)
+            game.game_loop()
+            print("season ended")
+        except Exception as e:
+            print(f"Unexpected error {e}")
 
 
 def main():
-    configuration = space_tycoon_client.Configuration(
-        # host = "https://space-tycoon.garage-trip.cz/api"
-        host="localhost"
-    )
+    configuration = Configuration()
+    # For debug
+    configuration.host = "127.0.0.1"
 
-    with space_tycoon_client.ApiClient(configuration=configuration) as api_client:
-        main_loop(api_client)
+    main_loop(ApiClient(configuration=configuration, cookie="SESSION_ID=1"))
 
 
 if __name__ == '__main__':

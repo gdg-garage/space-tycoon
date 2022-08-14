@@ -60,3 +60,18 @@ services:
     volumes:
       - "./api:/api"
       - "./example-bot:/example-bot"
+
+  swagger-client-gen:
+    image: swaggerapi/swagger-codegen-cli-v3
+    ulimits:
+      nofile: 122880
+    command: >
+      generate
+      -i /api/swagger.yaml
+      -l python
+      -o /example-bot
+      -D packageName=space_tycoon_client
+      -v
+    volumes:
+      - "./api:/api"
+      - "./example-bot:/example-bot"
