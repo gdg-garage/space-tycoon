@@ -531,6 +531,7 @@ components:
           format: int64
     Price:
       type: object
+      description: Prices are average across all planets.
       additionalProperties:
         type: object
         additionalProperties:
@@ -638,7 +639,6 @@ components:
           items:
             $ref: '#/components/schemas/Profiling'
         prices:
-          description: Prices are average across all planets.
           $ref: '#/components/schemas/Price'
         scores:
           $ref: '#/components/schemas/Score'
