@@ -61,8 +61,6 @@ class Game:
             (self.static_data.ship_classes[str(ship.ship_class)].name for ship in my_ships.values()))
         pretty_ship_type_cnt = ', '.join(f"{k}:{v}" for k, v in ship_type_cnt.most_common())
         print(f"I have {len(my_ships)} ships ({pretty_ship_type_cnt})")
-        print(f"I have {self.me.net_worth.total}$")
-        buffer = 100000
         mothership_id = [ship_id for ship_id, ship in my_ships.items() if
                          str(ship.ship_class) == self.named_ship_classes["mothership"]]
         if len(mothership_id) != 1:
@@ -71,8 +69,12 @@ class Game:
         mothership_id = mothership_id[0]
         shipper_class_id = self.named_ship_classes["shipper"]
         commands = {}
-        if self.me.net_worth.total - buffer > self.static_data.ship_classes[shipper_class_id].price:
-            num_shippers_to_buy = math.floor((self.me.net_worth.total - buffer) / self.static_data.ship_classes[
+        buffer = 200000
+        current_money = self.me.net_worth.money
+        print(f"I have {current_money}$")
+        current_money_without_buffer = current_money - buffer
+        if current_money_without_buffer > self.static_data.ship_classes[shipper_class_id].price:
+            num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.ship_classes[
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
             commands[mothership_id] = ConstructCommand(ship_class=int(shipper_class_id), type="construct")
