@@ -2,6 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
 	"github.com/rs/zerolog/log"
 	"net/http"
@@ -51,4 +54,46 @@ func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+}
+
+func Commands(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+	// read
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Warn().Err(err).Msg("Error reading body")
+		http.Error(w, "can't read request body", http.StatusBadRequest)
+		return
+	}
+	// parse
+	commands, err := stycoon.ParseCommands(string(body))
+	if err != nil {
+		log.Warn().Err(err).Msg("Command parsing failed")
+		http.Error(w, "parsing failed", http.StatusBadRequest)
+		return
+	}
+	// process
+	user, err := stycoon.LoggedUserFromSession(req, sessionManager)
+	if err != nil {
+		log.Warn().Err(err).Msg("User is not logged in")
+		http.Error(w, "only for logged users", http.StatusForbidden)
+		return
+	}
+	errs, processsingErr := game.ProcessCommands(commands, user)
+	if processsingErr != nil {
+		log.Warn().Err(processsingErr).Msg("Command processing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+	} else if len(errs) > 0 {
+		b, err := json.Marshal(errs)
+		if err != nil {
+			log.Warn().Err(err).Msg("Json marshall failed")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		_, err = w.Write(b)
+		if err != nil {
+			log.Warn().Err(err).Msg("response write failed")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	}
 }

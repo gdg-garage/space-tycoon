@@ -13,15 +13,7 @@ type AttackCommand struct {
 
 	Type string `json:"type"`
 
-	Target int64 `json:"target"`
-
-	Resource int64 `json:"resource,omitempty"`
-
-	Amount int64 `json:"amount,omitempty"`
-
-	ShipClass int64 `json:"ship-class,omitempty"`
-
-	Name string `json:"name,omitempty"`
+	Target *int64 `json:"target"`
 }
 
 // AssertAttackCommandRequired checks if the required fields are not zero-ed

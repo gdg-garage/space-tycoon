@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Game struct {
@@ -127,8 +129,8 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 		if err != nil {
 			return planets, fmt.Errorf("row read failed %v", err)
 		}
-		planet.Position = pos
-		planet.PrevPosition = posPrev
+		planet.Position = &pos
+		planet.PrevPosition = &posPrev
 		planet.Resources = game.getTradingResources(id, resources)
 		planets[strconv.Itoa(id)] = planet
 	}
@@ -160,8 +162,8 @@ func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*Tradi
 		if err != nil {
 			return ships, fmt.Errorf("row read failed %v", err)
 		}
-		ship.Position = pos
-		ship.PrevPosition = posPrev
+		ship.Position = &pos
+		ship.PrevPosition = &posPrev
 		ship.Resources = game.getResources(id, resources)
 		if playerId != nil {
 			if command, ok := commands[id]; ok {
@@ -191,16 +193,16 @@ func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
 			return commands, fmt.Errorf("row read failed %v", err)
 		}
 		if target.Valid {
-			command.Target = target.Int64
+			command.Target = &target.Int64
 		}
 		if resource.Valid {
-			command.Resource = resource.Int64
+			command.Resource = &resource.Int64
 		}
 		if amount.Valid {
-			command.Amount = amount.Int64
+			command.Amount = &amount.Int64
 		}
 		if class.Valid {
-			command.ShipClass = class.Int64
+			command.ShipClass = &class.Int64
 		}
 		commands[id] = command
 	}
