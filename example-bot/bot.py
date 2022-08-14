@@ -82,14 +82,14 @@ class Game:
         # todo send shippers to buy something
 
     def login(self) -> int:
-        user, status, headers = self.client.login_post_with_http_info(Credentials(
+        player, status, headers = self.client.login_post_with_http_info(Credentials(
             username="tivvit",
             password="12345",
             player="tivvit",
         ), _return_http_data_only=False)
         self.client.api_client.cookie = headers['Set-Cookie']
-        user: PlayerId = user
-        return user.id
+        player: PlayerId = player
+        return player.id
 
 
 def main_loop(api_client):
