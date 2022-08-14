@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -62,31 +63,34 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
-	game, err := stycoon.NewGame(db)
+	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
+	game, err := stycoon.NewGame(db, sessionManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
-	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 
 	http.HandleFunc("/", addDefaultHeaders(handlers.Root))
 	// TODO: disable based on config
 	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateUser(db, w, r)
+		handlers.CreateUser(game, db, w, r)
 	}))
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, sessionManager, w, r)
+		handlers.Login(game, db, w, r)
 	}))
 	http.HandleFunc("/data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, sessionManager, w, r)
-	}))
-	http.HandleFunc("/static-data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.StaticGameData(game, w, r)
+		handlers.Data(game, w, r)
 	}))
 	http.HandleFunc("/current-tick", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
 	}))
+	http.HandleFunc("/static-data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.StaticGameData(game, w, r)
+	}))
 	http.HandleFunc("/end-turn", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
+	}))
+	http.HandleFunc("/commands", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Commands(game, w, r)
 	}))
 
 	wg := &sync.WaitGroup{}
@@ -96,7 +100,6 @@ func main() {
 
 	wg.Add(1)
 	go game.MainLoop(ctx, wg)
-	// TODO add code for starting new season
 
 	serve(ctx, wg)
 
