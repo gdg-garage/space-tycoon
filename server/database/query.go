@@ -16,8 +16,11 @@ func CheckObjectIsPlanet(db *sql.DB, id int64) (bool, error) {
 
 func GetPlanetIDs(db *sql.DB) (map[int64]struct{}, error) {
 	planetIDs := map[int64]struct{}{}
-	rows, err := db.Query("select `id` from t_object join t_planet on t_planet.id = t_object.id")
+	rows, err := db.Query("select t_planet.`id` from t_object join t_planet on t_planet.id = t_object.id")
 	var id int64
+	if err != nil {
+		return planetIDs, fmt.Errorf("query failed %v", err)
+	}
 	for rows.Next() {
 		err = rows.Scan(&id)
 		if err != nil {

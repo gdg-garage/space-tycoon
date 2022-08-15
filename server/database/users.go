@@ -56,7 +56,7 @@ func IsObjectOwnedByPlayer(db *sql.DB, playerId int64, objectId int64) (bool, er
 
 func GetPlayerOwnedShips(db *sql.DB, playerId int64) (map[int64]struct{}, error) {
 	ownedShips := make(map[int64]struct{})
-	rows, err := db.Query("select t_object.id from t_object join t_ship on t_ship.id = t_object.id where t_object.owner = ?", playerId)
+	rows, err := db.Query("select t_object.`id` from t_object join t_ship on t_ship.id = t_object.id where t_object.owner = ?", playerId)
 	if err != nil {
 		return ownedShips, fmt.Errorf("query failed %v", err)
 	}
