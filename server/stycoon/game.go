@@ -24,6 +24,7 @@ type Game struct {
 	players              map[string]PlayersValue
 	SessionManager       sessions.Store
 	TickCond             *sync.Cond
+	Reports              Reports
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
@@ -62,6 +63,7 @@ func (game *Game) Init() error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating default players failed")
 	}
+	game.getReportsSinceSeasonStart()
 	return nil
 }
 

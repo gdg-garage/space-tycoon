@@ -64,6 +64,7 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			game.setGameTick()
 			game.TickCond.L.Unlock()
 			game.TickCond.Broadcast()
+			go game.getReportsForPreviousTick()
 			game.Ready.Unlock()
 			log.Info().Int64("tick", game.Tick.Tick).Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():
