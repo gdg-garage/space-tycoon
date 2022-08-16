@@ -49,6 +49,18 @@ services:
       - "./api:/api"
       - "./server:/server"
 
+  visualization-gen:
+    image: openapitools/openapi-generator-cli
+    command: >
+      generate
+      -i /api/swagger.yaml
+      -g javascript
+      -o /web/js/client
+      --additional-properties=projectName=space_tycoon_client
+    volumes:
+      - "./api:/api"
+      - "./web/js/client:/web/js/client"
+
   client-gen:
     image: openapitools/openapi-generator-cli
     command: >

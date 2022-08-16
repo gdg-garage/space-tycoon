@@ -12,11 +12,11 @@ func (game *Game) SetShipClasses() error {
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var shipClass ShipClass
-	var id int
-	var shipyard []uint8
-	var price sql.NullInt64
 	for rows.Next() {
+		var shipClass ShipClass
+		var id int
+		var shipyard []uint8
+		var price sql.NullInt64
 		err = rows.Scan(&id, &shipClass.Name, &shipyard, &shipClass.Speed, &shipClass.CargoCapacity, &shipClass.Life, &shipClass.Damage, &price)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)

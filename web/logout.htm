@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Space Tycoon</title>
+		<link rel="stylesheet" href="style.css">
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+	</head>
+	<body>
+		<nav>
+			<a href="index.htm">Home</a>
+		</nav>
+		<hr>
+		<p id="response">
+		<script>
+			document.cookie = "player-id=; expires= Thu, 21 Aug 2014 20:00:00 UTC; path=/"
+			d3.json("http://localhost/logout", { credentials: "include" })
+			.then(json => {
+				d3.select("#response").text(JSON.stringify(json))
+			})
+			.catch(err => {
+				d3.select("#response").text(err)
+			})
+		</script>
+	</body>
+</html>

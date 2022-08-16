@@ -10,16 +10,15 @@
 package stycoon
 
 type Reports struct {
-
 	Combat []Combat `json:"combat,omitempty"`
 
 	// Profiling information about the game. Used by the visualization website.
 	Profiling []Profiling `json:"profiling,omitempty"`
 
 	// Prices are average across all planets.
-	Prices []map[string]PriceValue `json:"prices,omitempty"`
+	Prices map[string]map[string]int64 `json:"prices,omitempty"`
 
-	Scores []map[string]ScoreValue `json:"scores,omitempty"`
+	Scores map[string]ScoreValue `json:"scores,omitempty"`
 
 	Trade []Trade `json:"trade,omitempty"`
 }
@@ -35,12 +34,6 @@ func AssertReportsRequired(obj Reports) error {
 		if err := AssertProfilingRequired(el); err != nil {
 			return err
 		}
-	}
-	if err := AssertRecursePriceValueRequired(obj.Prices); err != nil {
-		return err
-	}
-	if err := AssertRecurseScoreValueRequired(obj.Scores); err != nil {
-		return err
 	}
 	for _, el := range obj.Trade {
 		if err := AssertTradeRequired(el); err != nil {

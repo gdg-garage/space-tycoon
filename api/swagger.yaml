@@ -14,8 +14,24 @@ externalDocs:
 servers:
   - url: https://space-tycoon.garage-trip.cz/api/
 tags:
-  - name: game
-    description: Interact with the game
+- name: game
+  description: Interact with the game
+- name: login
+  description: Get user session
+- name: logout
+  description: Remove user session
+- name: static-data
+  description: Data that do not change during entire season, such as ships classes.
+- name: data
+  description: "Dynamic game data (scores, prices, spaceship positions)"
+- name: commands
+  description: Specify commands for your ships
+- name: current-tick
+  description: Returns the current tick, season and the approximate time until the next tick.
+- name: end-turn
+  description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
+- name: reports
+  description: Fetch statistical data about all players.
 paths:
   /login:
     post:
@@ -35,6 +51,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerId'
+        "400":
+          description: Invalid input
         "403":
           description: Invalid name or password
           content:
@@ -47,6 +65,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /logout:
+    get:
+      tags:
+        - logout
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid input
   /static-data:
     get:
       tags:
@@ -59,6 +86,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -77,6 +106,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -97,7 +128,9 @@ paths:
       responses:
         "200":
           description: OK
-          content: { }
+          content: {}
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -128,6 +161,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -149,6 +184,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -167,6 +204,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -482,68 +521,50 @@ components:
 
     Price:
       type: object
+      description: Prices are average across all planets.
       additionalProperties:
         type: object
-        properties:
-          tick:
-            type: integer
-            format: int64
-          buyer:
-            type: string
-          seller:
-            type: string
-          resource:
-            type: string
-          amount:
-            type: integer
-            format: int64
-          price:
-            type: integer
-            format: int64
-      example:
+        additionalProperties:
+          type: integer
+          format: int64
+      example: {
         1: {
-          tick: 10,
-          buyer: 2,
-          seller: 3,
-          resource: 30,
-          amount: 21,
-          price: 60,
+          125: 400,
+          126: 450,
+          127: 450,
+          128: 500
+        },
+        5: {
+          127: 200,
+          128: 200
         }
-
+      }
     Score:
       type: object
       additionalProperties:
         type: object
         properties:
           money:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           resources:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           ships:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
           total:
-            type: array
-            items:
-              type: object
-              additionalProperties:
-                type: integer
-                format: int64
-      example:
+            type: object
+            additionalProperties:
+              type: integer
+              format: int64
+      example: 
         1: {
           money: {
             125: 123456,
@@ -607,14 +628,9 @@ components:
           items:
             $ref: '#/components/schemas/Profiling'
         prices:
-          description: Prices are average across all planets.
-          type: array
-          items:
-            $ref: '#/components/schemas/Price'
+          $ref: '#/components/schemas/Price'
         scores:
-          type: array
-          items:
-            $ref: '#/components/schemas/Score'
+          $ref: '#/components/schemas/Score'
         trade:
           type: array
           items:

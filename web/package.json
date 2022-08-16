@@ -1,0 +1,23 @@
+{
+  "name": "space_tycoon",
+  "version": "0.0.0",
+  "description": "",
+  "main": "js/index.js",
+  "scripts": {
+    "build": "browserify js/index.js -o js/bundle.js",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "build": "js/index.js"
+  },
+  "author": "Tomáš Malý and the GDG Garage Prague Team",
+  "license": "MIT",
+  "dependencies": {
+    "space_tycoon_client": "",
+    "hash-int": ""
+  },
+  "devDependencies": {
+    "browserify": "",
+    "npm-watch": ""
+  }
+}

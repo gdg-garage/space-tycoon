@@ -52,7 +52,6 @@ func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
