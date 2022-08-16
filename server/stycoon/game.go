@@ -121,7 +121,6 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 	if err != nil {
 		return planets, fmt.Errorf("query failed %v", err)
 	}
-	var id int
 	for rows.Next() {
 		var id int
 		var planet Planet
