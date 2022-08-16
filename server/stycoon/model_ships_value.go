@@ -11,17 +11,17 @@ package stycoon
 
 type ShipsValue struct {
 
-	ShipClass int64 `json:"ship-class"`
+	ShipClass string `json:"ship-class"`
 
 	Life int64 `json:"life"`
 
 	Name string `json:"name"`
 
-	Player int64 `json:"player"`
+	Player string `json:"player"`
 
-	Position []int64 `json:"position"`
+	Position *[]int64 `json:"position"`
 
-	PrevPosition []int64 `json:"prev-position"`
+	PrevPosition *[]int64 `json:"prev-position"`
 
 	Resources map[string]Resource `json:"resources"`
 

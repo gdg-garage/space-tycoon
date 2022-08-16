@@ -3,17 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -43,35 +44,57 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
+func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Origin"); origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, User-Agent")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		fn(w, r)
+	}
+}
+
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
-	game, err := stycoon.NewGame(db)
+	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
+	game, err := stycoon.NewGame(db, sessionManager)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
-	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 
-	http.HandleFunc("/", handlers.Root)
+	http.HandleFunc("/", addDefaultHeaders(handlers.Root))
 	// TODO: disable based on config
-	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateUser(db, w, r)
-	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Login(db, sessionManager, w, r)
-	})
-	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
-		handlers.Data(game, sessionManager, w, r)
-	})
-	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.CreateUser(game, db, w, r)
+	}))
+	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Login(game, db, w, r)
+	}))
+	http.HandleFunc("/logout", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Logout(sessionManager, w, r)
+	}))
+	http.HandleFunc("/data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Data(game, w, r)
+	}))
+	http.HandleFunc("/current-tick", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
-	})
-	http.HandleFunc("/static-data", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/static-data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.StaticGameData(game, w, r)
-	})
-	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/end-turn", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
-	})
+	}))
+	http.HandleFunc("/commands", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Commands(game, w, r)
+	}))
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
@@ -80,7 +103,6 @@ func main() {
 
 	wg.Add(1)
 	go game.MainLoop(ctx, wg)
-	// TODO add code for starting new season
 
 	serve(ctx, wg)
 

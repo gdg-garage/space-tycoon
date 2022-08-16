@@ -16,6 +16,8 @@ servers:
 tags:
 - name: login
   description: Get user session
+- name: logout
+  description: Remove user session
 - name: static-data
   description: Data that do not change during entire season, such as ships classes.
 - name: data
@@ -48,8 +50,9 @@ paths:
                 type: object
                 properties:
                   player-id:
-                    type: integer
-                    format: int64
+                    type: string
+        "400":
+          description: Invalid input
         "403":
           description: Invalid name or password
           content:
@@ -62,6 +65,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /logout:
+    get:
+      tags:
+        - logout
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid input
   /static-data:
     get:
       tags:
@@ -73,6 +85,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StaticData'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -90,6 +104,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Data'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -110,6 +126,8 @@ paths:
         "200":
           description: OK
           content: {}
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -121,7 +139,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CommandError'
   /end-turn:
     post:
       tags:
@@ -139,6 +157,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -159,6 +179,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CurrentTick'
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -176,6 +198,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Reports"
+        "400":
+          description: Invalid input
         "403":
           description: Please login again
           content:
@@ -193,96 +217,136 @@ components:
         type:
           type: string
         target:
-          type: integer
-          format: int64
+          type: string
+          nullable: true
+        destination:
+          $ref: "#/components/schemas/Destination"
         resource:
-          type: integer
-          format: int64
+          type: string
+          nullable: true
         amount:
           type: integer
           format: int64
+          nullable: true
         ship-class:
-          type: integer
-          format: int64
+          type: string
+          nullable: true
         name:
-            type: string
+          type: string
+          nullable: true
 
     MoveCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        type:
+          type: string
+        destination:
+          $ref: "#/components/schemas/Destination"
+      required:
+        - type
         - destination
-        type: object
-        properties:
-          destination:
-            $ref: "#/components/schemas/Destination"
 
     StopCommand:
-      $ref: '#/components/schemas/Command'
+      type: object
 
     ConstructCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        ship-class:
+          type: string
+          nullable: true
+        type:
+          type: string
+      required:
+        - type
         - ship-class
-        type: object
-        properties:
-          ship-class:
-            type: integer
-            format: int64
 
     DecommissionCommand:
-      $ref: '#/components/schemas/Command'
+      type: object
+      properties: 
+        type:
+          type: string
+      required:
+        - type
 
     RenameCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        type:
+          type: string
+        name:
+          type: string
+          nullable: true
+      required:
         - name
-        type: object
-        properties:
-          name:
-            type: string
+        - type
 
     AttackCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
+      type: object
+      properties:
+        type:
+          type: string
+        target:
+          type: string
+          nullable: true
+      required:
         - target
-        type: object
-        properties:
-          target:
-            type: integer
-            format: int64
+        - type
 
     TradeCommand:
-      allOf:
-      - $ref: '#/components/schemas/Command'
-      - required:
-        - resource
-        - target
-        - amount
-        type: object
-        properties:
-          amount:
-            type: integer
-            format: int64
-          resource:
-            type: integer
-            format: int64
-          target:
-            type: integer
-            format: int64
+      type: object
+      properties:
+        type:
+          type: string
+        amount:
+          type: integer
+          format: int64
+          nullable: true
+          description: Positive value means buy, negative sell.
+        resource:
+          type: string
+          nullable: true
+        target:
+          type: string
+          nullable: true
+          description: Any planet or own ship.
+      required:
+      - amount
+      - resource
+      - target
+      - type
+    
+    RepairCommand:
+      type: object
+      properties:
+        type:
+          type: string
+      required:
+        - type
 
     Destination:
-      oneOf:
-      - $ref: "#/components/schemas/Coordinates"
-      - $ref: "#/components/schemas/Waypoint"
+      type: object
+      nullable: true # workaround explained here https://github.com/OpenAPITools/openapi-generator/issues/3159#issuecomment-572108376
+      properties:
+        coordinates:
+          $ref: "#/components/schemas/Coordinates"
+        target:
+          $ref: "#/components/schemas/Waypoint"
 
     Waypoint:
-      type: integer
-      format: int64
+      type: string
+      nullable: true
       example: 234
+      
+    Coordinates:
+      type: array
+      items:
+        type: integer
+        format: int64
+      minItems: 2
+      maxItems: 2
+      nullable: true
+      example: [10, 20]
 
     Commands:
       type: object
@@ -301,15 +365,6 @@ components:
           type: string
         player:
           type: string
-
-    Coordinates:
-      type: array
-      items:
-        type: integer
-        format: int64
-      minItems: 2
-      maxItems: 2
-      example: [10, 20]
 
     StaticData:
       type: object
@@ -429,8 +484,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
       example:
         id: 3
     Combat:
@@ -440,11 +494,9 @@ components:
           type: integer
           format: int64
         attacker:
-          type: integer
-          format: int64
+          type: string
         defender:
-          type: integer
-          format: int64
+          type: string
         killed:
           type: boolean
       example: 
@@ -499,14 +551,11 @@ components:
             type: integer
             format: int64
           buyer:
-            type: integer
-            format: int64
+            type: string
           seller:
-            type: integer
-            format: int64
+            type: string
           resource:
-            type: integer
-            format: int64
+            type: string
           amount:
             type: integer
             format: int64
@@ -585,14 +634,11 @@ components:
           type: integer
           format: int64
         buyer:
-          type: integer
-          format: int64
+          type: string
         seller:
-          type: integer
-          format: int64
+          type: string
         resource:
-          type: integer
-          format: int64
+          type: string
         amount:
           type: integer
           format: int64
@@ -692,16 +738,14 @@ components:
           - resources
         properties:
           ship-class:
-            type: integer
-            format: int64
+            type: string
           life:
             type: integer
             format: int64
           name:
             type: string
           player:
-            type: integer
-            format: int64
+            type: string
           position:
             $ref: '#/components/schemas/Coordinates'
           prev-position:
@@ -811,8 +855,7 @@ components:
         planets:
           $ref: '#/components/schemas/Planets'
         player-id:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         players:
           $ref: '#/components/schemas/Players'
@@ -862,3 +905,13 @@ components:
       properties:
         message:
           type: string
+          
+    CommandError:
+      type: object
+      additionalProperties:
+        type: string
+      description: "Map of all commands that failed to be processed"
+      example: {
+        '1': "required field 'destination' is zero value",
+        '4': "move command: forbidden to specify both coordinates and target"
+      }

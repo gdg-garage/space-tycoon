@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"strconv"
+	"sync"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 type Game struct {
@@ -17,23 +20,31 @@ type Game struct {
 	ResourceNames        map[string]string
 	ShipClasses          map[string]StaticDataShipClassesValue
 	SerializedStaticData []byte
+	Ready                sync.RWMutex
 	players              map[string]PlayersValue
+	SessionManager       sessions.Store
 }
 
-func NewGame(db *sql.DB) (*Game, error) {
+func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 	game := Game{
 		db:               db,
 		lastTickEstimate: time.Now(),
 		lastTickReal:     time.Now(),
+		SessionManager:   sessionManager,
 	}
+	err := game.Init()
+	return &game, err
+}
+
+func (game *Game) Init() error {
 	game.setGameTick()
 	err := game.SetShipClasses()
 	if err != nil {
-		return &game, err
+		return err
 	}
 	err = game.SetResourceNames()
 	if err != nil {
-		return &game, err
+		return err
 	}
 	staticData := StaticData{
 		ShipClasses:   game.ShipClasses,
@@ -42,10 +53,13 @@ func NewGame(db *sql.DB) (*Game, error) {
 	game.SerializedStaticData, err = json.Marshal(staticData)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
-		return &game, err
+		return err
 	}
-
-	return &game, nil
+	err = game.CreatePlayersForUsers()
+	if err != nil {
+		log.Warn().Err(err).Msg("Creating default players failed")
+	}
+	return nil
 }
 
 func (game *Game) SetResourceNames() error {
@@ -54,9 +68,9 @@ func (game *Game) SetResourceNames() error {
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var id int
-	var name string
 	for rows.Next() {
+		var id int
+		var name string
 		err = rows.Scan(&id, &name)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
@@ -70,7 +84,7 @@ func (game *Game) SetResourceNames() error {
 	return nil
 }
 
-func (game *Game) GetData(playerId *int64) (Data, error) {
+func (game *Game) GetData(playerId *string) (Data, error) {
 	data := Data{
 		CurrentTick: game.Tick,
 		Players:     game.players,
@@ -107,8 +121,8 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 	if err != nil {
 		return planets, fmt.Errorf("query failed %v", err)
 	}
-	var id int
 	for rows.Next() {
+		var id int
 		var planet PlanetsValue
 		var pos = make([]int64, 2)
 		var posPrev = make([]int64, 2)
@@ -116,8 +130,8 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 		if err != nil {
 			return planets, fmt.Errorf("row read failed %v", err)
 		}
-		planet.Position = pos
-		planet.PrevPosition = posPrev
+		planet.Position = &pos
+		planet.PrevPosition = &posPrev
 		planet.Resources = game.getTradingResources(id, resources)
 		planets[strconv.Itoa(id)] = planet
 	}
@@ -127,7 +141,7 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 	return planets, nil
 }
 
-func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*TradingResource) (map[string]ShipsValue, error) {
+func (game *Game) GetShips(playerId *string, resources *map[int]map[string]*TradingResource) (map[string]ShipsValue, error) {
 	var ships = make(map[string]ShipsValue)
 	rows, err := game.db.Query("select o.`id`, o.`name`, o.`pos_x`, o.`pos_y`, o.`pos_x_prev`, o.`pos_y_prev`, s.`class`, o.`owner`, s.`life` from t_object as o join t_ship s on o.id = s.id")
 	if err != nil {
@@ -149,8 +163,8 @@ func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*Tradi
 		if err != nil {
 			return ships, fmt.Errorf("row read failed %v", err)
 		}
-		ship.Position = pos
-		ship.PrevPosition = posPrev
+		ship.Position = &pos
+		ship.PrevPosition = &posPrev
 		ship.Resources = game.getResources(id, resources)
 		if playerId != nil {
 			if command, ok := commands[id]; ok {
@@ -165,37 +179,41 @@ func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*Tradi
 	return ships, nil
 }
 
-func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
+func (game *Game) getPlayerCommands(playerId string) (map[int]Command, error) {
 	commands := make(map[int]Command)
-	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
+	playerIdInt, err := strconv.Atoi(playerId)
 	if err != nil {
 		return commands, err
 	}
-	var id int
-	var target, resource, amount, class sql.NullInt64
+	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerIdInt)
+	if err != nil {
+		return commands, err
+	}
 	for rows.Next() {
+		var id int
+		var target, resource, class sql.NullString
+		var amount sql.NullInt64
 		var command Command
 		err = rows.Scan(&id, &command.Type, &target, &resource, &amount, &class)
 		if err != nil {
 			return commands, fmt.Errorf("row read failed %v", err)
 		}
 		if target.Valid {
-			command.Target = target.Int64
+			command.Target = &target.String
 		}
 		if resource.Valid {
-			command.Resource = resource.Int64
+			command.Resource = &resource.String
 		}
 		if amount.Valid {
-			command.Amount = amount.Int64
+			command.Amount = &amount.Int64
 		}
 		if class.Valid {
-			command.ShipClass = class.Int64
+			command.ShipClass = &class.String
 		}
 		commands[id] = command
 	}
 	if err = rows.Err(); err != nil {
 		return commands, fmt.Errorf("rows read failed: %v", err)
-
 	}
 	return commands, nil
 }
@@ -205,9 +223,9 @@ func (game *Game) setPlanetResourcePrices(resources *map[int]map[string]*Trading
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var planetId, resourceId int
-	var buy, sell sql.NullFloat64
 	for rows.Next() {
+		var planetId, resourceId int
+		var buy, sell sql.NullFloat64
 		err = rows.Scan(&planetId, &resourceId, &buy, &sell)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
@@ -254,9 +272,9 @@ func (game *Game) getCommodityAmounts() (map[int]map[string]*TradingResource, er
 	if err != nil {
 		return amounts, fmt.Errorf("query failed %v", err)
 	}
-	var objectId, resourceId int
-	var amount int64
 	for rows.Next() {
+		var objectId, resourceId int
+		var amount int64
 		err = rows.Scan(&objectId, &resourceId, &amount)
 		if err != nil {
 			return amounts, fmt.Errorf("row read failed %v", err)
@@ -274,15 +292,15 @@ func (game *Game) getCommodityAmounts() (map[int]map[string]*TradingResource, er
 
 func (game *Game) setPlayers() error {
 	var players = make(map[string]PlayersValue)
-	rows, err := game.db.Query("select `id`, `name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player left join t_report_player_score score on t_player.id = score.player where score.tick  = ?", game.Tick.Tick-1)
+	rows, err := game.db.Query("select `id`, `name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player left join t_report_player_score as score on t_player.id = score.player and score.tick = ?", game.Tick.Tick-1)
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var id int
-	var player PlayersValue
-	var color sql.NullString
-	var commodities, ships, total sql.NullInt64
 	for rows.Next() {
+		var id int
+		var player PlayersValue
+		var color sql.NullString
+		var commodities, ships, total sql.NullInt64
 		err = rows.Scan(&id, &player.Name, &color, &player.NetWorth.Money, &commodities, &ships, &total)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
@@ -308,5 +326,37 @@ func (game *Game) setPlayers() error {
 		return fmt.Errorf("rows read failed: %v", err)
 	}
 	game.players = players
+	return nil
+}
+
+func (game *Game) CreatePlayersForUsers() error {
+	rows, err := game.db.Query("select d_user.`id`, d_user.`name`, tp.`id` from d_user left join t_player as tp on d_user.id = tp.user")
+	if err != nil {
+		return fmt.Errorf("query failed %v", err)
+	}
+	var id int
+	var name string
+	var playerId sql.NullInt64
+	for rows.Next() {
+		err = rows.Scan(&id, &name, &playerId)
+		if err != nil {
+			return fmt.Errorf("row read failed %v", err)
+		}
+		if playerId.Valid {
+			// Player already exists for this user
+			continue
+		}
+		// TODO use color from pre-defined or-random set of colors
+		// TODO let user change the player name
+		log.Info().Str("user", name).Msg("Creating player for user")
+		_, err := game.db.Exec("select p_create_player(?, ?, ?, ?, ?)", id, 0, 0, name, "[0,0,0]")
+		if err != nil {
+			return err
+		}
+
+	}
+	if err = rows.Err(); err != nil {
+		return fmt.Errorf("rows read failed: %v", err)
+	}
 	return nil
 }

@@ -13,24 +13,22 @@ type TradeCommand struct {
 
 	Type string `json:"type"`
 
-	Target int64 `json:"target"`
+	// Positive value means buy, negative sell.
+	Amount *int64 `json:"amount"`
 
-	Resource int64 `json:"resource"`
+	Resource *string `json:"resource"`
 
-	Amount int64 `json:"amount"`
-
-	ShipClass int64 `json:"ship-class,omitempty"`
-
-	Name string `json:"name,omitempty"`
+	// Any planet or own ship.
+	Target *string `json:"target"`
 }
 
 // AssertTradeCommandRequired checks if the required fields are not zero-ed
 func AssertTradeCommandRequired(obj TradeCommand) error {
 	elements := map[string]interface{}{
 		"type": obj.Type,
-		"target": obj.Target,
-		"resource": obj.Resource,
 		"amount": obj.Amount,
+		"resource": obj.Resource,
+		"target": obj.Target,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
