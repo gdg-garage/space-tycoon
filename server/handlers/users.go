@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
@@ -127,6 +128,22 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func Logout(sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
+	session, _ := sessionManager.Get(req, stycoon.SessionKey)
+	session.Options.MaxAge = -1
+	err := session.Save(req, w)
+	if err != nil {
+		log.Warn().Err(err).Msg("Session store failed")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

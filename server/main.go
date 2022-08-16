@@ -77,6 +77,9 @@ func main() {
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(game, db, w, r)
 	}))
+	http.HandleFunc("/logout", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Logout(sessionManager, w, r)
+	}))
 	http.HandleFunc("/data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Data(game, w, r)
 	}))
