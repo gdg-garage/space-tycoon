@@ -48,20 +48,24 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 		case <-ticker.C:
 			start := time.Now()
 			game.lastTickEstimate = time.Now()
-			game.callUpdate()
-			game.lastTickReal = time.Now()
 			game.Ready.Lock()
-			game.setGameTick()
 			if game.Tick.Tick > seasonDuration {
 				log.Warn().Msg("Starting new season")
 				game.nextSeason()
+			} else {
+				game.callUpdate()
 			}
+			game.lastTickReal = time.Now()
 			err := game.setPlayers()
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")
 			}
+			game.TickCond.L.Lock()
+			game.setGameTick()
+			game.TickCond.L.Unlock()
+			game.TickCond.Broadcast()
 			game.Ready.Unlock()
-			log.Info().Msgf("Update took %d ms", time.Since(start).Milliseconds())
+			log.Info().Int64("tick", game.Tick.Tick).Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():
 			wg.Done()
 			return

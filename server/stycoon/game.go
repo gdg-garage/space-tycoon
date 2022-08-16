@@ -20,9 +20,10 @@ type Game struct {
 	ResourceNames        map[string]string
 	ShipClasses          map[string]StaticDataShipClassesValue
 	SerializedStaticData []byte
-	Ready                sync.RWMutex
+	Ready                *sync.RWMutex
 	players              map[string]PlayersValue
 	SessionManager       sessions.Store
+	TickCond             *sync.Cond
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
@@ -31,6 +32,8 @@ func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 		lastTickEstimate: time.Now(),
 		lastTickReal:     time.Now(),
 		SessionManager:   sessionManager,
+		TickCond:         sync.NewCond(&sync.Mutex{}),
+		Ready:            &sync.RWMutex{},
 	}
 	err := game.Init()
 	return &game, err

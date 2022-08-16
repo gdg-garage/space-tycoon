@@ -33,15 +33,10 @@ func (game *Game) GetGameTickState() CurrentTick {
 }
 
 func (game *Game) EndTurn(userTick int64) CurrentTick {
-	if userTick < game.Tick.Tick {
-		return game.GetGameTickState()
+	game.TickCond.L.Lock()
+	for userTick > game.Tick.Tick {
+		game.TickCond.Wait()
 	}
-	currentTick := game.Tick.Tick
-	time.Sleep(game.getRemainingTickTime())
-	tickState := game.GetGameTickState()
-	for tickState.Tick == currentTick {
-		time.Sleep(time.Millisecond)
-		tickState = game.GetGameTickState()
-	}
-	return tickState
+	defer game.TickCond.L.Unlock()
+	return game.GetGameTickState()
 }
