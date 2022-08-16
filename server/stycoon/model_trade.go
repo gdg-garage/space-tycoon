@@ -13,11 +13,11 @@ type Trade struct {
 
 	Tick int64 `json:"tick,omitempty"`
 
-	Buyer int64 `json:"buyer,omitempty"`
+	Buyer string `json:"buyer,omitempty"`
 
-	Seller int64 `json:"seller,omitempty"`
+	Seller string `json:"seller,omitempty"`
 
-	Resource int64 `json:"resource,omitempty"`
+	Resource string `json:"resource,omitempty"`
 
 	Amount int64 `json:"amount,omitempty"`
 

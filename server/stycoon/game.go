@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 type Game struct {
@@ -81,7 +82,7 @@ func (game *Game) SetResourceNames() error {
 	return nil
 }
 
-func (game *Game) GetData(playerId *int64) (Data, error) {
+func (game *Game) GetData(playerId *string) (Data, error) {
 	data := Data{
 		CurrentTick: game.Tick,
 		Players:     game.players,
@@ -138,7 +139,7 @@ func (game *Game) GetPlanets(resources *map[int]map[string]*TradingResource) (ma
 	return planets, nil
 }
 
-func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*TradingResource) (map[string]Ship, error) {
+func (game *Game) GetShips(playerId *string, resources *map[int]map[string]*TradingResource) (map[string]Ship, error) {
 	var ships = make(map[string]Ship)
 	rows, err := game.db.Query("select o.`id`, o.`name`, o.`pos_x`, o.`pos_y`, o.`pos_x_prev`, o.`pos_y_prev`, s.`class`, o.`owner`, s.`life` from t_object as o join t_ship s on o.id = s.id")
 	if err != nil {
@@ -176,14 +177,19 @@ func (game *Game) GetShips(playerId *int64, resources *map[int]map[string]*Tradi
 	return ships, nil
 }
 
-func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
+func (game *Game) getPlayerCommands(playerId string) (map[int]Command, error) {
 	commands := make(map[int]Command)
-	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerId)
+	playerIdInt, err := strconv.Atoi(playerId)
+	if err != nil {
+		return commands, err
+	}
+	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerIdInt)
 	if err != nil {
 		return commands, err
 	}
 	var id int
-	var target, resource, amount, class sql.NullInt64
+	var target, resource, class sql.NullString
+	var amount sql.NullInt64
 	for rows.Next() {
 		var command Command
 		err = rows.Scan(&id, &command.Type, &target, &resource, &amount, &class)
@@ -191,16 +197,16 @@ func (game *Game) getPlayerCommands(playerId int64) (map[int]Command, error) {
 			return commands, fmt.Errorf("row read failed %v", err)
 		}
 		if target.Valid {
-			command.Target = &target.Int64
+			command.Target = &target.String
 		}
 		if resource.Valid {
-			command.Resource = &resource.Int64
+			command.Resource = &resource.String
 		}
 		if amount.Valid {
 			command.Amount = &amount.Int64
 		}
 		if class.Valid {
-			command.ShipClass = &class.Int64
+			command.ShipClass = &class.String
 		}
 		commands[id] = command
 	}
