@@ -6,6 +6,7 @@ from space_tycoon_client import ApiClient
 from space_tycoon_client import Configuration
 from space_tycoon_client import GameApi
 from space_tycoon_client.models.construct_command import ConstructCommand
+from space_tycoon_client.models.trade_command import TradeCommand
 from space_tycoon_client.models.credentials import Credentials
 from space_tycoon_client.models.current_tick import CurrentTick
 from space_tycoon_client.models.data import Data
@@ -29,16 +30,21 @@ class Game:
         # this part is custom logic, feel free to edit / delete
         if self.player_id not in self.data.players:
             raise Exception("Logged as non-existent player")
-        self.me: Player = self.data.players[self.player_id]
+        self.me: Player = self.data.players[str(self.player_id)]
         self.named_ship_classes = {ship_cls.name: ship_cls_id for ship_cls_id, ship_cls in
                                    self.static_data.ship_classes.items()}
+        self.recreate_me()
         print(f"playing as [{self.me.name}] id: {self.player_id}")
+
+    def recreate_me(self):
+        self.me: Player = self.data.players[str(self.player_id)]
 
     def game_loop(self):
         while True:
             try:
                 print(f"tick {self.tick} season {self.season}")
                 self.data: Data = self.client.data_get()
+                self.recreate_me()
                 print(f"I am {self.data.player_id}")
                 self.game_logic()
                 current_tick: CurrentTick = self.client.end_turn_post(EndTurn(
@@ -77,7 +83,35 @@ class Game:
             num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.ship_classes[
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
-            commands[mothership_id] = ConstructCommand(ship_class=shipper_class_id, type="construct")
+            commands[mothership_id] = ConstructCommand(
+                ship_class=int(shipper_class_id), type="construct")
+        # todo send shippers to buy something
+        idle_shippers = [ship_id for ship_id, ship in my_ships.items() if
+                         ship.ship_class == shipper_class_id and ship.command is None]
+        print(f"idle shippers: {idle_shippers}")
+
+        for planet_id, planet in self.data.planets.items():
+            if len(idle_shippers) == 0:
+                break
+            resources_by_price = sorted(filter(lambda x: x[1].buy_price is not None,
+                                               planet.resources.items()), key=lambda x: x[1].buy_price)
+            for res_id, res in resources_by_price:
+                if len(idle_shippers) == 0:
+                    break
+                shipper = idle_shippers.pop()
+
+                amount = min(current_money // res.buy_price, res.amount)
+                commands[shipper] = TradeCommand(
+                    type="trade", amount=amount, resource=res_id, target=planet_id)
+                print(f"buying {amount} of {res_id}")
+
+        # check if someone is close to mothership
+        close_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
+                                   self.data.ships.items() if ship.player != self.player_id and ship._position["x"] == self.data.ships[mothership_id]._position["x"] and ship._position["y"] == self.data.ships[mothership_id]._position["y"]}
+        if len(close_ships) != 0:
+            print("There are alien ships close to our Mothership!")
+
+        print(commands)
         print(self.client.commands_post(commands))
         # todo send shippers to buy something
 

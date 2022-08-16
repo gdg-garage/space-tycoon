@@ -391,7 +391,9 @@ components:
         name:
           type: string
         resources:
-          $ref: '#/components/schemas/TradingResources'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TradingResource'
         position:
           $ref: '#/components/schemas/Coordinates'
         prev-position:
@@ -642,11 +644,6 @@ components:
       type: object
       additionalProperties:
         $ref: '#/components/schemas/Resource'
-
-    TradingResources:
-      type: object
-      additionalProperties:
-        $ref: '#/components/schemas/TradingResource'
 
     Player:
       type: object

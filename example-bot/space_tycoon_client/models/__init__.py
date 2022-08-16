@@ -49,5 +49,4 @@ from space_tycoon_client.models.stop_command import StopCommand
 from space_tycoon_client.models.trade import Trade
 from space_tycoon_client.models.trade_command import TradeCommand
 from space_tycoon_client.models.trading_resource import TradingResource
-from space_tycoon_client.models.trading_resources import TradingResources
 from space_tycoon_client.models.waypoint import Waypoint
