@@ -41,13 +41,12 @@ func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "only POST method is supported", http.StatusBadRequest)
 		return
 	}
-	// No deadlocks pls
-	//game.Ready.RLock()
-	//defer game.Ready.RUnlock()
+	game.Ready.RLock()
 	if stycoon.SeasonChanged(game, req, game.SessionManager) {
 		http.Error(w, "season changed", http.StatusForbidden)
 		return
 	}
+	game.Ready.RUnlock()
 	// TODO not sure if this should be only for logged users
 	// TODO add dev server functionality
 	body, err := ioutil.ReadAll(req.Body)

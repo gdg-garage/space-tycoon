@@ -17,19 +17,25 @@ type Game struct {
 	ResourceNames        map[string]string
 	ShipClasses          map[string]ShipClass
 	SerializedStaticData []byte
-	Ready                sync.RWMutex
+	Ready                *sync.RWMutex
+	TickCond             *sync.Cond
 	SessionManager       sessions.Store
 	Reports              Reports
 	db                   *sql.DB
+	lastTickEstimate     time.Time
+	lastTickReal         time.Time
 	lastTick             time.Time
 	players              map[string]Player
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 	game := Game{
-		db:             db,
-		SessionManager: sessionManager,
-		lastTick:       time.Now(),
+		db:               db,
+		lastTickEstimate: time.Now(),
+		lastTickReal:     time.Now(),
+		SessionManager:   sessionManager,
+		TickCond:         sync.NewCond(&sync.Mutex{}),
+		Ready:            &sync.RWMutex{},
 	}
 	err := game.Init()
 	return &game, err

@@ -138,6 +138,7 @@ Class | Method | HTTP request | Description
 *GameApi* | [**login_post**](docs/GameApi.md#login_post) | **POST** /login | Get user session
 *GameApi* | [**reports_get**](docs/GameApi.md#reports_get) | **GET** /reports | Fetch statistical data about all players.
 *GameApi* | [**static_data_get**](docs/GameApi.md#static_data_get) | **GET** /static-data | Data that do not change during entire season, such as ships classes.
+*LogoutApi* | [**logout_get**](docs/LogoutApi.md#logout_get) | **GET** /logout | 
 
 ## Documentation For Models
 

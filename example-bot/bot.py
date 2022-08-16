@@ -133,17 +133,21 @@ class Game:
                     del res_to_shipper[rId]
 
         # check if someone is close to mothership
-        close_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
-                                   self.data.ships.items() if ship.player != self.player_id and ship._position["x"] ==
-                                   self.data.ships[mothership_id]._position["x"] and ship._position["y"] ==
-                                   self.data.ships[mothership_id]._position["y"]}
-        if len(close_ships) != 0:
-            print("There are alien ships close to our Mothership!")
+        # close_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
+        #                            self.data.ships.items() if ship.player != self.player_id and ship.position["x"] ==
+        #                            self.data.ships[mothership_id].position["x"] and ship.position["y"] ==
+        #                            self.data.ships[mothership_id].position["y"]}
+        # if len(close_ships) != 0:
+        #     print("There are alien ships close to our Mothership!")
 
             # TODO defense
 
         print(commands)
-        print(self.client.commands_post(commands))
+        commands_result = self.client.commands_post(commands)
+        # todo this may need try catch
+        if commands_result:
+            print("some commands failed")
+            print(commands_result)
 
     def login(self) -> str:
         player, status, headers = self.client.login_post_with_http_info(Credentials(

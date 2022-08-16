@@ -30,8 +30,8 @@ class Reports(object):
     swagger_types = {
         'combat': 'list[Combat]',
         'profiling': 'list[Profiling]',
-        'prices': 'list[Price]',
-        'scores': 'list[Score]',
+        'prices': 'Price',
+        'scores': 'Score',
         'trade': 'list[Trade]'
     }
 
@@ -110,10 +110,9 @@ class Reports(object):
     def prices(self):
         """Gets the prices of this Reports.  # noqa: E501
 
-        Prices are average across all planets.  # noqa: E501
 
         :return: The prices of this Reports.  # noqa: E501
-        :rtype: list[Price]
+        :rtype: Price
         """
         return self._prices
 
@@ -121,10 +120,9 @@ class Reports(object):
     def prices(self, prices):
         """Sets the prices of this Reports.
 
-        Prices are average across all planets.  # noqa: E501
 
         :param prices: The prices of this Reports.  # noqa: E501
-        :type: list[Price]
+        :type: Price
         """
 
         self._prices = prices
@@ -135,7 +133,7 @@ class Reports(object):
 
 
         :return: The scores of this Reports.  # noqa: E501
-        :rtype: list[Score]
+        :rtype: Score
         """
         return self._scores
 
@@ -145,7 +143,7 @@ class Reports(object):
 
 
         :param scores: The scores of this Reports.  # noqa: E501
-        :type: list[Score]
+        :type: Score
         """
 
         self._scores = scores
