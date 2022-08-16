@@ -59,7 +59,6 @@ func CreateUser(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
 func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
@@ -130,5 +129,4 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }

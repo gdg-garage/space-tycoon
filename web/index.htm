@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Space Tycoon</title>
+		<link rel="stylesheet" href="style.css">
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="js/bundle.js"></script>
+	</head>
+	<body>
+		<nav>
+			<span id="userInfo">
+				<a href="register.htm">Sign up</a>
+				<a href="login.htm">Sign in</a>
+			</span>
+			<span id="playerInfo">
+			</span>
+			<span>
+				<a href="graphs.htm">Graphs</a>
+			</span>
+			<span id="tickInfo">
+				Javascript is required
+			</span>
+		</nav>
+		<hr>
+		<svg id="themap">
+			<defs>
+				<path id="class-mothership" d="M -6 -3 L -6 3 L 0 7 L 6 3 L 6 -3 L 0 -7 Z" />
+				<path id="class-hauler" d="M -4 -4 L -4 4 L 4 4 L 4 -4 Z" />
+				<path id="class-shipper" d="M -5 0 L 0 -5 L 5 0 L 0 5 Z" />
+				<path id="class-fighter" d="M 0 -6 L -5 3 L 5 3 Z" />
+				<path id="class-bomber" d="M 0 6 L -5 -3 L 5 -3 Z" />
+				<path id="class-destroyer" d="M -8 -5 L 8 -5 L 0 9 Z M -8 5 L 0 -9 L 8 5 Z" />
+				<g id="class-shipyard"><circle cx=0 cy=0 r=6 /></g>
+			</defs>
+			<g id="panzoom">
+				<g id="planets"></g>
+				<g id="lines"></g>
+				<g id="ships"></g>
+			</g>
+		</svg>
+		<hr>
+		<div id="modalContainer">
+			<div id ="modalWindow">
+				<div id="modalTitle">
+				</div>
+				<div id="modalInfo">
+				</div>
+			</div>
+		</div>
+		<div id="playersContainer">
+			<table id="playersOverlay">
+			</table>
+		</div>
+	</body>
+</html>

@@ -44,6 +44,22 @@ func serve(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
+func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Origin"); origin != "" {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, User-Agent")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		if r.Method == "OPTIONS" {
+			return
+		}
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		fn(w, r)
+	}
+}
+
 func main() {
 	db = database.ConnectDB()
 	defer database.CloseDB(db)
@@ -53,29 +69,29 @@ func main() {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
 
-	http.HandleFunc("/", handlers.Root)
+	http.HandleFunc("/", addDefaultHeaders(handlers.Root))
 	// TODO: disable based on config
-	http.HandleFunc("/create-user", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateUser(game, db, w, r)
-	})
-	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(game, db, w, r)
-	})
-	http.HandleFunc("/data", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Data(game, w, r)
-	})
-	http.HandleFunc("/current-tick", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/current-tick", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CurrentTick(game, w, r)
-	})
-	http.HandleFunc("/static-data", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/static-data", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.StaticGameData(game, w, r)
-	})
-	http.HandleFunc("/end-turn", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/end-turn", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.EndTurn(game, w, r)
-	})
-	http.HandleFunc("/commands", func(w http.ResponseWriter, r *http.Request) {
+	}))
+	http.HandleFunc("/commands", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Commands(game, w, r)
-	})
+	}))
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
