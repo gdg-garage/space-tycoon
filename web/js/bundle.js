@@ -1654,7 +1654,7 @@ var AttackCommand = /*#__PURE__*/function () {
    * Constructs a new <code>AttackCommand</code>.
    * @alias module:model/AttackCommand
    * @param type {String} 
-   * @param target {Number} 
+   * @param target {String} 
    */
   function AttackCommand(type, target) {
     _classCallCheck(this, AttackCommand);
@@ -1693,7 +1693,7 @@ var AttackCommand = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
         }
       }
 
@@ -1710,7 +1710,7 @@ var AttackCommand = /*#__PURE__*/function () {
 
 AttackCommand.prototype['type'] = undefined;
 /**
- * @member {Number} target
+ * @member {String} target
  */
 
 AttackCommand.prototype['target'] = undefined;
@@ -1778,11 +1778,11 @@ var Combat = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('attacker')) {
-          obj['attacker'] = _ApiClient["default"].convertToType(data['attacker'], 'Number');
+          obj['attacker'] = _ApiClient["default"].convertToType(data['attacker'], 'String');
         }
 
         if (data.hasOwnProperty('defender')) {
-          obj['defender'] = _ApiClient["default"].convertToType(data['defender'], 'Number');
+          obj['defender'] = _ApiClient["default"].convertToType(data['defender'], 'String');
         }
 
         if (data.hasOwnProperty('killed')) {
@@ -1803,12 +1803,12 @@ var Combat = /*#__PURE__*/function () {
 
 Combat.prototype['tick'] = undefined;
 /**
- * @member {Number} attacker
+ * @member {String} attacker
  */
 
 Combat.prototype['attacker'] = undefined;
 /**
- * @member {Number} defender
+ * @member {String} defender
  */
 
 Combat.prototype['defender'] = undefined;
@@ -1886,7 +1886,7 @@ var Command = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
         }
 
         if (data.hasOwnProperty('destination')) {
@@ -1894,7 +1894,7 @@ var Command = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
+          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'String');
         }
 
         if (data.hasOwnProperty('amount')) {
@@ -1902,7 +1902,7 @@ var Command = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
+          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
         }
 
         if (data.hasOwnProperty('name')) {
@@ -1923,7 +1923,7 @@ var Command = /*#__PURE__*/function () {
 
 Command.prototype['type'] = undefined;
 /**
- * @member {Number} target
+ * @member {String} target
  */
 
 Command.prototype['target'] = undefined;
@@ -1933,7 +1933,7 @@ Command.prototype['target'] = undefined;
 
 Command.prototype['destination'] = undefined;
 /**
- * @member {Number} resource
+ * @member {String} resource
  */
 
 Command.prototype['resource'] = undefined;
@@ -1943,7 +1943,7 @@ Command.prototype['resource'] = undefined;
 
 Command.prototype['amount'] = undefined;
 /**
- * @member {Number} ship-class
+ * @member {String} ship-class
  */
 
 Command.prototype['ship-class'] = undefined;
@@ -1981,7 +1981,7 @@ var ConstructCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>ConstructCommand</code>.
    * @alias module:model/ConstructCommand
-   * @param shipClass {Number} 
+   * @param shipClass {String} 
    * @param type {String} 
    */
   function ConstructCommand(shipClass, type) {
@@ -2017,7 +2017,7 @@ var ConstructCommand = /*#__PURE__*/function () {
         obj = obj || new ConstructCommand();
 
         if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
+          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
         }
 
         if (data.hasOwnProperty('type')) {
@@ -2032,7 +2032,7 @@ var ConstructCommand = /*#__PURE__*/function () {
   return ConstructCommand;
 }();
 /**
- * @member {Number} ship-class
+ * @member {String} ship-class
  */
 
 
@@ -2331,7 +2331,7 @@ var Data = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('player-id')) {
-          obj['player-id'] = _ApiClient["default"].convertToType(data['player-id'], 'Number');
+          obj['player-id'] = _ApiClient["default"].convertToType(data['player-id'], 'String');
         }
 
         if (data.hasOwnProperty('players')) {
@@ -2365,7 +2365,7 @@ Data.prototype['current-tick'] = undefined;
 
 Data.prototype['planets'] = undefined;
 /**
- * @member {Number} player-id
+ * @member {String} player-id
  */
 
 Data.prototype['player-id'] = undefined;
@@ -2522,7 +2522,7 @@ var Destination = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
         }
       }
 
@@ -2539,7 +2539,7 @@ var Destination = /*#__PURE__*/function () {
 
 Destination.prototype['coordinates'] = undefined;
 /**
- * @member {Number} target
+ * @member {String} target
  */
 
 Destination.prototype['target'] = undefined;
@@ -2761,7 +2761,7 @@ var LoginPost200Response = /*#__PURE__*/function () {
         obj = obj || new LoginPost200Response();
 
         if (data.hasOwnProperty('player-id')) {
-          obj['player-id'] = _ApiClient["default"].convertToType(data['player-id'], 'Number');
+          obj['player-id'] = _ApiClient["default"].convertToType(data['player-id'], 'String');
         }
       }
 
@@ -2772,7 +2772,7 @@ var LoginPost200Response = /*#__PURE__*/function () {
   return LoginPost200Response;
 }();
 /**
- * @member {Number} player-id
+ * @member {String} player-id
  */
 
 
@@ -3157,7 +3157,7 @@ var PlayerId = /*#__PURE__*/function () {
         obj = obj || new PlayerId();
 
         if (data.hasOwnProperty('id')) {
-          obj['id'] = _ApiClient["default"].convertToType(data['id'], 'Number');
+          obj['id'] = _ApiClient["default"].convertToType(data['id'], 'String');
         }
       }
 
@@ -3168,7 +3168,7 @@ var PlayerId = /*#__PURE__*/function () {
   return PlayerId;
 }();
 /**
- * @member {Number} id
+ * @member {String} id
  */
 
 
@@ -3340,15 +3340,15 @@ var PriceValue = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('buyer')) {
-          obj['buyer'] = _ApiClient["default"].convertToType(data['buyer'], 'Number');
+          obj['buyer'] = _ApiClient["default"].convertToType(data['buyer'], 'String');
         }
 
         if (data.hasOwnProperty('seller')) {
-          obj['seller'] = _ApiClient["default"].convertToType(data['seller'], 'Number');
+          obj['seller'] = _ApiClient["default"].convertToType(data['seller'], 'String');
         }
 
         if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
+          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'String');
         }
 
         if (data.hasOwnProperty('amount')) {
@@ -3373,17 +3373,17 @@ var PriceValue = /*#__PURE__*/function () {
 
 PriceValue.prototype['tick'] = undefined;
 /**
- * @member {Number} buyer
+ * @member {String} buyer
  */
 
 PriceValue.prototype['buyer'] = undefined;
 /**
- * @member {Number} seller
+ * @member {String} seller
  */
 
 PriceValue.prototype['seller'] = undefined;
 /**
- * @member {Number} resource
+ * @member {String} resource
  */
 
 PriceValue.prototype['resource'] = undefined;
@@ -4079,10 +4079,10 @@ var ShipsValue = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>ShipsValue</code>.
    * @alias module:model/ShipsValue
-   * @param shipClass {Number} 
+   * @param shipClass {String} 
    * @param life {Number} 
    * @param name {String} 
-   * @param player {Number} 
+   * @param player {String} 
    * @param position {Array.<Number>} 
    * @param prevPosition {Array.<Number>} 
    * @param resources {Object.<String, module:model/Resource>} 
@@ -4125,7 +4125,7 @@ var ShipsValue = /*#__PURE__*/function () {
         obj = obj || new ShipsValue();
 
         if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'Number');
+          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
         }
 
         if (data.hasOwnProperty('life')) {
@@ -4137,7 +4137,7 @@ var ShipsValue = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('player')) {
-          obj['player'] = _ApiClient["default"].convertToType(data['player'], 'Number');
+          obj['player'] = _ApiClient["default"].convertToType(data['player'], 'String');
         }
 
         if (data.hasOwnProperty('position')) {
@@ -4166,7 +4166,7 @@ var ShipsValue = /*#__PURE__*/function () {
   return ShipsValue;
 }();
 /**
- * @member {Number} ship-class
+ * @member {String} ship-class
  */
 
 
@@ -4182,7 +4182,7 @@ ShipsValue.prototype['life'] = undefined;
 
 ShipsValue.prototype['name'] = undefined;
 /**
- * @member {Number} player
+ * @member {String} player
  */
 
 ShipsValue.prototype['player'] = undefined;
@@ -4508,15 +4508,15 @@ var Trade = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('buyer')) {
-          obj['buyer'] = _ApiClient["default"].convertToType(data['buyer'], 'Number');
+          obj['buyer'] = _ApiClient["default"].convertToType(data['buyer'], 'String');
         }
 
         if (data.hasOwnProperty('seller')) {
-          obj['seller'] = _ApiClient["default"].convertToType(data['seller'], 'Number');
+          obj['seller'] = _ApiClient["default"].convertToType(data['seller'], 'String');
         }
 
         if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
+          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'String');
         }
 
         if (data.hasOwnProperty('amount')) {
@@ -4541,17 +4541,17 @@ var Trade = /*#__PURE__*/function () {
 
 Trade.prototype['tick'] = undefined;
 /**
- * @member {Number} buyer
+ * @member {String} buyer
  */
 
 Trade.prototype['buyer'] = undefined;
 /**
- * @member {Number} seller
+ * @member {String} seller
  */
 
 Trade.prototype['seller'] = undefined;
 /**
- * @member {Number} resource
+ * @member {String} resource
  */
 
 Trade.prototype['resource'] = undefined;
@@ -4596,8 +4596,8 @@ var TradeCommand = /*#__PURE__*/function () {
    * @alias module:model/TradeCommand
    * @param type {String} 
    * @param amount {Number} Positive value means buy, negative sell.
-   * @param resource {Number} 
-   * @param target {Number} Any planet or own ship.
+   * @param resource {String} 
+   * @param target {String} Any planet or own ship.
    */
   function TradeCommand(type, amount, resource, target) {
     _classCallCheck(this, TradeCommand);
@@ -4642,11 +4642,11 @@ var TradeCommand = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'Number');
+          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'String');
         }
 
         if (data.hasOwnProperty('target')) {
-          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'Number');
+          obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
         }
       }
 
@@ -4669,13 +4669,13 @@ TradeCommand.prototype['type'] = undefined;
 
 TradeCommand.prototype['amount'] = undefined;
 /**
- * @member {Number} resource
+ * @member {String} resource
  */
 
 TradeCommand.prototype['resource'] = undefined;
 /**
  * Any planet or own ship.
- * @member {Number} target
+ * @member {String} target
  */
 
 TradeCommand.prototype['target'] = undefined;
