@@ -2,6 +2,7 @@ package stycoon
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gdg-garage/space-tycoon/server/database"
 )
@@ -13,24 +14,24 @@ func NewMoveCommand(command Command) *MoveCommand {
 	}
 }
 
-func (game *Game) CreateWaypointFromCoordinates(c []int64) (int64, error) {
+func (game *Game) CreateWaypointFromCoordinates(c []int64) (string, error) {
 	if len(c) != 2 {
-		return 0, fmt.Errorf("move command: coordinates must have exactly two elements")
+		return "", fmt.Errorf("move command: coordinates must have exactly two elements")
 	}
 	// TODO search for existing waypoints first
 	waypointId, err := database.InsertObject(game.db, c[0], c[1])
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return waypointId, nil
+	return strconv.Itoa(int(waypointId)), nil
 }
 
-func (game *Game) DetermineTarget(d Destination) (int64, error) {
+func (game *Game) DetermineTarget(d Destination) (string, error) {
 	if d.Coordinates != nil && d.Target != nil {
-		return 0, fmt.Errorf("move command: forbidden to specify both coordinates and target")
+		return "", fmt.Errorf("move command: forbidden to specify both coordinates and target")
 	}
 	if d.Coordinates == nil && d.Target == nil {
-		return 0, fmt.Errorf("move command: one of coordinates and target must be specified")
+		return "", fmt.Errorf("move command: one of coordinates and target must be specified")
 	}
 	if d.Coordinates != nil {
 		return game.CreateWaypointFromCoordinates(*d.Coordinates)
@@ -48,5 +49,11 @@ func (game *Game) processMove(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.ReplaceMoveCommand(game.db, id, command.Type, target)
+
+	targetInt, err := strconv.Atoi(target)
+	if err != nil {
+		return err
+	}
+
+	return database.ReplaceMoveCommand(game.db, id, command.Type, int64(targetInt))
 }

@@ -11,13 +11,13 @@ package stycoon
 
 type Ship struct {
 
-	ShipClass int64 `json:"ship-class"`
+	ShipClass string `json:"ship-class"`
 
 	Life int64 `json:"life"`
 
 	Name string `json:"name"`
 
-	Player int64 `json:"player"`
+	Player string `json:"player"`
 
 	Position *[]int64 `json:"position"`
 

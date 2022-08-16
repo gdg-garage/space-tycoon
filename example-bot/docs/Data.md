@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **current_tick** | [**CurrentTick**](CurrentTick.md) |  | 
 **planets** | [**dict(str, Planet)**](Planet.md) |  | 
-**player_id** | **int** |  | [optional] 
+**player_id** | **str** |  | [optional] 
 **players** | [**dict(str, Player)**](Player.md) |  | 
 **ships** | [**dict(str, Ship)**](Ship.md) |  | 
 

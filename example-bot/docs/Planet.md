@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **str** |  | 
-**resources** | [**TradingResources**](TradingResources.md) |  | 
+**resources** | [**dict(str, TradingResource)**](TradingResource.md) |  | 
 **position** | [**Coordinates**](Coordinates.md) |  | 
 **prev_position** | [**Coordinates**](Coordinates.md) |  | 
 

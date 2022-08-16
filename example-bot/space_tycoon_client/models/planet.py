@@ -29,7 +29,7 @@ class Planet(object):
     """
     swagger_types = {
         'name': 'str',
-        'resources': 'TradingResources',
+        'resources': 'dict(str, TradingResource)',
         'position': 'Coordinates',
         'prev_position': 'Coordinates'
     }
@@ -82,7 +82,7 @@ class Planet(object):
 
 
         :return: The resources of this Planet.  # noqa: E501
-        :rtype: TradingResources
+        :rtype: dict(str, TradingResource)
         """
         return self._resources
 
@@ -92,7 +92,7 @@ class Planet(object):
 
 
         :param resources: The resources of this Planet.  # noqa: E501
-        :type: TradingResources
+        :type: dict(str, TradingResource)
         """
         if resources is None:
             raise ValueError("Invalid value for `resources`, must not be `None`")  # noqa: E501

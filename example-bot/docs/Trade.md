@@ -4,9 +4,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tick** | **int** |  | [optional] 
-**buyer** | **int** |  | [optional] 
-**seller** | **int** |  | [optional] 
-**resource** | **int** |  | [optional] 
+**buyer** | **str** |  | [optional] 
+**seller** | **str** |  | [optional] 
+**resource** | **str** |  | [optional] 
 **amount** | **int** |  | [optional] 
 **price** | **int** |  | [optional] 
 

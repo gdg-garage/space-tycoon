@@ -11,13 +11,13 @@ package stycoon
 
 type ScoreValue struct {
 
-	Money []map[string]int64 `json:"money,omitempty"`
+	Money map[string]int64 `json:"money,omitempty"`
 
-	Resources []map[string]int64 `json:"resources,omitempty"`
+	Resources map[string]int64 `json:"resources,omitempty"`
 
-	Ships []map[string]int64 `json:"ships,omitempty"`
+	Ships map[string]int64 `json:"ships,omitempty"`
 
-	Total []map[string]int64 `json:"total,omitempty"`
+	Total map[string]int64 `json:"total,omitempty"`
 }
 
 // AssertScoreValueRequired checks if the required fields are not zero-ed

@@ -16,10 +16,10 @@ type TradeCommand struct {
 	// Positive value means buy, negative sell.
 	Amount *int64 `json:"amount"`
 
-	Resource *int64 `json:"resource"`
+	Resource *string `json:"resource"`
 
 	// Any planet or own ship.
-	Target *int64 `json:"target"`
+	Target *string `json:"target"`
 }
 
 // AssertTradeCommandRequired checks if the required fields are not zero-ed

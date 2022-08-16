@@ -55,6 +55,7 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 				log.Warn().Msg("Starting new season")
 				game.nextSeason()
 			}
+			go game.getReportsForPreviousTick()
 			err := game.setPlayers()
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")

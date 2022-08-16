@@ -28,7 +28,7 @@ class PlayerId(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'id': 'int'
+        'id': 'str'
     }
 
     attribute_map = {
@@ -48,7 +48,7 @@ class PlayerId(object):
 
 
         :return: The id of this PlayerId.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._id
 
@@ -58,7 +58,7 @@ class PlayerId(object):
 
 
         :param id: The id of this PlayerId.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._id = id

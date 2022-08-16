@@ -30,7 +30,7 @@ class Data(object):
     swagger_types = {
         'current_tick': 'CurrentTick',
         'planets': 'dict(str, Planet)',
-        'player_id': 'int',
+        'player_id': 'str',
         'players': 'dict(str, Player)',
         'ships': 'dict(str, Ship)'
     }
@@ -110,7 +110,7 @@ class Data(object):
 
 
         :return: The player_id of this Data.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._player_id
 
@@ -120,7 +120,7 @@ class Data(object):
 
 
         :param player_id: The player_id of this Data.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._player_id = player_id

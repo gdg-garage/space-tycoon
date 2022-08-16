@@ -28,10 +28,10 @@ class Ship(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'ship_class': 'int',
+        'ship_class': 'str',
         'life': 'int',
         'name': 'str',
-        'player': 'int',
+        'player': 'str',
         'position': 'Coordinates',
         'prev_position': 'Coordinates',
         'resources': 'Resources',
@@ -76,7 +76,7 @@ class Ship(object):
 
 
         :return: The ship_class of this Ship.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._ship_class
 
@@ -86,7 +86,7 @@ class Ship(object):
 
 
         :param ship_class: The ship_class of this Ship.  # noqa: E501
-        :type: int
+        :type: str
         """
         if ship_class is None:
             raise ValueError("Invalid value for `ship_class`, must not be `None`")  # noqa: E501
@@ -145,7 +145,7 @@ class Ship(object):
 
 
         :return: The player of this Ship.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._player
 
@@ -155,7 +155,7 @@ class Ship(object):
 
 
         :param player: The player of this Ship.  # noqa: E501
-        :type: int
+        :type: str
         """
         if player is None:
             raise ValueError("Invalid value for `player`, must not be `None`")  # noqa: E501

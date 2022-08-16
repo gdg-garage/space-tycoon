@@ -3,10 +3,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ship_class** | **int** |  | 
+**ship_class** | **str** |  | 
 **life** | **int** |  | 
 **name** | **str** |  | 
-**player** | **int** |  | 
+**player** | **str** |  | 
 **position** | [**Coordinates**](Coordinates.md) |  | 
 **prev_position** | [**Coordinates**](Coordinates.md) |  | 
 **resources** | [**Resources**](Resources.md) |  | 

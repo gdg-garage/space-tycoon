@@ -11,7 +11,7 @@ package stycoon
 
 type ConstructCommand struct {
 
-	ShipClass *int64 `json:"ship-class"`
+	ShipClass *string `json:"ship-class"`
 
 	Type string `json:"type"`
 }

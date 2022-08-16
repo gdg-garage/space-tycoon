@@ -176,7 +176,6 @@ Class | Method | HTTP request | Description
  - [Trade](docs/Trade.md)
  - [TradeCommand](docs/TradeCommand.md)
  - [TradingResource](docs/TradingResource.md)
- - [TradingResources](docs/TradingResources.md)
  - [Waypoint](docs/Waypoint.md)
 
 ## Documentation For Authorization
