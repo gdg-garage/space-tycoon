@@ -15,21 +15,26 @@ import (
 type Game struct {
 	Tick                 CurrentTick
 	db                   *sql.DB
-	lastTick             time.Time
+	lastTickEstimate     time.Time
+	lastTickReal         time.Time
 	ResourceNames        map[string]string
 	ShipClasses          map[string]StaticDataShipClassesValue
 	SerializedStaticData []byte
-	Ready                sync.RWMutex
+	Ready                *sync.RWMutex
 	players              map[string]PlayersValue
 	SessionManager       sessions.Store
+	TickCond             *sync.Cond
 	Reports              Reports
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 	game := Game{
-		db:             db,
-		SessionManager: sessionManager,
-		lastTick:       time.Now(),
+		db:               db,
+		lastTickEstimate: time.Now(),
+		lastTickReal:     time.Now(),
+		SessionManager:   sessionManager,
+		TickCond:         sync.NewCond(&sync.Mutex{}),
+		Ready:            &sync.RWMutex{},
 	}
 	err := game.Init()
 	return &game, err
