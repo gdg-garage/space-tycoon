@@ -22,6 +22,7 @@ type Game struct {
 	Ready                sync.RWMutex
 	players              map[string]PlayersValue
 	SessionManager       sessions.Store
+	Reports              Reports
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
@@ -57,6 +58,7 @@ func (game *Game) Init() error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating default players failed")
 	}
+	game.getReportsSinceSeasonStart()
 	return nil
 }
 
