@@ -29,24 +29,24 @@ class CurrentTick(object):
     """
     swagger_types = {
         'tick': 'int',
-        'time_left_ms': 'int',
+        'min_time_left_ms': 'int',
         'season': 'int'
     }
 
     attribute_map = {
         'tick': 'tick',
-        'time_left_ms': 'time-left-ms',
+        'min_time_left_ms': 'min-time-left-ms',
         'season': 'season'
     }
 
-    def __init__(self, tick=None, time_left_ms=None, season=None):  # noqa: E501
+    def __init__(self, tick=None, min_time_left_ms=None, season=None):  # noqa: E501
         """CurrentTick - a model defined in Swagger"""  # noqa: E501
         self._tick = None
-        self._time_left_ms = None
+        self._min_time_left_ms = None
         self._season = None
         self.discriminator = None
         self.tick = tick
-        self.time_left_ms = time_left_ms
+        self.min_time_left_ms = min_time_left_ms
         self.season = season
 
     @property
@@ -73,27 +73,27 @@ class CurrentTick(object):
         self._tick = tick
 
     @property
-    def time_left_ms(self):
-        """Gets the time_left_ms of this CurrentTick.  # noqa: E501
+    def min_time_left_ms(self):
+        """Gets the min_time_left_ms of this CurrentTick.  # noqa: E501
 
 
-        :return: The time_left_ms of this CurrentTick.  # noqa: E501
+        :return: The min_time_left_ms of this CurrentTick.  # noqa: E501
         :rtype: int
         """
-        return self._time_left_ms
+        return self._min_time_left_ms
 
-    @time_left_ms.setter
-    def time_left_ms(self, time_left_ms):
-        """Sets the time_left_ms of this CurrentTick.
+    @min_time_left_ms.setter
+    def min_time_left_ms(self, min_time_left_ms):
+        """Sets the min_time_left_ms of this CurrentTick.
 
 
-        :param time_left_ms: The time_left_ms of this CurrentTick.  # noqa: E501
+        :param min_time_left_ms: The min_time_left_ms of this CurrentTick.  # noqa: E501
         :type: int
         """
-        if time_left_ms is None:
-            raise ValueError("Invalid value for `time_left_ms`, must not be `None`")  # noqa: E501
+        if min_time_left_ms is None:
+            raise ValueError("Invalid value for `min_time_left_ms`, must not be `None`")  # noqa: E501
 
-        self._time_left_ms = time_left_ms
+        self._min_time_left_ms = min_time_left_ms
 
     @property
     def season(self):

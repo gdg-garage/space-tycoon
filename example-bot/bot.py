@@ -77,7 +77,7 @@ class Game:
             num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.ship_classes[
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
-            commands[mothership_id] = ConstructCommand(ship_class=int(shipper_class_id), type="construct")
+            commands[mothership_id] = ConstructCommand(ship_class=shipper_class_id, type="construct")
         print(self.client.commands_post(commands))
         # todo send shippers to buy something
 
