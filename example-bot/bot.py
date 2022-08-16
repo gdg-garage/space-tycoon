@@ -1,11 +1,13 @@
 import math
 from collections import Counter
 from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 from space_tycoon_client import ApiClient
 from space_tycoon_client import Configuration
 from space_tycoon_client import GameApi
-from space_tycoon_client.models.construct_command import ConstructCommand
 from space_tycoon_client.models.credentials import Credentials
 from space_tycoon_client.models.current_tick import CurrentTick
 from space_tycoon_client.models.data import Data
@@ -15,22 +17,22 @@ from space_tycoon_client.models.player_id import PlayerId
 from space_tycoon_client.models.ship import Ship
 from space_tycoon_client.models.static_data import StaticData
 from space_tycoon_client.models.trade_command import TradeCommand
+from space_tycoon_client.models.construct_command import ConstructCommand
 from space_tycoon_client.rest import ApiException
 
 
 class Game:
     def __init__(self, api_client: GameApi):
+        self.me: Optional[Player] = None
         self.client = api_client
         self.player_id = self.login()
         self.static_data: StaticData = self.client.static_data_get()
         self.data: Data = self.client.data_get()
-        self.tick = self.data.current_tick.tick
         self.season = self.data.current_tick.season
-
+        self.tick = self.data.current_tick.tick
         # this part is custom logic, feel free to edit / delete
         if self.player_id not in self.data.players:
             raise Exception("Logged as non-existent player")
-        self.me: Player = self.data.players[self.player_id]
         self.named_ship_classes = {ship_cls.name: ship_cls_id for ship_cls_id, ship_cls in
                                    self.static_data.ship_classes.items()}
         self.recreate_me()
@@ -45,8 +47,8 @@ class Game:
             try:
                 print(f"tick {self.tick} season {self.season}")
                 self.data: Data = self.client.data_get()
-                self.recreate_me()
-                print(f"I am {self.data.player_id}")
+                if self.data.player_id is None:
+                    raise Exception("I am not correctly logged in. Bailing out")
                 self.game_logic()
                 current_tick: CurrentTick = self.client.end_turn_post(EndTurn(
                     tick=self.tick,
@@ -59,14 +61,18 @@ class Game:
                 else:
                     raise e
             except Exception as e:
-                print(f"Game logic error {e}")
+                print(f"!!! EXCEPTION !!! Game logic error {e}")
 
-    def dist(x, y):
-        return math.sqrt((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2)
+    @staticmethod
+    def dist(a, b):
+        return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
     def game_logic(self):
+        self.recreate_me()
         my_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
                                 self.data.ships.items() if ship.player == self.player_id}
+        self.stuck_ships_id = {ship_id for ship_id, ship in my_ships.items() if ship.command is not None and
+                               ship.command.type == "trade" and ship.position == ship.prev_position}
         ship_type_cnt = Counter(
             (self.static_data.ship_classes[ship.ship_class].name for ship in my_ships.values()))
         pretty_ship_type_cnt = ', '.join(
@@ -92,8 +98,10 @@ class Game:
                 ship_class=shipper_class_id, type="construct")
 
         # send shippers to buy something
-        idle_shippers = [(ship_id, ship) for ship_id, ship in my_ships.items() if
-                         ship.ship_class == shipper_class_id and ship.command is None]
+        idle_shippers: Tuple[str, List[Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
+                                                 ship.ship_class == shipper_class_id and (
+                                                             ship.command is None or ship_id in self.stuck_ships_id)]
+        # todo some shippers may be stuck because of some precondition ...
         idle_empty_shippers = list(
             filter(lambda x: len(x[1].resources) == 0, idle_shippers))
         idle_non_empty_shippers = list(
@@ -105,18 +113,22 @@ class Game:
         for planet_id, planet in self.data.planets.items():
             if len(idle_empty_shippers) == 0:
                 break
-            resources_by_price = sorted(filter(lambda x: x[1].buy_price is not None,
+            resources_by_price = sorted(filter(lambda x: x[1].buy_price is not None and x[1].amount > 0,
                                                planet.resources.items()), key=lambda x: x[1].buy_price)
             for res_id, res in resources_by_price:
                 if len(idle_empty_shippers) == 0:
                     break
                 shipper = idle_empty_shippers.pop()
+                if res.buy_price == 0:
+                    continue
 
-                amount = min(current_money // res.buy_price, res.amount)
+                max_amount = min(current_money // res.buy_price, res.amount)
                 commands[shipper[0]] = TradeCommand(
-                    type="trade", amount=amount, resource=res_id, target=planet_id)
+                    type="trade",
+                    amount=min(max_amount, self.static_data.ship_classes[shipper[1].ship_class].cargo_capacity),
+                    resource=res_id, target=planet_id)
                 d = Game.dist(planet.position, shipper[1].position)
-                print(f"buying {amount} of {res_id}; distance {d}")
+                print(f"buying {max_amount} of {res_id}; distance {d}")
 
         res_to_shipper = {res_id: {sId: shipper} for sId, shipper in idle_non_empty_shippers for res_id in
                           shipper.resources.keys()}
@@ -126,6 +138,8 @@ class Game:
             for rId, r in planet.resources.items():
                 if rId not in res_to_shipper:
                     continue
+                if r.sell_price is None or r.sell_price == 0:
+                    continue
                 for sId, s in res_to_shipper[rId].items():
                     amount = s.resources[rId]["amount"]
                     commands[sId] = TradeCommand(type="trade", amount=-amount, resource=rId, target=planet_id)
@@ -133,16 +147,15 @@ class Game:
                     del res_to_shipper[rId]
 
         # check if someone is close to mothership
-        # close_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
-        #                            self.data.ships.items() if ship.player != self.player_id and ship.position["x"] ==
-        #                            self.data.ships[mothership_id].position["x"] and ship.position["y"] ==
-        #                            self.data.ships[mothership_id].position["y"]}
-        # if len(close_ships) != 0:
-        #     print("There are alien ships close to our Mothership!")
+        close_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
+                                   self.data.ships.items() if ship.player != self.player_id and
+                                   self.dist(ship.position, self.data.ships[mothership_id].position) <= 1}
+        if len(close_ships) != 0:
+            print(f"There are {len(close_ships)} alien ships close to our Mothership!")
 
-            # TODO defense
+        # TODO defense
 
-        print(commands)
+        print(commands) if commands else None
         commands_result = self.client.commands_post(commands)
         # todo this may need try catch
         if commands_result:
