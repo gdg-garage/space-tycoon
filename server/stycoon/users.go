@@ -2,18 +2,21 @@ package stycoon
 
 import (
 	"errors"
-	"github.com/gorilla/sessions"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
+
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const SessionKey = "SESSION_ID"
 const UsernameField = "username"
 const PlayerIdField = "playerId"
+const SeasonField = "season"
 
 type LoggedUser struct {
 	Username string
-	PlayerId int64
+	PlayerId string
 }
 
 func HashPassword(password string) (string, error) {
@@ -41,7 +44,7 @@ func LoggedUserFromSession(req *http.Request, sessionManager sessions.Store) (Lo
 		return user, errors.New("username is missing = user is not logged")
 	}
 	if maybePlayer, ok := session.Values[PlayerIdField]; ok {
-		if player, ok := maybePlayer.(int64); ok {
+		if player, ok := maybePlayer.(string); ok {
 			user.PlayerId = player
 		} else {
 			return user, errors.New("player is corrupted")
@@ -50,4 +53,26 @@ func LoggedUserFromSession(req *http.Request, sessionManager sessions.Store) (Lo
 		return user, errors.New("player is not set")
 	}
 	return user, nil
+}
+
+func SeasonChanged(game *Game, req *http.Request, sessionManager sessions.Store) bool {
+	session, err := sessionManager.Get(req, SessionKey)
+	if err != nil {
+		return false
+	}
+	if maybeSeason, ok := session.Values[SeasonField]; ok {
+		if season, ok := maybeSeason.(int64); ok {
+			if game.Tick.Season != season {
+				log.Info().Msgf("season changed for user [%v]", session.Values[UsernameField])
+				return true
+			}
+		} else {
+			log.Warn().Msgf("user is corrupted, %v", session.Values)
+			return true
+		}
+	} else if len(session.Values) > 0 {
+		log.Warn().Msgf("user season field is missing, %v", session.Values)
+		return true
+	}
+	return false
 }
