@@ -29,7 +29,7 @@ class AttackCommand(object):
     """
     swagger_types = {
         'type': 'str',
-        'target': 'int'
+        'target': 'str'
     }
 
     attribute_map = {
@@ -74,7 +74,7 @@ class AttackCommand(object):
 
 
         :return: The target of this AttackCommand.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._target
 
@@ -84,7 +84,7 @@ class AttackCommand(object):
 
 
         :param target: The target of this AttackCommand.  # noqa: E501
-        :type: int
+        :type: str
         """
         if target is None:
             raise ValueError("Invalid value for `target`, must not be `None`")  # noqa: E501

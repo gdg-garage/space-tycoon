@@ -29,8 +29,8 @@ class Combat(object):
     """
     swagger_types = {
         'tick': 'int',
-        'attacker': 'int',
-        'defender': 'int',
+        'attacker': 'str',
+        'defender': 'str',
         'killed': 'bool'
     }
 
@@ -84,7 +84,7 @@ class Combat(object):
 
 
         :return: The attacker of this Combat.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._attacker
 
@@ -94,7 +94,7 @@ class Combat(object):
 
 
         :param attacker: The attacker of this Combat.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._attacker = attacker
@@ -105,7 +105,7 @@ class Combat(object):
 
 
         :return: The defender of this Combat.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._defender
 
@@ -115,7 +115,7 @@ class Combat(object):
 
 
         :param defender: The defender of this Combat.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._defender = defender

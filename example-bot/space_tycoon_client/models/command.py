@@ -29,11 +29,11 @@ class Command(object):
     """
     swagger_types = {
         'type': 'str',
-        'target': 'int',
+        'target': 'str',
         'destination': 'Destination',
-        'resource': 'int',
+        'resource': 'str',
         'amount': 'int',
-        'ship_class': 'int',
+        'ship_class': 'str',
         'name': 'str'
     }
 
@@ -100,7 +100,7 @@ class Command(object):
 
 
         :return: The target of this Command.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._target
 
@@ -110,7 +110,7 @@ class Command(object):
 
 
         :param target: The target of this Command.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._target = target
@@ -142,7 +142,7 @@ class Command(object):
 
 
         :return: The resource of this Command.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._resource
 
@@ -152,7 +152,7 @@ class Command(object):
 
 
         :param resource: The resource of this Command.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._resource = resource
@@ -184,7 +184,7 @@ class Command(object):
 
 
         :return: The ship_class of this Command.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._ship_class
 
@@ -194,7 +194,7 @@ class Command(object):
 
 
         :param ship_class: The ship_class of this Command.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._ship_class = ship_class

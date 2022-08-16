@@ -28,7 +28,7 @@ class ConstructCommand(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'ship_class': 'int',
+        'ship_class': 'str',
         'type': 'str'
     }
 
@@ -51,7 +51,7 @@ class ConstructCommand(object):
 
 
         :return: The ship_class of this ConstructCommand.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._ship_class
 
@@ -61,7 +61,7 @@ class ConstructCommand(object):
 
 
         :param ship_class: The ship_class of this ConstructCommand.  # noqa: E501
-        :type: int
+        :type: str
         """
         if ship_class is None:
             raise ValueError("Invalid value for `ship_class`, must not be `None`")  # noqa: E501

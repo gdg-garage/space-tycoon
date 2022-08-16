@@ -29,9 +29,9 @@ class Trade(object):
     """
     swagger_types = {
         'tick': 'int',
-        'buyer': 'int',
-        'seller': 'int',
-        'resource': 'int',
+        'buyer': 'str',
+        'seller': 'str',
+        'resource': 'str',
         'amount': 'int',
         'price': 'int'
     }
@@ -94,7 +94,7 @@ class Trade(object):
 
 
         :return: The buyer of this Trade.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._buyer
 
@@ -104,7 +104,7 @@ class Trade(object):
 
 
         :param buyer: The buyer of this Trade.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._buyer = buyer
@@ -115,7 +115,7 @@ class Trade(object):
 
 
         :return: The seller of this Trade.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._seller
 
@@ -125,7 +125,7 @@ class Trade(object):
 
 
         :param seller: The seller of this Trade.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._seller = seller
@@ -136,7 +136,7 @@ class Trade(object):
 
 
         :return: The resource of this Trade.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._resource
 
@@ -146,7 +146,7 @@ class Trade(object):
 
 
         :param resource: The resource of this Trade.  # noqa: E501
-        :type: int
+        :type: str
         """
 
         self._resource = resource

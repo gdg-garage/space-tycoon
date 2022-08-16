@@ -30,8 +30,8 @@ class TradeCommand(object):
     swagger_types = {
         'type': 'str',
         'amount': 'int',
-        'resource': 'int',
-        'target': 'int'
+        'resource': 'str',
+        'target': 'str'
     }
 
     attribute_map = {
@@ -107,7 +107,7 @@ class TradeCommand(object):
 
 
         :return: The resource of this TradeCommand.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._resource
 
@@ -117,7 +117,7 @@ class TradeCommand(object):
 
 
         :param resource: The resource of this TradeCommand.  # noqa: E501
-        :type: int
+        :type: str
         """
         if resource is None:
             raise ValueError("Invalid value for `resource`, must not be `None`")  # noqa: E501
@@ -131,7 +131,7 @@ class TradeCommand(object):
         Any planet or own ship.  # noqa: E501
 
         :return: The target of this TradeCommand.  # noqa: E501
-        :rtype: int
+        :rtype: str
         """
         return self._target
 
@@ -142,7 +142,7 @@ class TradeCommand(object):
         Any planet or own ship.  # noqa: E501
 
         :param target: The target of this TradeCommand.  # noqa: E501
-        :type: int
+        :type: str
         """
         if target is None:
             raise ValueError("Invalid value for `target`, must not be `None`")  # noqa: E501

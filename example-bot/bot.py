@@ -27,9 +27,9 @@ class Game:
         self.season = self.data.current_tick.season
 
         # this part is custom logic, feel free to edit / delete
-        if str(self.player_id) not in self.data.players:
+        if self.player_id not in self.data.players:
             raise Exception("Logged as non-existent player")
-        self.me: Player = self.data.players[str(self.player_id)]
+        self.me: Player = self.data.players[self.player_id]
         self.named_ship_classes = {ship_cls.name: ship_cls_id for ship_cls_id, ship_cls in
                                    self.static_data.ship_classes.items()}
         print(f"playing as [{self.me.name}] id: {self.player_id}")
@@ -58,11 +58,11 @@ class Game:
         my_ships: Dict[Ship] = {ship_id: ship for ship_id, ship in
                                 self.data.ships.items() if ship.player == self.player_id}
         ship_type_cnt = Counter(
-            (self.static_data.ship_classes[str(ship.ship_class)].name for ship in my_ships.values()))
+            (self.static_data.ship_classes[ship.ship_class].name for ship in my_ships.values()))
         pretty_ship_type_cnt = ', '.join(f"{k}:{v}" for k, v in ship_type_cnt.most_common())
         print(f"I have {len(my_ships)} ships ({pretty_ship_type_cnt})")
         mothership_id = [ship_id for ship_id, ship in my_ships.items() if
-                         str(ship.ship_class) == self.named_ship_classes["mothership"]]
+                         ship.ship_class == self.named_ship_classes["mothership"]]
         if len(mothership_id) != 1:
             print("mothership is gone :(")
             return
@@ -77,11 +77,11 @@ class Game:
             num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.ship_classes[
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
-            commands[mothership_id] = ConstructCommand(ship_class=int(shipper_class_id), type="construct")
+            commands[mothership_id] = ConstructCommand(ship_class=shipper_class_id, type="construct")
         print(self.client.commands_post(commands))
         # todo send shippers to buy something
 
-    def login(self) -> int:
+    def login(self) -> str:
         player, status, headers = self.client.login_post_with_http_info(Credentials(
             username="tivvit",
             password="12345",
