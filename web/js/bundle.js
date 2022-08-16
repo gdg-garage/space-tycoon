@@ -7548,7 +7548,7 @@ function timerLoop() {
 				setTimeout(timerLoop, 1000)
 				d3.select("#tickInfo").text(error)
 			} else {
-				setTimeout(timerLoop, data["time-left-ms"] || 300)
+				setTimeout(timerLoop, data["min-time-left-ms"] || 300)
 				if (currentTick.tick != data.tick) {
 					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 					currentTick = data
