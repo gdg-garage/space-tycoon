@@ -11,7 +11,7 @@ package stycoon
 
 type LoginPost200Response struct {
 
-	PlayerId int64 `json:"player-id,omitempty"`
+	PlayerId string `json:"player-id,omitempty"`
 }
 
 // AssertLoginPost200ResponseRequired checks if the required fields are not zero-ed
