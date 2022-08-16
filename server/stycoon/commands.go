@@ -35,7 +35,7 @@ func (game *Game) ProcessCommands(commands map[string]Command, user LoggedUser) 
 
 		_, ownedByPlayer := playerOwnedShips[int64(id)]
 		if !ownedByPlayer {
-			res[strId] = fmt.Sprintf("object id: %d does not belong to player id: %d", id, user.PlayerId)
+			res[strId] = fmt.Sprintf("object id: %d does not belong to player id: %s", id, user.PlayerId)
 			continue
 		}
 
