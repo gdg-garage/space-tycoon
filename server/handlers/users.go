@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
