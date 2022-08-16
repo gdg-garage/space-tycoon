@@ -13,7 +13,7 @@ type Destination struct {
 
 	Coordinates *[]int64 `json:"coordinates,omitempty"`
 
-	Target *int64 `json:"target,omitempty"`
+	Target *string `json:"target,omitempty"`
 }
 
 // AssertDestinationRequired checks if the required fields are not zero-ed

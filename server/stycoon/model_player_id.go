@@ -11,7 +11,7 @@ package stycoon
 
 type PlayerId struct {
 
-	Id int64 `json:"id,omitempty"`
+	Id string `json:"id,omitempty"`
 }
 
 // AssertPlayerIdRequired checks if the required fields are not zero-ed

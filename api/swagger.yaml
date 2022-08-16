@@ -48,8 +48,7 @@ paths:
                 type: object
                 properties:
                   player-id:
-                    type: integer
-                    format: int64
+                    type: string
         "403":
           description: Invalid name or password
           content:
@@ -193,22 +192,19 @@ components:
         type:
           type: string
         target:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         destination:
           $ref: "#/components/schemas/Destination"
         resource:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         amount:
           type: integer
           format: int64
           nullable: true
         ship-class:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         name:
           type: string
@@ -232,8 +228,7 @@ components:
       type: object
       properties:
         ship-class:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         type:
           type: string
@@ -267,8 +262,7 @@ components:
         type:
           type: string
         target:
-          type: integer
-          format: int64
+          type: string
           nullable: true
       required:
         - target
@@ -285,12 +279,10 @@ components:
           nullable: true
           description: Positive value means buy, negative sell.
         resource:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         target:
-          type: integer
-          format: int64
+          type: string
           nullable: true
           description: Any planet or own ship.
       required:
@@ -317,8 +309,7 @@ components:
           $ref: "#/components/schemas/Waypoint"
 
     Waypoint:
-      type: integer
-      format: int64
+      type: string
       nullable: true
       example: 234
       
@@ -468,8 +459,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
       example:
         id: 3
     Combat:
@@ -479,11 +469,9 @@ components:
           type: integer
           format: int64
         attacker:
-          type: integer
-          format: int64
+          type: string
         defender:
-          type: integer
-          format: int64
+          type: string
         killed:
           type: boolean
       example: 
@@ -538,14 +526,11 @@ components:
             type: integer
             format: int64
           buyer:
-            type: integer
-            format: int64
+            type: string
           seller:
-            type: integer
-            format: int64
+            type: string
           resource:
-            type: integer
-            format: int64
+            type: string
           amount:
             type: integer
             format: int64
@@ -624,14 +609,11 @@ components:
           type: integer
           format: int64
         buyer:
-          type: integer
-          format: int64
+          type: string
         seller:
-          type: integer
-          format: int64
+          type: string
         resource:
-          type: integer
-          format: int64
+          type: string
         amount:
           type: integer
           format: int64
@@ -731,16 +713,14 @@ components:
           - resources
         properties:
           ship-class:
-            type: integer
-            format: int64
+            type: string
           life:
             type: integer
             format: int64
           name:
             type: string
           player:
-            type: integer
-            format: int64
+            type: string
           position:
             $ref: '#/components/schemas/Coordinates'
           prev-position:
@@ -850,8 +830,7 @@ components:
         planets:
           $ref: '#/components/schemas/Planets'
         player-id:
-          type: integer
-          format: int64
+          type: string
           nullable: true
         players:
           $ref: '#/components/schemas/Players'

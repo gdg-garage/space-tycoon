@@ -13,9 +13,9 @@ type Combat struct {
 
 	Tick int64 `json:"tick,omitempty"`
 
-	Attacker int64 `json:"attacker,omitempty"`
+	Attacker string `json:"attacker,omitempty"`
 
-	Defender int64 `json:"defender,omitempty"`
+	Defender string `json:"defender,omitempty"`
 
 	Killed bool `json:"killed,omitempty"`
 }

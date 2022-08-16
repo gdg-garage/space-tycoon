@@ -13,15 +13,15 @@ type Command struct {
 
 	Type string `json:"type"`
 
-	Target *int64 `json:"target,omitempty"`
+	Target *string `json:"target,omitempty"`
 
 	Destination *Destination `json:"destination,omitempty"`
 
-	Resource *int64 `json:"resource,omitempty"`
+	Resource *string `json:"resource,omitempty"`
 
 	Amount *int64 `json:"amount,omitempty"`
 
-	ShipClass *int64 `json:"ship-class,omitempty"`
+	ShipClass *string `json:"ship-class,omitempty"`
 
 	Name *string `json:"name,omitempty"`
 }
