@@ -19,9 +19,9 @@ func (game *Game) fillCombats(tick *int64) error {
 	if err != nil {
 		return err
 	}
-	var combat Combat
-	var killed string
 	for rows.Next() {
+		var combat Combat
+		var killed string
 		if tick == nil {
 			rows.Scan(&combat.Tick, &combat.Attacker, &combat.Defender, &killed)
 		} else {
@@ -50,8 +50,8 @@ func (game *Game) fillProfiling(tick *int64) error {
 	if err != nil {
 		return err
 	}
-	var profiling Profiling
 	for rows.Next() {
+		var profiling Profiling
 		if tick == nil {
 			rows.Scan(&profiling.Tick, &profiling.Movement, &profiling.Attacks, &profiling.Trades, &profiling.Recipes, &profiling.Prices, &profiling.Constructions, &profiling.Report, &profiling.Total, &profiling.Overall, &profiling.At)
 		} else {
@@ -80,9 +80,9 @@ func (game *Game) fillPrices(tick *int64) error {
 		game.Reports.Prices = make(map[string]map[string]int64)
 	}
 
-	var fetchedTick, resource, price int64
-	var strTick, strResource string
 	for rows.Next() {
+		var fetchedTick, resource, price int64
+		var strTick, strResource string
 		if tick == nil {
 			rows.Scan(&fetchedTick, &resource, &price)
 			strTick = strconv.Itoa(int(fetchedTick))
@@ -120,9 +120,9 @@ func (game *Game) fillScores(tick *int64) error {
 		game.Reports.Scores = make(map[string]ScoreValue)
 	}
 
-	var fetchedTick, commodities, ships, money, total, player int64
-	var strTick string
 	for rows.Next() {
+		var fetchedTick, commodities, ships, money, total, player int64
+		var strTick string
 		if tick == nil {
 			rows.Scan(&fetchedTick, &player, &commodities, &ships, &money, &total)
 			strTick = strconv.Itoa(int(fetchedTick))
