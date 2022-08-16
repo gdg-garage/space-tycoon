@@ -13,7 +13,7 @@ type AttackCommand struct {
 
 	Type string `json:"type"`
 
-	Target *int64 `json:"target"`
+	Target *string `json:"target"`
 }
 
 // AssertAttackCommandRequired checks if the required fields are not zero-ed

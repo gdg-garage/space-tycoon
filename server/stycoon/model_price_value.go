@@ -9,7 +9,7 @@
 
 package stycoon
 
-type Trade struct {
+type PriceValue struct {
 
 	Tick int64 `json:"tick,omitempty"`
 
@@ -24,19 +24,19 @@ type Trade struct {
 	Price int64 `json:"price,omitempty"`
 }
 
-// AssertTradeRequired checks if the required fields are not zero-ed
-func AssertTradeRequired(obj Trade) error {
+// AssertPriceValueRequired checks if the required fields are not zero-ed
+func AssertPriceValueRequired(obj PriceValue) error {
 	return nil
 }
 
-// AssertRecurseTradeRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of Trade (e.g. [][]Trade), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseTradeRequired(objSlice interface{}) error {
+// AssertRecursePriceValueRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of PriceValue (e.g. [][]PriceValue), otherwise ErrTypeAssertionError is thrown.
+func AssertRecursePriceValueRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aTrade, ok := obj.(Trade)
+		aPriceValue, ok := obj.(PriceValue)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertTradeRequired(aTrade)
+		return AssertPriceValueRequired(aPriceValue)
 	})
 }

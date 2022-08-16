@@ -1,6 +1,8 @@
 package stycoon
 
 import (
+	"strconv"
+
 	"github.com/gdg-garage/space-tycoon/server/database"
 )
 
@@ -17,5 +19,11 @@ func (game *Game) processAttack(id int64, command Command) error {
 	if err != nil {
 		return err
 	}
-	return database.ReplaceAttackCommand(game.db, id, command.Type, *c.Target)
+
+	targetInt, err := strconv.Atoi(*c.Target)
+	if err != nil {
+		return err
+	}
+
+	return database.ReplaceAttackCommand(game.db, id, command.Type, int64(targetInt))
 }

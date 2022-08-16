@@ -15,7 +15,7 @@ type Data struct {
 
 	Planets map[string]PlanetsValue `json:"planets"`
 
-	PlayerId *int64 `json:"player-id,omitempty"`
+	PlayerId *string `json:"player-id,omitempty"`
 
 	Players map[string]PlayersValue `json:"players"`
 

@@ -2,10 +2,11 @@ package stycoon
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 const SessionKey = "SESSION_ID"
@@ -15,7 +16,7 @@ const SeasonField = "season"
 
 type LoggedUser struct {
 	Username string
-	PlayerId int64
+	PlayerId string
 }
 
 func HashPassword(password string) (string, error) {
@@ -43,7 +44,7 @@ func LoggedUserFromSession(req *http.Request, sessionManager sessions.Store) (Lo
 		return user, errors.New("username is missing = user is not logged")
 	}
 	if maybePlayer, ok := session.Values[PlayerIdField]; ok {
-		if player, ok := maybePlayer.(int64); ok {
+		if player, ok := maybePlayer.(string); ok {
 			user.PlayerId = player
 		} else {
 			return user, errors.New("player is corrupted")
