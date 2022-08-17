@@ -2393,6 +2393,13 @@ UPDATE t_ship_moves SET speed = LEAST(speed / SQRT(f_sqr(dx) + f_sqr(dy)), 1), d
 
 UPDATE t_object JOIN t_ship_moves USING(id) SET pos_x = pos_x + dx, pos_y = pos_y + dy;
 
+# delete finished moves
+DELETE t_command
+FROM t_command
+JOIN t_object AS me ON me.id = t_command.ship
+JOIN t_object AS tgt ON tgt.id = t_command.target
+WHERE t_command.type = "move" AND me.pos_x = tgt.pos_x AND me.pos_y = tgt.pos_y;
+
 END//
 DELIMITER ;
 
