@@ -184,35 +184,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /history:
-    post:
-      tags:
-        - history
-      requestBody:
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/HistoryIdentifier'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HistoryEntry'
-        "403":
-          description: Please login again
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        "404":
-          description: NotFound
-          content: { }
-        "405":
-          description: Invalid input
-          content: { }
 
 components:
   schemas:
@@ -903,20 +874,6 @@ components:
           tick: 165,
           season: 13,
         }
-
-    HistoryEntry:
-      type: object
-      properties:
-        static-data:
-          $ref: '#/components/schemas/StaticData'
-        data:
-          $ref: '#/components/schemas/Data'
-        reports:
-          $ref: '#/components/schemas/Reports'
-      required:
-        - static-data
-        - data
-        - reports
 
     Error:
       required:
