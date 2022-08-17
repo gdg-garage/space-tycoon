@@ -435,9 +435,10 @@ function graphsPrepareResourcesVolumes(data) {
 		for (let k of Object.keys(data.prices[rid]))
 			res[rid][k] = 0
 	}
-	for (let tr of Object.values(data.trade)) {
-		console.log(tr)
-		res[tr.resource][tr.tick] += tr.amount
+	if (typeof data["trade"] !== "undefined") {
+		for (let tr of Object.values(data.trade)) {
+			res[tr.resource][tr.tick] += tr.amount
+		}
 	}
 	return res
 }
