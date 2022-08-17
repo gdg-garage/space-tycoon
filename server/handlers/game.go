@@ -11,6 +11,9 @@ import (
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
 )
 
+const querySeasonParam = "season"
+const queryTickParam = "tick"
+
 func Root(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		w.WriteHeader(http.StatusNotFound)

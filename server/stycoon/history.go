@@ -6,7 +6,7 @@ import (
 )
 
 func (game *Game) reportStaticData() error {
-	_, err := game.db.Exec("insert into d_static_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
+	_, err := game.db.Exec("replace into d_static_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
 	return err
 }
 
@@ -75,4 +75,10 @@ func (game *Game) History(id HistoryIdentifier, playerId *string) (HistoryEntry,
 		FilterCommands(playerId, &entry.Data.Ships)
 	}
 	return entry, nil
+}
+
+func (game *Game) HistoricStaticData(season int) (string, error) {
+	var staticData string
+	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", season).Scan(&staticData)
+	return staticData, err
 }

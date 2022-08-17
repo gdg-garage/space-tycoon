@@ -77,7 +77,12 @@ paths:
   /static-data:
     get:
       tags:
-      - static-data
+        - static-data
+      parameters:
+      - in: query
+        name: season
+        schema:
+          type: integer
       responses:
         "200":
           description: OK
@@ -96,7 +101,16 @@ paths:
   /data:
     get:
       tags:
-      - data
+        - data
+      parameters:
+      - in: query
+        name: season
+        schema:
+          type: integer
+      - in: query
+        name: tick
+        schema:
+          type: integer
       responses:
         "200":
           description: OK
@@ -191,6 +205,11 @@ paths:
     get:
       tags:
       - reports
+      parameters:
+      - in: query
+        name: season
+        schema:
+          type: integer
       responses:
         "200":
           description: OK
