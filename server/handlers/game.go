@@ -3,46 +3,34 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
 	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
 )
 
 func Root(w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
-		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		log.Warn().Err(err).Msg("Error reading body")
-		http.Error(w, "can't read request body", http.StatusBadRequest)
-		return
-	}
-	r, err := json.Marshal(map[string]string{"greeting": "hello", "body": string(body)})
-	if err != nil {
-		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
-		return
-	}
-	_, err = w.Write(r)
-	if err != nil {
-		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 }
 
-func Data(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
+func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
 		return
 	}
-	gameData, err := game.GetData(stycoon.MaybeGetLoggedPlayerId(req, sessionManager))
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
+		return
+	}
+	gameData, err := game.GetData(stycoon.MaybeGetLoggedPlayerId(req, game.SessionManager))
 	if err != nil {
 		log.Warn().Err(err).Msg("game data fetch failed")
 		http.Error(w, "db call failed", http.StatusInternalServerError)
@@ -59,7 +47,59 @@ func Data(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWrit
 		log.Warn().Err(err).Msg("response write failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+}
+
+func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		return
+	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
+		return
+	}
+	// read
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		log.Warn().Err(err).Msg("Error reading body")
+		http.Error(w, "can't read request body", http.StatusBadRequest)
+		return
+	}
+	// parse
+	commands, err := stycoon.ParseCommands(string(body))
+	if err != nil {
+		log.Warn().Err(err).Msg("Command parsing failed")
+		http.Error(w, "parsing failed", http.StatusBadRequest)
+		return
+	}
+	// process
+	user, err := stycoon.LoggedUserFromSession(req, game.SessionManager)
+	if err != nil {
+		log.Warn().Err(err).Msg("User is not logged in")
+		http.Error(w, "only for logged users", http.StatusForbidden)
+		return
+	}
+	errs, processingErr := game.ProcessCommands(commands, user)
+	if processingErr != nil {
+		log.Warn().Err(processingErr).Msg("Command processing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+	} else if len(errs) > 0 {
+		b, err := json.Marshal(errs)
+		if err != nil {
+			log.Warn().Err(err).Msg("Json marshall failed")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		_, err = w.Write(b)
+		if err != nil {
+			log.Warn().Err(err).Msg("response write failed")
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	}
 }
 
 func History(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {

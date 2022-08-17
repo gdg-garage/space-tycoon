@@ -13,15 +13,7 @@ type RenameCommand struct {
 
 	Type string `json:"type"`
 
-	Target int64 `json:"target,omitempty"`
-
-	Resource int64 `json:"resource,omitempty"`
-
-	Amount int64 `json:"amount,omitempty"`
-
-	ShipClass int64 `json:"ship-class,omitempty"`
-
-	Name string `json:"name"`
+	Name *string `json:"name"`
 }
 
 // AssertRenameCommandRequired checks if the required fields are not zero-ed

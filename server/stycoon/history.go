@@ -12,7 +12,7 @@ func (game *Game) reportStaticData() error {
 
 func (game *Game) report() error {
 	// TODO report report
-	reportUserId := int64(-1)
+	reportUserId := "-1"
 	data, err := game.GetData(&reportUserId)
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func (game *Game) report() error {
 	return err
 }
 
-func FilterCommands(playerId *int64, ships *map[string]ShipsValue) {
+func FilterCommands(playerId *string, ships *map[string]ShipsValue) {
 	for k, ship := range *ships {
 		if ship.Command == nil {
 			continue
@@ -40,7 +40,7 @@ func FilterCommands(playerId *int64, ships *map[string]ShipsValue) {
 	}
 }
 
-func (game *Game) History(id HistoryIdentifier, playerId *int64) (HistoryEntry, error) {
+func (game *Game) History(id HistoryIdentifier, playerId *string) (HistoryEntry, error) {
 	var entry HistoryEntry
 	var staticData sql.NullString
 	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", id.Season).Scan(&staticData)

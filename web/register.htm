@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Space Tycoon</title>
+		<link rel="stylesheet" href="style.css">
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+	</head>
+	<body>
+		<nav>
+			<a href="index.htm">Home</a>
+		</nav>
+		<hr>
+		<form>
+			<table>
+				<tr>
+					<td>
+						<label for="username">User name:</label>
+					<td>
+						<input type="text" id="username" name="username" oninput="registrationValidate(0)">
+				</tr>
+				<tr>
+					<td>
+						<label for="password">Password:</label>
+					<td>
+						<input type="password" id="password" name="password" oninput="registrationValidate(1)">
+				</tr>
+				<tr>
+					<td>
+						<label for="password2">Again:</label>
+					<td>
+						<input type="password" id="password2" name="password2" oninput="registrationValidate(2)">
+				</tr>
+				<tr>
+					<td>
+					<td>
+						<input type="button" value="Register" onclick="registrationSubmit()">
+				</tr>
+				<tr>
+					<td>
+						Response:
+					<td id="response">
+				</tr>
+			</table>
+		</form>
+		<script>
+			function registrationValidate(which) {
+				let u = d3.select("#username").node().value
+				let p1 = d3.select("#password").node().value
+				let p2 = d3.select("#password2").node().value
+				if (u.length <= 3 || u.length >= 30) {
+					d3.select("#response").text("invalid user name")
+					return false
+				}
+				if (p1.length <= 4 || p1.length >= 100) {
+					d3.select("#response").text("invalid password")
+					return false
+				}
+				if (p1 != p2) {
+					d3.select("#response").text("passwords do not match")
+					return false
+				}
+				d3.select("#response").text("")
+				return true
+			}
+			function registrationSubmit() {
+				if (!registrationValidate(-1))
+					return
+				d3.json("http://localhost/create-user", {
+					method: "POST",
+					body: JSON.stringify({
+						username: d3.select("#username").node().value,
+						password: d3.select("#password").node().value
+					}),
+					headers: {
+						"Content-type": "application/json; charset=UTF-8"
+					}
+				})
+				.then(json => {
+					d3.select("#response").text(JSON.stringify(json))
+				})
+				.catch(err => {
+					d3.select("#response").text(err)
+				})
+			}
+		</script>
+	</body>
+</html>
