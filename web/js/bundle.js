@@ -846,7 +846,7 @@ var CommandsApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = CommandsApi;
-},{"../ApiClient":1,"../model/Command":12,"../model/Error":20}],3:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Command":13,"../model/Error":21}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -920,7 +920,7 @@ var CurrentTickApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = CurrentTickApi;
-},{"../ApiClient":1,"../model/CurrentTick":15,"../model/Error":20}],4:[function(require,module,exports){
+},{"../ApiClient":1,"../model/CurrentTick":16,"../model/Error":21}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -994,7 +994,7 @@ var DataApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = DataApi;
-},{"../ApiClient":1,"../model/Data":16,"../model/Error":20}],5:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Data":17,"../model/Error":21}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1076,7 +1076,7 @@ var EndTurnApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = EndTurnApi;
-},{"../ApiClient":1,"../model/CurrentTick":15,"../model/EndTurn":19,"../model/Error":20}],6:[function(require,module,exports){
+},{"../ApiClient":1,"../model/CurrentTick":16,"../model/EndTurn":20,"../model/Error":21}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1158,7 +1158,76 @@ var LoginApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = LoginApi;
-},{"../ApiClient":1,"../model/Credentials":14,"../model/Error":20,"../model/LoginPost200Response":21}],7:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Credentials":15,"../model/Error":21,"../model/LoginPost200Response":22}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _ApiClient = _interopRequireDefault(require("../ApiClient"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+/**
+* Logout service.
+* @module api/LogoutApi
+* @version 1.0.0
+*/
+var LogoutApi = /*#__PURE__*/function () {
+  /**
+  * Constructs a new LogoutApi. 
+  * @alias module:api/LogoutApi
+  * @class
+  * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
+  * default to {@link module:ApiClient#instance} if unspecified.
+  */
+  function LogoutApi(apiClient) {
+    _classCallCheck(this, LogoutApi);
+
+    this.apiClient = apiClient || _ApiClient["default"].instance;
+  }
+  /**
+   * Callback function to receive the result of the logoutGet operation.
+   * @callback module:api/LogoutApi~logoutGetCallback
+   * @param {String} error Error message, if any.
+   * @param data This operation does not return a value.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * @param {module:api/LogoutApi~logoutGetCallback} callback The callback function, accepting three arguments: error, data, response
+   */
+
+
+  _createClass(LogoutApi, [{
+    key: "logoutGet",
+    value: function logoutGet(callback) {
+      var postBody = null;
+      var pathParams = {};
+      var queryParams = {};
+      var headerParams = {};
+      var formParams = {};
+      var authNames = [];
+      var contentTypes = [];
+      var accepts = [];
+      var returnType = null;
+      return this.apiClient.callApi('/logout', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+    }
+  }]);
+
+  return LogoutApi;
+}();
+
+exports["default"] = LogoutApi;
+},{"../ApiClient":1}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1232,7 +1301,7 @@ var ReportsApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = ReportsApi;
-},{"../ApiClient":1,"../model/Error":20,"../model/Reports":31}],8:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Error":21,"../model/Reports":31}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1306,7 +1375,7 @@ var StaticDataApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = StaticDataApi;
-},{"../ApiClient":1,"../model/Error":20,"../model/StaticData":35}],9:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Error":21,"../model/StaticData":35}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1420,6 +1489,12 @@ Object.defineProperty(exports, "LoginPost200Response", {
     return _LoginPost200Response["default"];
   }
 });
+Object.defineProperty(exports, "LogoutApi", {
+  enumerable: true,
+  get: function get() {
+    return _LogoutApi["default"];
+  }
+});
 Object.defineProperty(exports, "MoveCommand", {
   enumerable: true,
   get: function get() {
@@ -1448,12 +1523,6 @@ Object.defineProperty(exports, "PlayersValue", {
   enumerable: true,
   get: function get() {
     return _PlayersValue["default"];
-  }
-});
-Object.defineProperty(exports, "PriceValue", {
-  enumerable: true,
-  get: function get() {
-    return _PriceValue["default"];
   }
 });
 Object.defineProperty(exports, "Profiling", {
@@ -1583,8 +1652,6 @@ var _PlayerId = _interopRequireDefault(require("./model/PlayerId"));
 
 var _PlayersValue = _interopRequireDefault(require("./model/PlayersValue"));
 
-var _PriceValue = _interopRequireDefault(require("./model/PriceValue"));
-
 var _Profiling = _interopRequireDefault(require("./model/Profiling"));
 
 var _RenameCommand = _interopRequireDefault(require("./model/RenameCommand"));
@@ -1621,12 +1688,14 @@ var _EndTurnApi = _interopRequireDefault(require("./api/EndTurnApi"));
 
 var _LoginApi = _interopRequireDefault(require("./api/LoginApi"));
 
+var _LogoutApi = _interopRequireDefault(require("./api/LogoutApi"));
+
 var _ReportsApi = _interopRequireDefault(require("./api/ReportsApi"));
 
 var _StaticDataApi = _interopRequireDefault(require("./api/StaticDataApi"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-},{"./ApiClient":1,"./api/CommandsApi":2,"./api/CurrentTickApi":3,"./api/DataApi":4,"./api/EndTurnApi":5,"./api/LoginApi":6,"./api/ReportsApi":7,"./api/StaticDataApi":8,"./model/AttackCommand":10,"./model/Combat":11,"./model/Command":12,"./model/ConstructCommand":13,"./model/Credentials":14,"./model/CurrentTick":15,"./model/Data":16,"./model/DecommissionCommand":17,"./model/Destination":18,"./model/EndTurn":19,"./model/Error":20,"./model/LoginPost200Response":21,"./model/MoveCommand":22,"./model/NetWorth":23,"./model/PlanetsValue":24,"./model/PlayerId":25,"./model/PlayersValue":26,"./model/PriceValue":27,"./model/Profiling":28,"./model/RenameCommand":29,"./model/RepairCommand":30,"./model/Reports":31,"./model/Resource":32,"./model/ScoreValue":33,"./model/ShipsValue":34,"./model/StaticData":35,"./model/StaticDataShipClassesValue":36,"./model/Trade":37,"./model/TradeCommand":38,"./model/TradingResource":39,"./model/TradingResourceAllOf":40}],10:[function(require,module,exports){
+},{"./ApiClient":1,"./api/CommandsApi":2,"./api/CurrentTickApi":3,"./api/DataApi":4,"./api/EndTurnApi":5,"./api/LoginApi":6,"./api/LogoutApi":7,"./api/ReportsApi":8,"./api/StaticDataApi":9,"./model/AttackCommand":11,"./model/Combat":12,"./model/Command":13,"./model/ConstructCommand":14,"./model/Credentials":15,"./model/CurrentTick":16,"./model/Data":17,"./model/DecommissionCommand":18,"./model/Destination":19,"./model/EndTurn":20,"./model/Error":21,"./model/LoginPost200Response":22,"./model/MoveCommand":23,"./model/NetWorth":24,"./model/PlanetsValue":25,"./model/PlayerId":26,"./model/PlayersValue":27,"./model/Profiling":28,"./model/RenameCommand":29,"./model/RepairCommand":30,"./model/Reports":31,"./model/Resource":32,"./model/ScoreValue":33,"./model/ShipsValue":34,"./model/StaticData":35,"./model/StaticDataShipClassesValue":36,"./model/Trade":37,"./model/TradeCommand":38,"./model/TradingResource":39,"./model/TradingResourceAllOf":40}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1716,7 +1785,7 @@ AttackCommand.prototype['type'] = undefined;
 AttackCommand.prototype['target'] = undefined;
 var _default = AttackCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],11:[function(require,module,exports){
+},{"../ApiClient":1}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1819,7 +1888,7 @@ Combat.prototype['defender'] = undefined;
 Combat.prototype['killed'] = undefined;
 var _default = Combat;
 exports["default"] = _default;
-},{"../ApiClient":1}],12:[function(require,module,exports){
+},{"../ApiClient":1}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1954,7 +2023,7 @@ Command.prototype['ship-class'] = undefined;
 Command.prototype['name'] = undefined;
 var _default = Command;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":18}],13:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":19}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2044,7 +2113,7 @@ ConstructCommand.prototype['ship-class'] = undefined;
 ConstructCommand.prototype['type'] = undefined;
 var _default = ConstructCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],14:[function(require,module,exports){
+},{"../ApiClient":1}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2145,7 +2214,7 @@ Credentials.prototype['password'] = undefined;
 Credentials.prototype['player'] = undefined;
 var _default = Credentials;
 exports["default"] = _default;
-},{"../ApiClient":1}],15:[function(require,module,exports){
+},{"../ApiClient":1}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2173,13 +2242,13 @@ var CurrentTick = /*#__PURE__*/function () {
    * Constructs a new <code>CurrentTick</code>.
    * @alias module:model/CurrentTick
    * @param tick {Number} 
-   * @param timeLeftMs {Number} 
+   * @param minTimeLeftMs {Number} 
    * @param season {Number} 
    */
-  function CurrentTick(tick, timeLeftMs, season) {
+  function CurrentTick(tick, minTimeLeftMs, season) {
     _classCallCheck(this, CurrentTick);
 
-    CurrentTick.initialize(this, tick, timeLeftMs, season);
+    CurrentTick.initialize(this, tick, minTimeLeftMs, season);
   }
   /**
    * Initializes the fields of this object.
@@ -2190,9 +2259,9 @@ var CurrentTick = /*#__PURE__*/function () {
 
   _createClass(CurrentTick, null, [{
     key: "initialize",
-    value: function initialize(obj, tick, timeLeftMs, season) {
+    value: function initialize(obj, tick, minTimeLeftMs, season) {
       obj['tick'] = tick;
-      obj['time-left-ms'] = timeLeftMs;
+      obj['min-time-left-ms'] = minTimeLeftMs;
       obj['season'] = season;
     }
     /**
@@ -2213,8 +2282,8 @@ var CurrentTick = /*#__PURE__*/function () {
           obj['tick'] = _ApiClient["default"].convertToType(data['tick'], 'Number');
         }
 
-        if (data.hasOwnProperty('time-left-ms')) {
-          obj['time-left-ms'] = _ApiClient["default"].convertToType(data['time-left-ms'], 'Number');
+        if (data.hasOwnProperty('min-time-left-ms')) {
+          obj['min-time-left-ms'] = _ApiClient["default"].convertToType(data['min-time-left-ms'], 'Number');
         }
 
         if (data.hasOwnProperty('season')) {
@@ -2235,10 +2304,10 @@ var CurrentTick = /*#__PURE__*/function () {
 
 CurrentTick.prototype['tick'] = undefined;
 /**
- * @member {Number} time-left-ms
+ * @member {Number} min-time-left-ms
  */
 
-CurrentTick.prototype['time-left-ms'] = undefined;
+CurrentTick.prototype['min-time-left-ms'] = undefined;
 /**
  * @member {Number} season
  */
@@ -2246,7 +2315,7 @@ CurrentTick.prototype['time-left-ms'] = undefined;
 CurrentTick.prototype['season'] = undefined;
 var _default = CurrentTick;
 exports["default"] = _default;
-},{"../ApiClient":1}],16:[function(require,module,exports){
+},{"../ApiClient":1}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2381,7 +2450,7 @@ Data.prototype['players'] = undefined;
 Data.prototype['ships'] = undefined;
 var _default = Data;
 exports["default"] = _default;
-},{"../ApiClient":1,"./CurrentTick":15,"./PlanetsValue":24,"./PlayersValue":26,"./ShipsValue":34}],17:[function(require,module,exports){
+},{"../ApiClient":1,"./CurrentTick":16,"./PlanetsValue":25,"./PlayersValue":27,"./ShipsValue":34}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2460,7 +2529,7 @@ var DecommissionCommand = /*#__PURE__*/function () {
 DecommissionCommand.prototype['type'] = undefined;
 var _default = DecommissionCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],18:[function(require,module,exports){
+},{"../ApiClient":1}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2545,7 +2614,7 @@ Destination.prototype['coordinates'] = undefined;
 Destination.prototype['target'] = undefined;
 var _default = Destination;
 exports["default"] = _default;
-},{"../ApiClient":1}],19:[function(require,module,exports){
+},{"../ApiClient":1}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2624,7 +2693,7 @@ var EndTurn = /*#__PURE__*/function () {
 EndTurn.prototype['tick'] = undefined;
 var _default = EndTurn;
 exports["default"] = _default;
-},{"../ApiClient":1}],20:[function(require,module,exports){
+},{"../ApiClient":1}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2703,7 +2772,7 @@ var Error = /*#__PURE__*/function () {
 Error.prototype['message'] = undefined;
 var _default = Error;
 exports["default"] = _default;
-},{"../ApiClient":1}],21:[function(require,module,exports){
+},{"../ApiClient":1}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2779,7 +2848,7 @@ var LoginPost200Response = /*#__PURE__*/function () {
 LoginPost200Response.prototype['player-id'] = undefined;
 var _default = LoginPost200Response;
 exports["default"] = _default;
-},{"../ApiClient":1}],22:[function(require,module,exports){
+},{"../ApiClient":1}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2871,7 +2940,7 @@ MoveCommand.prototype['type'] = undefined;
 MoveCommand.prototype['destination'] = undefined;
 var _default = MoveCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":18}],23:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":19}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2983,7 +3052,7 @@ NetWorth.prototype['ships'] = undefined;
 NetWorth.prototype['total'] = undefined;
 var _default = NetWorth;
 exports["default"] = _default;
-},{"../ApiClient":1}],24:[function(require,module,exports){
+},{"../ApiClient":1}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3099,7 +3168,7 @@ PlanetsValue.prototype['position'] = undefined;
 PlanetsValue.prototype['prev-position'] = undefined;
 var _default = PlanetsValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./TradingResource":39}],25:[function(require,module,exports){
+},{"../ApiClient":1,"./TradingResource":39}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3175,7 +3244,7 @@ var PlayerId = /*#__PURE__*/function () {
 PlayerId.prototype['id'] = undefined;
 var _default = PlayerId;
 exports["default"] = _default;
-},{"../ApiClient":1}],26:[function(require,module,exports){
+},{"../ApiClient":1}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3278,128 +3347,7 @@ PlayersValue.prototype['color'] = undefined;
 PlayersValue.prototype['net-worth'] = undefined;
 var _default = PlayersValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./NetWorth":23}],27:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
- * The PriceValue model module.
- * @module model/PriceValue
- * @version 1.0.0
- */
-var PriceValue = /*#__PURE__*/function () {
-  /**
-   * Constructs a new <code>PriceValue</code>.
-   * @alias module:model/PriceValue
-   */
-  function PriceValue() {
-    _classCallCheck(this, PriceValue);
-
-    PriceValue.initialize(this);
-  }
-  /**
-   * Initializes the fields of this object.
-   * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
-   * Only for internal use.
-   */
-
-
-  _createClass(PriceValue, null, [{
-    key: "initialize",
-    value: function initialize(obj) {}
-    /**
-     * Constructs a <code>PriceValue</code> from a plain JavaScript object, optionally creating a new instance.
-     * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
-     * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/PriceValue} obj Optional instance to populate.
-     * @return {module:model/PriceValue} The populated <code>PriceValue</code> instance.
-     */
-
-  }, {
-    key: "constructFromObject",
-    value: function constructFromObject(data, obj) {
-      if (data) {
-        obj = obj || new PriceValue();
-
-        if (data.hasOwnProperty('tick')) {
-          obj['tick'] = _ApiClient["default"].convertToType(data['tick'], 'Number');
-        }
-
-        if (data.hasOwnProperty('buyer')) {
-          obj['buyer'] = _ApiClient["default"].convertToType(data['buyer'], 'String');
-        }
-
-        if (data.hasOwnProperty('seller')) {
-          obj['seller'] = _ApiClient["default"].convertToType(data['seller'], 'String');
-        }
-
-        if (data.hasOwnProperty('resource')) {
-          obj['resource'] = _ApiClient["default"].convertToType(data['resource'], 'String');
-        }
-
-        if (data.hasOwnProperty('amount')) {
-          obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
-        }
-
-        if (data.hasOwnProperty('price')) {
-          obj['price'] = _ApiClient["default"].convertToType(data['price'], 'Number');
-        }
-      }
-
-      return obj;
-    }
-  }]);
-
-  return PriceValue;
-}();
-/**
- * @member {Number} tick
- */
-
-
-PriceValue.prototype['tick'] = undefined;
-/**
- * @member {String} buyer
- */
-
-PriceValue.prototype['buyer'] = undefined;
-/**
- * @member {String} seller
- */
-
-PriceValue.prototype['seller'] = undefined;
-/**
- * @member {String} resource
- */
-
-PriceValue.prototype['resource'] = undefined;
-/**
- * @member {Number} amount
- */
-
-PriceValue.prototype['amount'] = undefined;
-/**
- * @member {Number} price
- */
-
-PriceValue.prototype['price'] = undefined;
-var _default = PriceValue;
-exports["default"] = _default;
-},{"../ApiClient":1}],28:[function(require,module,exports){
+},{"../ApiClient":1,"./NetWorth":24}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3746,8 +3694,6 @@ var _ApiClient = _interopRequireDefault(require("../ApiClient"));
 
 var _Combat = _interopRequireDefault(require("./Combat"));
 
-var _PriceValue = _interopRequireDefault(require("./PriceValue"));
-
 var _Profiling = _interopRequireDefault(require("./Profiling"));
 
 var _ScoreValue = _interopRequireDefault(require("./ScoreValue"));
@@ -3810,11 +3756,17 @@ var Reports = /*#__PURE__*/function () {
         }
 
         if (data.hasOwnProperty('prices')) {
-          obj['prices'] = _ApiClient["default"].convertToType(data['prices'], [Object]);
+          obj['prices'] = _ApiClient["default"].convertToType(data['prices'], {
+            'String': {
+              'String': 'Number'
+            }
+          });
         }
 
         if (data.hasOwnProperty('scores')) {
-          obj['scores'] = _ApiClient["default"].convertToType(data['scores'], [Object]);
+          obj['scores'] = _ApiClient["default"].convertToType(data['scores'], {
+            'String': _ScoreValue["default"]
+          });
         }
 
         if (data.hasOwnProperty('trade')) {
@@ -3842,12 +3794,12 @@ Reports.prototype['combat'] = undefined;
 Reports.prototype['profiling'] = undefined;
 /**
  * Prices are average across all planets.
- * @member {Array.<Object.<String, module:model/PriceValue>>} prices
+ * @member {Object.<String, Object.<String, Number>>} prices
  */
 
 Reports.prototype['prices'] = undefined;
 /**
- * @member {Array.<Object.<String, module:model/ScoreValue>>} scores
+ * @member {Object.<String, module:model/ScoreValue>} scores
  */
 
 Reports.prototype['scores'] = undefined;
@@ -3858,7 +3810,7 @@ Reports.prototype['scores'] = undefined;
 Reports.prototype['trade'] = undefined;
 var _default = Reports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":11,"./PriceValue":27,"./Profiling":28,"./ScoreValue":33,"./Trade":37}],32:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":12,"./Profiling":28,"./ScoreValue":33,"./Trade":37}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3995,27 +3947,27 @@ var ScoreValue = /*#__PURE__*/function () {
         obj = obj || new ScoreValue();
 
         if (data.hasOwnProperty('money')) {
-          obj['money'] = _ApiClient["default"].convertToType(data['money'], [{
+          obj['money'] = _ApiClient["default"].convertToType(data['money'], {
             'String': 'Number'
-          }]);
+          });
         }
 
         if (data.hasOwnProperty('resources')) {
-          obj['resources'] = _ApiClient["default"].convertToType(data['resources'], [{
+          obj['resources'] = _ApiClient["default"].convertToType(data['resources'], {
             'String': 'Number'
-          }]);
+          });
         }
 
         if (data.hasOwnProperty('ships')) {
-          obj['ships'] = _ApiClient["default"].convertToType(data['ships'], [{
+          obj['ships'] = _ApiClient["default"].convertToType(data['ships'], {
             'String': 'Number'
-          }]);
+          });
         }
 
         if (data.hasOwnProperty('total')) {
-          obj['total'] = _ApiClient["default"].convertToType(data['total'], [{
+          obj['total'] = _ApiClient["default"].convertToType(data['total'], {
             'String': 'Number'
-          }]);
+          });
         }
       }
 
@@ -4026,23 +3978,23 @@ var ScoreValue = /*#__PURE__*/function () {
   return ScoreValue;
 }();
 /**
- * @member {Array.<Object.<String, Number>>} money
+ * @member {Object.<String, Number>} money
  */
 
 
 ScoreValue.prototype['money'] = undefined;
 /**
- * @member {Array.<Object.<String, Number>>} resources
+ * @member {Object.<String, Number>} resources
  */
 
 ScoreValue.prototype['resources'] = undefined;
 /**
- * @member {Array.<Object.<String, Number>>} ships
+ * @member {Object.<String, Number>} ships
  */
 
 ScoreValue.prototype['ships'] = undefined;
 /**
- * @member {Array.<Object.<String, Number>>} total
+ * @member {Object.<String, Number>} total
  */
 
 ScoreValue.prototype['total'] = undefined;
@@ -4208,7 +4160,7 @@ ShipsValue.prototype['resources'] = undefined;
 ShipsValue.prototype['command'] = undefined;
 var _default = ShipsValue;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":12,"./Resource":32}],35:[function(require,module,exports){
+},{"../ApiClient":1,"./Command":13,"./Resource":32}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7356,7 +7308,9 @@ console.log(STC)
 
 var currentTick = new STC.CurrentTick()
 var staticData
+var playerData
 var zoom
+var graphsOptions = {}
 
 function bignum(n) {
 	if (!n)
@@ -7370,7 +7324,48 @@ function bignum(n) {
 	return n.toFixed(0) + exponents[i]
 }
 
-function handleZoom(e) {
+function colorToRgb(c) {
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
+function hsvToRgb (h, s, b) {
+	// input range: 360, 100, 100
+	// output range: 256, 256, 256
+	s /= 100
+	b /= 100
+	let k = (n) => (n + h / 60) % 6
+	let f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)))
+	return [255 * f(5), 255 * f(3), 255 * f(1)]
+}
+
+function updateResourcesColors() {
+	let num = Object.keys(staticData["resource-names"]).length
+	let index = 0
+	staticData.resourceColors = {}
+	for (let rid of Object.keys(staticData["resource-names"])) {
+		staticData.resourceColors[rid] = colorToRgb(hsvToRgb(index * 360 / num, 100, 100))
+		index += 1
+	}
+}
+
+function parseCookies() {
+	let c = document.cookie
+	if (c == "")
+		return {}
+	return document.cookie
+	.split(";")
+	.map(v => v.split("="))
+	.reduce((acc, v) => {
+		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
+		return acc
+	}, {})
+}
+
+//////////////////////////////////////////
+// map
+//////////////////////////////////////////
+
+function mapHandleZoom(e) {
 	d3.selectAll("#panzoom")
 	.attr("transform", e.transform)
 
@@ -7451,19 +7446,19 @@ function planetColor(d) {
 	let h2 = hashInt(h1 + 123)
 	let h3 = hashInt(h2 + 741)
 	let c = [ h1 % 20 + 120, h2 % 20 + 120, h3 % 20 + 120 ]
-	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+	return colorToRgb(c)
 }
 
 function shipColor(d) {
 	let c = d.data.players[d.player].color
-	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+	return colorToRgb(c)
 }
 
 function shipHref(d) {
 	return "#class-" + staticData["ship-classes"][d["ship-class"]].name
 }
 
-function redraw(data) {
+function mapRedraw(data) {
 	data.objects = {}
 
 	let planets = []
@@ -7496,10 +7491,20 @@ function redraw(data) {
 		data.objects[sid] = s
 	}
 
+	let shipsPositions = function(sel) {
+		return sel
+		.attr("x", d => d.position[0])
+		.attr("y", d => d.position[1])
+	}
+
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
-	.join("use")
+	.join(function(enter) {
+		return enter
+		.append('use')
+		.call(shipsPositions)
+	})
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
@@ -7508,8 +7513,7 @@ function redraw(data) {
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x", d => d.position[0])
-	.attr("y", d => d.position[1])
+	.call(shipsPositions)
 
 	let lines = []
 	for (let sid of Object.keys(data.ships)) {
@@ -7526,18 +7530,27 @@ function redraw(data) {
 		}
 	}
 
+	let linesPositions = function(sel) {
+		return sel
+		.attr("x1", d => d.ship.position[0])
+		.attr("y1", d => d.ship.position[1])
+		.attr("x2", d => d.target.position[0])
+		.attr("y2", d => d.target.position[1])
+	}
+
 	d3.select("#lines")
 	.selectAll(".line")
 	.data(lines, d => d.id)
-	.join("line")
+	.join(function(enter) {
+		return enter
+		.append('line')
+		.call(linesPositions)
+	})
 	.classed("line", true)
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x1", d => d.ship.position[0])
-	.attr("y1", d => d.ship.position[1])
-	.attr("x2", d => d.target.position[0])
-	.attr("y2", d => d.target.position[1])
+	.call(linesPositions)
 
 	if (typeof data["player-id"] !== "undefined") {
 		let ps = data.players[data["player-id"]]["net-worth"]
@@ -7561,10 +7574,10 @@ function redraw(data) {
 	.data(players, d => d.id)
 	.join("tr")
 	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
-	.style("color", d => "rgb(" + d.color[0] + "," + d.color[1] + "," + d.color[2] + ")")
+	.style("color", d => colorToRgb(d.color))
 }
 
-function refresh() {
+function mapRefresh() {
 	if (!staticData) {
 		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
 			if (error) {
@@ -7583,49 +7596,36 @@ function refresh() {
 				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}
-				redraw(data)
+				mapRedraw(data)
 			}
 		}
 	})
 }
 
-function timerLoop() {
+function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
 		(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
 			if (error) {
-				setTimeout(timerLoop, 1000)
+				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
 			} else {
-				setTimeout(timerLoop, data["time-left-ms"] || 300)
+				setTimeout(mapTimerLoop, data["min-time-left-ms"] || 300)
 				if (currentTick.tick != data.tick) {
 					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 					currentTick = data
-					refresh()
+					mapRefresh()
 				}
 			}
 		})
 	} else {
-		setTimeout(timerLoop, 1000)
+		setTimeout(mapTimerLoop, 1000)
 	}
 }
 
-function parseCookies() {
-	let c = document.cookie
-	if (c == "")
-		return {}
-	return document.cookie
-	.split(";")
-	.map(v => v.split("="))
-	.reduce((acc, v) => {
-		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
-		return acc
-	}, {})
-}
-
-function startLoop() {
+function mapStartLoop() {
 	let size = d3.select("#themap").node().getBoundingClientRect()
 	zoom = d3.zoom()
-	.on("zoom", handleZoom)
+	.on("zoom", mapHandleZoom)
 	d3.select("#themap")
 	.call(zoom)
 	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
@@ -7637,12 +7637,211 @@ function startLoop() {
 	}
 
 	d3.select("#tickInfo").text("Connecting...")
-	setTimeout(timerLoop, 0)
+	setTimeout(mapTimerLoop, 0)
 }
 
-setTimeout(startLoop, 0)
+window.initializeMap = function() {
+	setTimeout(mapStartLoop, 0)
+}
 
-},{"hash-int":53,"space_tycoon_client":9}],50:[function(require,module,exports){
+//////////////////////////////////////////
+// graphs
+//////////////////////////////////////////
+
+function multiLineGraph(lines, legends) {
+	let size = d3.select("#thegraph").node().getBoundingClientRect()
+
+	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
+	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
+	d3.select("#xaxis").call(xAxis)
+
+	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
+	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yAxis = d3.axisRight().scale(yScale).ticks(10)
+	d3.select("#yaxis").call(yAxis)
+
+	d3.select("#graphdata")
+	.selectAll(".line")
+	.data(lines, d => d.id)
+	.join("path")
+	.attr("class", d => d.classes)
+	.attr("stroke", d => d.color)
+	.attr("d", d => d3.line()
+		.x(p => xScale(p[0]))
+		.y(p => yScale(p[1]))
+		(d.values)
+	)
+
+	if (legends) {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.data(legends, d => d.id)
+		.join("text")
+		.classed("legend", true)
+		.text(d => d.name)
+		.attr("fill", d => d.color)
+		.attr("x", size.width - 20)
+		.transition()
+		.duration(1000)
+		.attr("y", d => yScale(d.value) - 3)
+	} else {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.remove()
+	}
+}
+
+function graphsRedrawPlayers(data) {
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(data.scores)) {
+		let s = data.scores[sid]
+		let name = playerData[sid].name
+		let color = colorToRgb(playerData[sid].color)
+
+		function category(key) {
+			let m = {}
+			m.id = key + "-" + sid
+			m.name = name
+			m.color = color
+			m.classes = "line line-" + key
+			m.values = []
+			for (let x of Object.keys(s[key]))
+				m.values.push([ parseInt(x), s[key][x] ])
+			lines.push(m)
+		}
+
+		category("resources")
+		category("ships")
+		category("money")
+		category("total")
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsPrepareResourcesVolumes(data) {
+	let res = {}
+	for (let rid of Object.keys(data.prices)) {
+		res[rid] = {}
+		for (let k of Object.keys(data.prices[rid]))
+			res[rid][k] = 0
+	}
+	for (let tr of Object.values(data.trade)) {
+		console.log(tr)
+		res[tr.resource][tr.tick] += tr.amount
+	}
+	return res
+}
+
+function graphsRedrawResources(data) {
+	let arr
+	let allowLegends = true
+	if (graphsOptions.type == "resources-prices")
+		arr = data.prices
+	else if (graphsOptions.type == "resources-amounts")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-totals")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-volumes") {
+		arr = graphsPrepareResourcesVolumes(data)
+		allowLegends = false
+	}
+
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(arr)) {
+		let p = arr[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
+		legends.push(l)
+	}
+	multiLineGraph(lines, allowLegends ? legends : null)
+}
+
+function graphsRefresh(data) {
+	if (!staticData) {
+		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				staticData = data
+				updateResourcesColors()
+			}
+		})
+	}
+
+	if (!playerData) {
+		(new STC.DataApi()).dataGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				playerData = data.players
+			}
+		})
+	}
+
+	if (staticData && playerData) {
+		if (graphsOptions.type == "players")
+			graphsRedrawPlayers(data)
+		else
+			graphsRedrawResources(data)
+	}
+}
+
+function graphsTimerLoop() {
+	setTimeout(graphsTimerLoop, 1000)
+	if (document.visibilityState === "visible") {
+		(new STC.ReportsApi()).reportsGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				d3.select("#tickInfo").text("")
+				graphsRefresh(data)
+			}
+		})
+	}
+}
+
+function graphsStartLoop() {
+	d3.select("#tickInfo").text("Connecting...")
+	setTimeout(graphsTimerLoop, 0)
+	graphsOptions.type = "players"
+	d3.select("#graphSelect").on("change", function(e) {
+		graphsOptions.type = e.target.value
+	})
+}
+
+window.initializeGraphs = function() {
+	setTimeout(graphsStartLoop, 0)
+}
+
+},{"hash-int":53,"space_tycoon_client":10}],50:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength

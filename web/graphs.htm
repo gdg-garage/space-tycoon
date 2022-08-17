@@ -5,14 +5,33 @@
 		<title>Space Tycoon</title>
 		<link rel="stylesheet" href="style.css">
 		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="js/bundle.js"></script>
 	</head>
 	<body>
 		<nav>
 			<a href="index.htm">Home</a>
+			<select id="graphSelect">
+				<option value="players">Players</option>
+				<optgroup label="Resources">
+					<option value="resources-prices">Prices</option>
+					<option value="resources-amounts">Amounts</option>
+					<option value="resources-totals">Totals</option>
+					<option value="resources-volumes">Volumes</option>
+				</optgroup>
+			</select>
+			<span id="tickInfo">
+				Javascript is required
+			</span>
 		</nav>
 		<hr>
-		Not implemented
-		<script>
-		</script>
+		<svg id="thegraph">
+			<g id="graphdata"></g>
+			<g id="xaxis"></g>
+			<g id="yaxis"></g>
+			<g id="legend"></g>
+		</svg>
 	</body>
+	<script>
+		window.initializeGraphs()
+	</script>
 </html>
