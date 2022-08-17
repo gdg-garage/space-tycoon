@@ -60,6 +60,10 @@ function parseCookies() {
 	}, {})
 }
 
+function last(p) {
+	return p[Object.keys(p)[Object.keys(p).length - 1]]
+}
+
 //////////////////////////////////////////
 // map
 //////////////////////////////////////////
@@ -422,45 +426,17 @@ function graphsRedrawPlayers(data) {
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
+		l.value = last(s.total)
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
 }
 
-function graphsPrepareResourcesVolumes(data) {
-	let res = {}
-	for (let rid of Object.keys(data.prices)) {
-		res[rid] = {}
-		for (let k of Object.keys(data.prices[rid]))
-			res[rid][k] = 0
-	}
-	if (typeof data["trade"] !== "undefined") {
-		for (let tr of Object.values(data.trade)) {
-			res[tr.resource][tr.tick] += tr.amount
-		}
-	}
-	return res
-}
-
-function graphsRedrawResources(data) {
-	let arr
-	let allowLegends = true
-	if (graphsOptions.type == "resources-prices")
-		arr = data.prices
-	else if (graphsOptions.type == "resources-amounts")
-		arr = data.prices // todo
-	else if (graphsOptions.type == "resources-totals")
-		arr = data.prices // todo
-	else if (graphsOptions.type == "resources-volumes") {
-		arr = graphsPrepareResourcesVolumes(data)
-		allowLegends = false
-	}
-
+function graphsRedrawResourcesPrices(data) {
 	let lines = []
 	let legends = []
-	for (let rid of Object.keys(arr)) {
-		let p = arr[rid]
+	for (let rid of Object.keys(data.prices)) {
+		let p = data.prices[rid]
 		let name = staticData["resource-names"][rid]
 		let color = staticData.resourceColors[rid]
 
@@ -478,10 +454,99 @@ function graphsRedrawResources(data) {
 		l.id = rid
 		l.name = name
 		l.color = color
-		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
+		l.value = last(p)
 		legends.push(l)
 	}
-	multiLineGraph(lines, allowLegends ? legends : null)
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesAmounts(data) {
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(data.resourceAmounts)) {
+		let p = data.resourceAmounts[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesTotals(data) {
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(data.prices)) {
+		let p = data.prices[rid]
+		let a = data.resourceAmounts[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] * a[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p) * last(a)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesVolumes(data) {
+	let res = {}
+	for (let rid of Object.keys(data.prices)) {
+		res[rid] = {}
+		for (let k of Object.keys(data.prices[rid]))
+			res[rid][k] = 0
+	}
+	if (typeof data["trade"] !== "undefined") {
+		for (let tr of Object.values(data.trade)) {
+			res[tr.resource][tr.tick] += tr.amount
+		}
+	}
+
+	let lines = []
+	for (let rid of Object.keys(res)) {
+		let p = res[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+	}
+	multiLineGraph(lines, null)
 }
 
 function graphsRefresh(data) {
@@ -509,8 +574,14 @@ function graphsRefresh(data) {
 	if (staticData && playerData) {
 		if (graphsOptions.type == "players")
 			graphsRedrawPlayers(data)
-		else
-			graphsRedrawResources(data)
+		else if (graphsOptions.type == "resources-prices")
+			graphsRedrawResourcesPrices(data)
+		else if (graphsOptions.type == "resources-amounts")
+			graphsRedrawResourcesAmounts(data)
+		else if (graphsOptions.type == "resources-totals")
+			graphsRedrawResourcesTotals(data)
+		else if (graphsOptions.type == "resources-volumes")
+			graphsRedrawResourcesVolumes(data)
 	}
 }
 
