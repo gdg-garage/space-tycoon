@@ -127,3 +127,20 @@ form {
 	stroke-width: 1;
 	fill: none;
 }
+
+#thegraph .line-resources {
+	stroke-dasharray: 4 8;
+}
+#thegraph .line-ships {
+	stroke-dasharray: 2 4;
+}
+#thegraph .line-money {
+	stroke-dasharray: 6 12;
+}
+#thegraph .line-total {
+	stroke-width: 2;
+}
+
+#thegraph .legend {
+	text-anchor: end;
+}

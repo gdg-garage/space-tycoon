@@ -234,7 +234,7 @@ function mapRedraw(data) {
 	.data(players, d => d.id)
 	.join("tr")
 	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
-	.style("color", d => "rgb(" + d.color[0] + "," + d.color[1] + "," + d.color[2] + ")")
+	.style("color", d => colorToRgb(d.color))
 }
 
 function mapRefresh() {
@@ -310,14 +310,18 @@ window.initializeMap = function() {
 
 function graphsRedraw(data) {
 	let lines = []
+	let legends = []
 	for (let sid of Object.keys(data.scores)) {
 		let s = data.scores[sid]
+		let name = playerData[sid].name
+		let color = colorToRgb(playerData[sid].color)
 
 		function category(key) {
 			let m = {}
+			m.id = key + "-" + sid
 			m.category = key
-			m.name = playerData[sid].name
-			m.color = colorToRgb(playerData[sid].color)
+			m.name = name
+			m.color = color
 			m.values = []
 			for (let x of Object.keys(s[key]))
 				m.values.push([ parseInt(x), s[key][x] ])
@@ -328,33 +332,52 @@ function graphsRedraw(data) {
 		category("ships")
 		category("money")
 		category("total")
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
+		legends.push(l)
 	}
 
 	let size = d3.select("#thegraph").node().getBoundingClientRect()
 
 	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
 	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([10, size.width - 10])
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
 	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
 	d3.select("#xaxis").call(xAxis)
 
 	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
 	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([10, size.height - 10])
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
 	let yAxis = d3.axisRight().scale(yScale).ticks(10)
 	d3.select("#yaxis").call(yAxis)
 
 	d3.select("#graphdata")
 	.selectAll(".line")
-	.data(lines)
+	.data(lines, d => d.id)
 	.join("path")
-	.classed("line", true)
+	.attr("class", d => "line line-" + d.category)
 	.attr("stroke", d => d.color)
 	.attr("d", d => d3.line()
 		.x(p => xScale(p[0]))
 		.y(p => yScale(p[1]))
 		(d.values)
 	)
+
+	d3.select("#legend")
+	.selectAll(".legend")
+	.data(legends, d => d.id)
+	.join("text")
+	.classed("legend", true)
+	.text(d => d.name)
+	.attr("fill", d => d.color)
+	.attr("x", size.width - 20)
+	.transition()
+	.duration(1000)
+	.attr("y", d => yScale(d.value) - 3)
 }
 
 function graphsRefresh(data) {
