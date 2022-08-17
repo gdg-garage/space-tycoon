@@ -25,7 +25,6 @@ type Game struct {
 	SessionManager       sessions.Store
 	TickCond             *sync.Cond
 	Reports              Reports
-	AggregatedReports    AggregatedReports
 }
 
 func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
@@ -117,6 +116,7 @@ func (game *Game) GetData(playerId *string) (Data, error) {
 		return data, err
 	}
 	data.Ships = ships
+	data.Reports = game.getDataReports()
 
 	return data, nil
 }

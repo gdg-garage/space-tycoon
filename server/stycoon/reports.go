@@ -59,47 +59,57 @@ func (game *Game) fillProfiling(tick *int64) error {
 			rows.Scan(&profiling.Movement, &profiling.Attacks, &profiling.Trades, &profiling.Recipes, &profiling.Prices, &profiling.Constructions, &profiling.Report, &profiling.Total, &profiling.Overall, &profiling.At)
 			profiling.Tick = *tick
 		}
-		game.AggregatedReports.Profiling = append(game.AggregatedReports.Profiling, profiling)
+		game.Reports.Profiling = append(game.Reports.Profiling, profiling)
 	}
 	return nil
 }
 
 // nil tick means fetching all previous ticks
-func (game *Game) fillPrices(tick *int64) error {
+func (game *Game) fillPricesAndAmounts(tick *int64) error {
 	var rows *sql.Rows
 	var err error
 	if tick == nil {
-		rows, err = game.db.Query("select `tick`, `resource`, `price` from t_report_resource_price order by `tick`")
+		rows, err = game.db.Query("select `tick`, `resource`, `price`, `amount` from t_report_resources order by `tick`")
 	} else {
-		rows, err = game.db.Query("select `resource`, `price` from t_report_resource_price where tick = ?", tick)
+		rows, err = game.db.Query("select `resource`, `price`, `amount` from t_report_resources where tick = ?", tick)
 	}
 	if err != nil {
 		return err
 	}
 
-	if game.AggregatedReports.Prices == nil {
-		game.AggregatedReports.Prices = make(map[string]map[string]int64)
+	if game.Reports.Prices == nil {
+		game.Reports.Prices = make(map[string]map[string]int64)
+	}
+	if game.Reports.ResourceAmounts == nil {
+		game.Reports.ResourceAmounts = make(map[string]map[string]int64)
 	}
 
 	for rows.Next() {
-		var fetchedTick, resource, price int64
+		var fetchedTick, resource, price, amount int64
 		var strTick, strResource string
 		if tick == nil {
-			rows.Scan(&fetchedTick, &resource, &price)
+			rows.Scan(&fetchedTick, &resource, &price, &amount)
 			strTick = strconv.Itoa(int(fetchedTick))
 		} else {
-			rows.Scan(&resource, &price)
+			rows.Scan(&resource, &price, &amount)
 			strTick = strconv.Itoa(int(*tick))
 		}
 
 		strResource = strconv.Itoa(int(resource))
-		priceValue, ok := game.AggregatedReports.Prices[strResource]
+		priceValue, ok := game.Reports.Prices[strResource]
 		if !ok {
 			priceValue = map[string]int64{}
 		}
+		amountValue, ok := game.Reports.ResourceAmounts[strResource]
+		if !ok {
+			amountValue = map[string]int64{}
+		}
 
 		priceValue[strTick] = price
-		game.AggregatedReports.Prices[strResource] = priceValue
+		game.Reports.Prices[strResource] = priceValue
+
+		amountValue[strTick] = amount
+		game.Reports.ResourceAmounts[strResource] = amountValue
 	}
 	return nil
 }
@@ -117,8 +127,8 @@ func (game *Game) fillScores(tick *int64) error {
 		return err
 	}
 
-	if game.AggregatedReports.Scores == nil {
-		game.AggregatedReports.Scores = make(map[string]ScoreValue)
+	if game.Reports.Scores == nil {
+		game.Reports.Scores = make(map[string]ScoreValue)
 	}
 
 	for rows.Next() {
@@ -132,7 +142,7 @@ func (game *Game) fillScores(tick *int64) error {
 			strTick = strconv.Itoa(int(*tick))
 		}
 
-		scoreValue, ok := game.AggregatedReports.Scores[strconv.Itoa(int(player))]
+		scoreValue, ok := game.Reports.Scores[strconv.Itoa(int(player))]
 		if !ok {
 			scoreValue = ScoreValue{
 				Resources: make(map[string]int64),
@@ -147,7 +157,7 @@ func (game *Game) fillScores(tick *int64) error {
 		scoreValue.Money[strTick] = money
 		scoreValue.Total[strTick] = total
 
-		game.AggregatedReports.Scores[strconv.Itoa(int(player))] = scoreValue
+		game.Reports.Scores[strconv.Itoa(int(player))] = scoreValue
 	}
 	return nil
 }
@@ -190,9 +200,9 @@ func (game *Game) getReports(previousTick *int64) {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_timing")
 		return
 	}
-	err = game.fillPrices(previousTick)
+	err = game.fillPricesAndAmounts(previousTick)
 	if err != nil {
-		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_resource_price")
+		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_resources")
 		return
 	}
 	err = game.fillScores(previousTick)
@@ -219,20 +229,24 @@ func (game *Game) fillAllReportsSinceSeasonStart() {
 	game.getReports(nil)
 }
 
-func (game *Game) getReportsForTick(tick int64) {
-	var tickReports Reports
+func (game *Game) getDataReports() DataReports {
+	var tickReports DataReports
+	tick := game.Tick.Tick - 1
+	if tick < 0 {
+		return tickReports
+	}
 
 	c := game.Reports.Combat
 	pos := sort.Search(len(c), func(i int) bool { return c[i].Tick >= tick })
-	for c[pos].Tick == tick {
+	for pos < len(c) && c[pos].Tick == tick {
 		tickReports.Combat = append(tickReports.Combat, c[pos])
 		pos++
 	}
-
 	t := game.Reports.Trade
 	pos = sort.Search(len(t), func(i int) bool { return t[i].Tick >= tick })
-	for c[pos].Tick == tick {
+	for pos < len(t) && t[pos].Tick == tick {
 		tickReports.Trade = append(tickReports.Trade, t[pos])
 		pos++
 	}
+	return tickReports
 }
