@@ -7648,6 +7648,52 @@ window.initializeMap = function() {
 // graphs
 //////////////////////////////////////////
 
+function multiLineGraph(lines, legends) {
+	let size = d3.select("#thegraph").node().getBoundingClientRect()
+
+	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
+	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
+	d3.select("#xaxis").call(xAxis)
+
+	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
+	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yAxis = d3.axisRight().scale(yScale).ticks(10)
+	d3.select("#yaxis").call(yAxis)
+
+	d3.select("#graphdata")
+	.selectAll(".line")
+	.data(lines, d => d.id)
+	.join("path")
+	.attr("class", d => d.classes)
+	.attr("stroke", d => d.color)
+	.attr("d", d => d3.line()
+		.x(p => xScale(p[0]))
+		.y(p => yScale(p[1]))
+		(d.values)
+	)
+
+	if (legends) {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.data(legends, d => d.id)
+		.join("text")
+		.classed("legend", true)
+		.text(d => d.name)
+		.attr("fill", d => d.color)
+		.attr("x", size.width - 20)
+		.transition()
+		.duration(1000)
+		.attr("y", d => yScale(d.value) - 3)
+	} else {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.remove()
+	}
+}
+
 function graphsRedrawPlayers(data) {
 	let lines = []
 	let legends = []
@@ -7659,9 +7705,9 @@ function graphsRedrawPlayers(data) {
 		function category(key) {
 			let m = {}
 			m.id = key + "-" + sid
-			m.category = key
 			m.name = name
 			m.color = color
+			m.classes = "line line-" + key
 			m.values = []
 			for (let x of Object.keys(s[key]))
 				m.values.push([ parseInt(x), s[key][x] ])
@@ -7680,51 +7726,41 @@ function graphsRedrawPlayers(data) {
 		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
 		legends.push(l)
 	}
+	multiLineGraph(lines, legends)
+}
 
-	let size = d3.select("#thegraph").node().getBoundingClientRect()
-
-	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
-	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
-	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
-	d3.select("#xaxis").call(xAxis)
-
-	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
-	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
-	let yAxis = d3.axisRight().scale(yScale).ticks(10)
-	d3.select("#yaxis").call(yAxis)
-
-	d3.select("#graphdata")
-	.selectAll(".line")
-	.data(lines, d => d.id)
-	.join("path")
-	.attr("class", d => "line line-" + d.category)
-	.attr("stroke", d => d.color)
-	.attr("d", d => d3.line()
-		.x(p => xScale(p[0]))
-		.y(p => yScale(p[1]))
-		(d.values)
-	)
-
-	d3.select("#legend")
-	.selectAll(".legend")
-	.data(legends, d => d.id)
-	.join("text")
-	.classed("legend", true)
-	.text(d => d.name)
-	.attr("fill", d => d.color)
-	.attr("x", size.width - 20)
-	.transition()
-	.duration(1000)
-	.attr("y", d => yScale(d.value) - 3)
+function graphsPrepareResourcesVolumes(data) {
+	let res = {}
+	for (let rid of Object.keys(data.prices)) {
+		res[rid] = {}
+		for (let k of Object.keys(data.prices[rid]))
+			res[rid][k] = 0
+	}
+	for (let tr of Object.values(data.trade)) {
+		console.log(tr)
+		res[tr.resource][tr.tick] += tr.amount
+	}
+	return res
 }
 
 function graphsRedrawResources(data) {
+	let arr
+	let allowLegends = true
+	if (graphsOptions.type == "resources-prices")
+		arr = data.prices
+	else if (graphsOptions.type == "resources-amounts")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-totals")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-volumes") {
+		arr = graphsPrepareResourcesVolumes(data)
+		allowLegends = false
+	}
+
 	let lines = []
 	let legends = []
-	for (let rid of Object.keys(data.prices)) {
-		let p = data.prices[rid]
+	for (let rid of Object.keys(arr)) {
+		let p = arr[rid]
 		let name = staticData["resource-names"][rid]
 		let color = staticData.resourceColors[rid]
 
@@ -7732,6 +7768,7 @@ function graphsRedrawResources(data) {
 		m.id = rid
 		m.name = name
 		m.color = color
+		m.classes = "line"
 		m.values = []
 		for (let x of Object.keys(p))
 			m.values.push([ parseInt(x), p[x] ])
@@ -7744,44 +7781,7 @@ function graphsRedrawResources(data) {
 		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
 		legends.push(l)
 	}
-
-	let size = d3.select("#thegraph").node().getBoundingClientRect()
-
-	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
-	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
-	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
-	d3.select("#xaxis").call(xAxis)
-
-	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
-	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
-	let yAxis = d3.axisRight().scale(yScale).ticks(10)
-	d3.select("#yaxis").call(yAxis)
-
-	d3.select("#graphdata")
-	.selectAll(".line")
-	.data(lines, d => d.id)
-	.join("path")
-	.classed("line", true)
-	.attr("stroke", d => d.color)
-	.attr("d", d => d3.line()
-		.x(p => xScale(p[0]))
-		.y(p => yScale(p[1]))
-		(d.values)
-	)
-
-	d3.select("#legend")
-	.selectAll(".legend")
-	.data(legends, d => d.id)
-	.join("text")
-	.classed("legend", true)
-	.text(d => d.name)
-	.attr("fill", d => d.color)
-	.attr("x", size.width - 20)
-	.transition()
-	.duration(1000)
-	.attr("y", d => yScale(d.value) - 3)
+	multiLineGraph(lines, allowLegends ? legends : null)
 }
 
 function graphsRefresh(data) {
@@ -7809,7 +7809,7 @@ function graphsRefresh(data) {
 	if (staticData && playerData) {
 		if (graphsOptions.type == "players")
 			graphsRedrawPlayers(data)
-		if (graphsOptions.type == "resources")
+		else
 			graphsRedrawResources(data)
 	}
 }
@@ -7828,33 +7828,13 @@ function graphsTimerLoop() {
 	}
 }
 
-function graphsUpdateOptions() {
-	d3.select("#graphsButtons")
-	.selectAll("button")
-	.remove()
-
-	d3.select("#graphsButtons")
-	.append("button")
-	.on("click", function() {
-		graphsOptions.type = "players"
-		graphsUpdateOptions()
-	})
-	.text("Players")
-
-	d3.select("#graphsButtons")
-	.append("button")
-	.on("click", function() {
-		graphsOptions.type = "resources"
-		graphsUpdateOptions()
-	})
-	.text("Resources")
-}
-
 function graphsStartLoop() {
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(graphsTimerLoop, 0)
 	graphsOptions.type = "players"
-	graphsUpdateOptions()
+	d3.select("#graphSelect").on("change", function(e) {
+		graphsOptions.type = e.target.value
+	})
 }
 
 window.initializeGraphs = function() {
