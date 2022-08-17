@@ -9,6 +9,7 @@ var currentTick = new STC.CurrentTick()
 var staticData
 var playerData
 var zoom
+var graphsOptions = {}
 
 function bignum(n) {
 	if (!n)
@@ -24,6 +25,26 @@ function bignum(n) {
 
 function colorToRgb(c) {
 	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
+function hsvToRgb (h, s, b) {
+	// input range: 360, 100, 100
+	// output range: 256, 256, 256
+	s /= 100
+	b /= 100
+	let k = (n) => (n + h / 60) % 6
+	let f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)))
+	return [255 * f(5), 255 * f(3), 255 * f(1)]
+}
+
+function updateResourcesColors() {
+	let num = Object.keys(staticData["resource-names"]).length
+	let index = 0
+	staticData.resourceColors = {}
+	for (let rid of Object.keys(staticData["resource-names"])) {
+		staticData.resourceColors[rid] = colorToRgb(hsvToRgb(index * 360 / num, 100, 100))
+		index += 1
+	}
 }
 
 function parseCookies() {
@@ -326,7 +347,7 @@ window.initializeMap = function() {
 // graphs
 //////////////////////////////////////////
 
-function graphsRedraw(data) {
+function graphsRedrawPlayers(data) {
 	let lines = []
 	let legends = []
 	for (let sid of Object.keys(data.scores)) {
@@ -398,6 +419,70 @@ function graphsRedraw(data) {
 	.attr("y", d => yScale(d.value) - 3)
 }
 
+function graphsRedrawResources(data) {
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(data.prices)) {
+		let p = data.prices[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
+		legends.push(l)
+	}
+
+	let size = d3.select("#thegraph").node().getBoundingClientRect()
+
+	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
+	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
+	d3.select("#xaxis").call(xAxis)
+
+	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
+	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yAxis = d3.axisRight().scale(yScale).ticks(10)
+	d3.select("#yaxis").call(yAxis)
+
+	d3.select("#graphdata")
+	.selectAll(".line")
+	.data(lines, d => d.id)
+	.join("path")
+	.classed("line", true)
+	.attr("stroke", d => d.color)
+	.attr("d", d => d3.line()
+		.x(p => xScale(p[0]))
+		.y(p => yScale(p[1]))
+		(d.values)
+	)
+
+	d3.select("#legend")
+	.selectAll(".legend")
+	.data(legends, d => d.id)
+	.join("text")
+	.classed("legend", true)
+	.text(d => d.name)
+	.attr("fill", d => d.color)
+	.attr("x", size.width - 20)
+	.transition()
+	.duration(1000)
+	.attr("y", d => yScale(d.value) - 3)
+}
+
 function graphsRefresh(data) {
 	if (!staticData) {
 		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
@@ -405,6 +490,7 @@ function graphsRefresh(data) {
 				d3.select("#tickInfo").text(error)
 			} else {
 				staticData = data
+				updateResourcesColors()
 			}
 		})
 	}
@@ -420,7 +506,10 @@ function graphsRefresh(data) {
 	}
 
 	if (staticData && playerData) {
-		graphsRedraw(data)
+		if (graphsOptions.type == "players")
+			graphsRedrawPlayers(data)
+		if (graphsOptions.type == "resources")
+			graphsRedrawResources(data)
 	}
 }
 
@@ -438,9 +527,33 @@ function graphsTimerLoop() {
 	}
 }
 
+function graphsUpdateOptions() {
+	d3.select("#graphsButtons")
+	.selectAll("button")
+	.remove()
+
+	d3.select("#graphsButtons")
+	.append("button")
+	.on("click", function() {
+		graphsOptions.type = "players"
+		graphsUpdateOptions()
+	})
+	.text("Players")
+
+	d3.select("#graphsButtons")
+	.append("button")
+	.on("click", function() {
+		graphsOptions.type = "resources"
+		graphsUpdateOptions()
+	})
+	.text("Resources")
+}
+
 function graphsStartLoop() {
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(graphsTimerLoop, 0)
+	graphsOptions.type = "players"
+	graphsUpdateOptions()
 }
 
 window.initializeGraphs = function() {
