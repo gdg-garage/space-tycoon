@@ -7,7 +7,9 @@ console.log(STC)
 
 var currentTick = new STC.CurrentTick()
 var staticData
+var playerData
 var zoom
+var graphsOptions = {}
 
 function bignum(n) {
 	if (!n)
@@ -21,7 +23,48 @@ function bignum(n) {
 	return n.toFixed(0) + exponents[i]
 }
 
-function handleZoom(e) {
+function colorToRgb(c) {
+	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+}
+
+function hsvToRgb (h, s, b) {
+	// input range: 360, 100, 100
+	// output range: 256, 256, 256
+	s /= 100
+	b /= 100
+	let k = (n) => (n + h / 60) % 6
+	let f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)))
+	return [255 * f(5), 255 * f(3), 255 * f(1)]
+}
+
+function updateResourcesColors() {
+	let num = Object.keys(staticData["resource-names"]).length
+	let index = 0
+	staticData.resourceColors = {}
+	for (let rid of Object.keys(staticData["resource-names"])) {
+		staticData.resourceColors[rid] = colorToRgb(hsvToRgb(index * 360 / num, 100, 100))
+		index += 1
+	}
+}
+
+function parseCookies() {
+	let c = document.cookie
+	if (c == "")
+		return {}
+	return document.cookie
+	.split(";")
+	.map(v => v.split("="))
+	.reduce((acc, v) => {
+		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
+		return acc
+	}, {})
+}
+
+//////////////////////////////////////////
+// map
+//////////////////////////////////////////
+
+function mapHandleZoom(e) {
 	d3.selectAll("#panzoom")
 	.attr("transform", e.transform)
 
@@ -102,19 +145,19 @@ function planetColor(d) {
 	let h2 = hashInt(h1 + 123)
 	let h3 = hashInt(h2 + 741)
 	let c = [ h1 % 20 + 120, h2 % 20 + 120, h3 % 20 + 120 ]
-	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+	return colorToRgb(c)
 }
 
 function shipColor(d) {
 	let c = d.data.players[d.player].color
-	return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"
+	return colorToRgb(c)
 }
 
 function shipHref(d) {
 	return "#class-" + staticData["ship-classes"][d["ship-class"]].name
 }
 
-function redraw(data) {
+function mapRedraw(data) {
 	data.objects = {}
 
 	let planets = []
@@ -147,10 +190,20 @@ function redraw(data) {
 		data.objects[sid] = s
 	}
 
+	let shipsPositions = function(sel) {
+		return sel
+		.attr("x", d => d.position[0])
+		.attr("y", d => d.position[1])
+	}
+
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
-	.join("use")
+	.join(function(enter) {
+		return enter
+		.append('use')
+		.call(shipsPositions)
+	})
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
@@ -159,8 +212,7 @@ function redraw(data) {
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x", d => d.position[0])
-	.attr("y", d => d.position[1])
+	.call(shipsPositions)
 
 	let lines = []
 	for (let sid of Object.keys(data.ships)) {
@@ -177,18 +229,27 @@ function redraw(data) {
 		}
 	}
 
+	let linesPositions = function(sel) {
+		return sel
+		.attr("x1", d => d.ship.position[0])
+		.attr("y1", d => d.ship.position[1])
+		.attr("x2", d => d.target.position[0])
+		.attr("y2", d => d.target.position[1])
+	}
+
 	d3.select("#lines")
 	.selectAll(".line")
 	.data(lines, d => d.id)
-	.join("line")
+	.join(function(enter) {
+		return enter
+		.append('line')
+		.call(linesPositions)
+	})
 	.classed("line", true)
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x1", d => d.ship.position[0])
-	.attr("y1", d => d.ship.position[1])
-	.attr("x2", d => d.target.position[0])
-	.attr("y2", d => d.target.position[1])
+	.call(linesPositions)
 
 	if (typeof data["player-id"] !== "undefined") {
 		let ps = data.players[data["player-id"]]["net-worth"]
@@ -212,10 +273,10 @@ function redraw(data) {
 	.data(players, d => d.id)
 	.join("tr")
 	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
-	.style("color", d => "rgb(" + d.color[0] + "," + d.color[1] + "," + d.color[2] + ")")
+	.style("color", d => colorToRgb(d.color))
 }
 
-function refresh() {
+function mapRefresh() {
 	if (!staticData) {
 		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
 			if (error) {
@@ -234,49 +295,36 @@ function refresh() {
 				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}
-				redraw(data)
+				mapRedraw(data)
 			}
 		}
 	})
 }
 
-function timerLoop() {
+function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
 		(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
 			if (error) {
-				setTimeout(timerLoop, 1000)
+				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
 			} else {
-				setTimeout(timerLoop, data["time-left-ms"] || 300)
+				setTimeout(mapTimerLoop, data["min-time-left-ms"] || 300)
 				if (currentTick.tick != data.tick) {
 					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 					currentTick = data
-					refresh()
+					mapRefresh()
 				}
 			}
 		})
 	} else {
-		setTimeout(timerLoop, 1000)
+		setTimeout(mapTimerLoop, 1000)
 	}
 }
 
-function parseCookies() {
-	let c = document.cookie
-	if (c == "")
-		return {}
-	return document.cookie
-	.split(";")
-	.map(v => v.split("="))
-	.reduce((acc, v) => {
-		acc[decodeURIComponent(v[0].trim())] = decodeURIComponent(v[1].trim())
-		return acc
-	}, {})
-}
-
-function startLoop() {
+function mapStartLoop() {
 	let size = d3.select("#themap").node().getBoundingClientRect()
 	zoom = d3.zoom()
-	.on("zoom", handleZoom)
+	.on("zoom", mapHandleZoom)
 	d3.select("#themap")
 	.call(zoom)
 	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
@@ -288,7 +336,206 @@ function startLoop() {
 	}
 
 	d3.select("#tickInfo").text("Connecting...")
-	setTimeout(timerLoop, 0)
+	setTimeout(mapTimerLoop, 0)
 }
 
-setTimeout(startLoop, 0)
+window.initializeMap = function() {
+	setTimeout(mapStartLoop, 0)
+}
+
+//////////////////////////////////////////
+// graphs
+//////////////////////////////////////////
+
+function multiLineGraph(lines, legends) {
+	let size = d3.select("#thegraph").node().getBoundingClientRect()
+
+	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
+	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
+	d3.select("#xaxis").call(xAxis)
+
+	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
+	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yAxis = d3.axisRight().scale(yScale).ticks(10)
+	d3.select("#yaxis").call(yAxis)
+
+	d3.select("#graphdata")
+	.selectAll(".line")
+	.data(lines, d => d.id)
+	.join("path")
+	.attr("class", d => d.classes)
+	.attr("stroke", d => d.color)
+	.attr("d", d => d3.line()
+		.x(p => xScale(p[0]))
+		.y(p => yScale(p[1]))
+		(d.values)
+	)
+
+	if (legends) {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.data(legends, d => d.id)
+		.join("text")
+		.classed("legend", true)
+		.text(d => d.name)
+		.attr("fill", d => d.color)
+		.attr("x", size.width - 20)
+		.transition()
+		.duration(1000)
+		.attr("y", d => yScale(d.value) - 3)
+	} else {
+		d3.select("#legend")
+		.selectAll(".legend")
+		.remove()
+	}
+}
+
+function graphsRedrawPlayers(data) {
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(data.scores)) {
+		let s = data.scores[sid]
+		let name = playerData[sid].name
+		let color = colorToRgb(playerData[sid].color)
+
+		function category(key) {
+			let m = {}
+			m.id = key + "-" + sid
+			m.name = name
+			m.color = color
+			m.classes = "line line-" + key
+			m.values = []
+			for (let x of Object.keys(s[key]))
+				m.values.push([ parseInt(x), s[key][x] ])
+			lines.push(m)
+		}
+
+		category("resources")
+		category("ships")
+		category("money")
+		category("total")
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsPrepareResourcesVolumes(data) {
+	let res = {}
+	for (let rid of Object.keys(data.prices)) {
+		res[rid] = {}
+		for (let k of Object.keys(data.prices[rid]))
+			res[rid][k] = 0
+	}
+	for (let tr of Object.values(data.trade)) {
+		console.log(tr)
+		res[tr.resource][tr.tick] += tr.amount
+	}
+	return res
+}
+
+function graphsRedrawResources(data) {
+	let arr
+	let allowLegends = true
+	if (graphsOptions.type == "resources-prices")
+		arr = data.prices
+	else if (graphsOptions.type == "resources-amounts")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-totals")
+		arr = data.prices // todo
+	else if (graphsOptions.type == "resources-volumes") {
+		arr = graphsPrepareResourcesVolumes(data)
+		allowLegends = false
+	}
+
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(arr)) {
+		let p = arr[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
+		legends.push(l)
+	}
+	multiLineGraph(lines, allowLegends ? legends : null)
+}
+
+function graphsRefresh(data) {
+	if (!staticData) {
+		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				staticData = data
+				updateResourcesColors()
+			}
+		})
+	}
+
+	if (!playerData) {
+		(new STC.DataApi()).dataGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				playerData = data.players
+			}
+		})
+	}
+
+	if (staticData && playerData) {
+		if (graphsOptions.type == "players")
+			graphsRedrawPlayers(data)
+		else
+			graphsRedrawResources(data)
+	}
+}
+
+function graphsTimerLoop() {
+	setTimeout(graphsTimerLoop, 1000)
+	if (document.visibilityState === "visible") {
+		(new STC.ReportsApi()).reportsGet(function(error, data, response) {
+			if (error) {
+				d3.select("#tickInfo").text(error)
+			} else {
+				d3.select("#tickInfo").text("")
+				graphsRefresh(data)
+			}
+		})
+	}
+}
+
+function graphsStartLoop() {
+	d3.select("#tickInfo").text("Connecting...")
+	setTimeout(graphsTimerLoop, 0)
+	graphsOptions.type = "players"
+	d3.select("#graphSelect").on("change", function(e) {
+		graphsOptions.type = e.target.value
+	})
+}
+
+window.initializeGraphs = function() {
+	setTimeout(graphsStartLoop, 0)
+}

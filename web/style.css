@@ -41,22 +41,22 @@ form {
 	padding-right: 0.5em;
 }
 
-#themap {
+#themap, #thegraph {
 	flex-grow: 1;
 	background-color: #1a1a1a;
 }
 
-.planet {
+#themap .planet {
 	stroke: lightblue;
 	stroke-width: 0.2;
 }
 
-.ship {
+#themap .ship {
 	stroke: white;
 	stroke-width: 0.5;
 }
 
-.line {
+#themap .line {
 	stroke: dimgray;
 	stroke-width: 0.1;
 }
@@ -121,4 +121,26 @@ form {
 .sell {
 	text-align: right;
 	color: green;
+}
+
+#thegraph .line {
+	stroke-width: 1;
+	fill: none;
+}
+
+#thegraph .line-resources {
+	stroke-dasharray: 4 8;
+}
+#thegraph .line-ships {
+	stroke-dasharray: 2 4;
+}
+#thegraph .line-money {
+	stroke-dasharray: 6 12;
+}
+#thegraph .line-total {
+	stroke-width: 2;
+}
+
+#thegraph .legend {
+	text-anchor: end;
 }
