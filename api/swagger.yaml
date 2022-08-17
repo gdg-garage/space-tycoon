@@ -197,7 +197,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Reports"
+                $ref: "#/components/schemas/AggregatedReports"
         "400":
           description: Invalid input
         "403":
@@ -643,6 +643,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Combat'
+        trade:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trade'
+    AggregatedReports:
+      type: object
+      properties:
         profiling:
           description: Profiling information about the game. Used by the visualization website.
           type: array
@@ -652,10 +659,6 @@ components:
           $ref: '#/components/schemas/Price'
         scores:
           $ref: '#/components/schemas/Score'
-        trade:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trade'
 
     Resource:
       type: object
@@ -839,6 +842,8 @@ components:
           $ref: '#/components/schemas/Players'
         ships:
           $ref: '#/components/schemas/Ships'
+        reports:
+          $ref: '#/components/schemas/Reports'
 
     CurrentTick:
       type: object

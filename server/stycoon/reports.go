@@ -2,6 +2,7 @@ package stycoon
 
 import (
 	"database/sql"
+	"sort"
 	"strconv"
 
 	"github.com/rs/zerolog/log"
@@ -58,7 +59,7 @@ func (game *Game) fillProfiling(tick *int64) error {
 			rows.Scan(&profiling.Movement, &profiling.Attacks, &profiling.Trades, &profiling.Recipes, &profiling.Prices, &profiling.Constructions, &profiling.Report, &profiling.Total, &profiling.Overall, &profiling.At)
 			profiling.Tick = *tick
 		}
-		game.Reports.Profiling = append(game.Reports.Profiling, profiling)
+		game.AggregatedReports.Profiling = append(game.AggregatedReports.Profiling, profiling)
 	}
 	return nil
 }
@@ -76,8 +77,8 @@ func (game *Game) fillPrices(tick *int64) error {
 		return err
 	}
 
-	if game.Reports.Prices == nil {
-		game.Reports.Prices = make(map[string]map[string]int64)
+	if game.AggregatedReports.Prices == nil {
+		game.AggregatedReports.Prices = make(map[string]map[string]int64)
 	}
 
 	for rows.Next() {
@@ -92,13 +93,13 @@ func (game *Game) fillPrices(tick *int64) error {
 		}
 
 		strResource = strconv.Itoa(int(resource))
-		priceValue, ok := game.Reports.Prices[strResource]
+		priceValue, ok := game.AggregatedReports.Prices[strResource]
 		if !ok {
 			priceValue = map[string]int64{}
 		}
 
 		priceValue[strTick] = price
-		game.Reports.Prices[strResource] = priceValue
+		game.AggregatedReports.Prices[strResource] = priceValue
 	}
 	return nil
 }
@@ -116,8 +117,8 @@ func (game *Game) fillScores(tick *int64) error {
 		return err
 	}
 
-	if game.Reports.Scores == nil {
-		game.Reports.Scores = make(map[string]ScoreValue)
+	if game.AggregatedReports.Scores == nil {
+		game.AggregatedReports.Scores = make(map[string]ScoreValue)
 	}
 
 	for rows.Next() {
@@ -131,7 +132,7 @@ func (game *Game) fillScores(tick *int64) error {
 			strTick = strconv.Itoa(int(*tick))
 		}
 
-		scoreValue, ok := game.Reports.Scores[strconv.Itoa(int(player))]
+		scoreValue, ok := game.AggregatedReports.Scores[strconv.Itoa(int(player))]
 		if !ok {
 			scoreValue = ScoreValue{
 				Resources: make(map[string]int64),
@@ -146,7 +147,7 @@ func (game *Game) fillScores(tick *int64) error {
 		scoreValue.Money[strTick] = money
 		scoreValue.Total[strTick] = total
 
-		game.Reports.Scores[strconv.Itoa(int(player))] = scoreValue
+		game.AggregatedReports.Scores[strconv.Itoa(int(player))] = scoreValue
 	}
 	return nil
 }
@@ -206,7 +207,7 @@ func (game *Game) getReports(previousTick *int64) {
 	}
 }
 
-func (game *Game) getReportsForPreviousTick() {
+func (game *Game) fillAllReportsForPreviousTick() {
 	previousTick := game.Tick.Tick - 1
 	if previousTick < 0 {
 		return
@@ -214,6 +215,24 @@ func (game *Game) getReportsForPreviousTick() {
 	game.getReports(&previousTick)
 }
 
-func (game *Game) getReportsSinceSeasonStart() {
+func (game *Game) fillAllReportsSinceSeasonStart() {
 	game.getReports(nil)
+}
+
+func (game *Game) getReportsForTick(tick int64) {
+	var tickReports Reports
+
+	c := game.Reports.Combat
+	pos := sort.Search(len(c), func(i int) bool { return c[i].Tick >= tick })
+	for c[pos].Tick == tick {
+		tickReports.Combat = append(tickReports.Combat, c[pos])
+		pos++
+	}
+
+	t := game.Reports.Trade
+	pos = sort.Search(len(t), func(i int) bool { return t[i].Tick >= tick })
+	for c[pos].Tick == tick {
+		tickReports.Trade = append(tickReports.Trade, t[pos])
+		pos++
+	}
 }

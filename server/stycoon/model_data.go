@@ -20,6 +20,8 @@ type Data struct {
 	Players map[string]PlayersValue `json:"players"`
 
 	Ships map[string]ShipsValue `json:"ships"`
+
+	Reports Reports `json:"reports,omitempty"`
 }
 
 // AssertDataRequired checks if the required fields are not zero-ed
@@ -37,6 +39,9 @@ func AssertDataRequired(obj Data) error {
 	}
 
 	if err := AssertCurrentTickRequired(obj.CurrentTick); err != nil {
+		return err
+	}
+	if err := AssertReportsRequired(obj.Reports); err != nil {
 		return err
 	}
 	return nil
