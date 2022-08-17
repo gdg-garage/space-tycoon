@@ -188,6 +188,11 @@ func (game *Game) fillTrades(tick *int64) error {
 	return nil
 }
 
+func (game *Game) fillSeasonAndTick() {
+	game.Reports.Tick = game.Tick.Tick
+	game.Reports.Season = game.Tick.Season
+}
+
 // nil tick means fetching all previous ticks
 func (game *Game) getReports(previousTick *int64) {
 	err := game.fillCombats(previousTick)
@@ -215,6 +220,7 @@ func (game *Game) getReports(previousTick *int64) {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_trade")
 		return
 	}
+	game.fillSeasonAndTick()
 }
 
 func (game *Game) fillAllReportsForPreviousTick() {
