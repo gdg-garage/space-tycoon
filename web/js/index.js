@@ -169,10 +169,20 @@ function mapRedraw(data) {
 		data.objects[sid] = s
 	}
 
+	let shipsPositions = function(sel) {
+		return sel
+		.attr("x", d => d.position[0])
+		.attr("y", d => d.position[1])
+	}
+
 	d3.select("#ships")
 	.selectAll(".ship")
 	.data(ships, d => d.id)
-	.join("use")
+	.join(function(enter) {
+		return enter
+		.append('use')
+		.call(shipsPositions)
+	})
 	.classed("ship", true)
 	.on("click", clickInfo)
 	.html(d => "<title>" + d.name + "</title>")
@@ -181,8 +191,7 @@ function mapRedraw(data) {
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x", d => d.position[0])
-	.attr("y", d => d.position[1])
+	.call(shipsPositions)
 
 	let lines = []
 	for (let sid of Object.keys(data.ships)) {
@@ -199,18 +208,27 @@ function mapRedraw(data) {
 		}
 	}
 
+	let linesPositions = function(sel) {
+		return sel
+		.attr("x1", d => d.ship.position[0])
+		.attr("y1", d => d.ship.position[1])
+		.attr("x2", d => d.target.position[0])
+		.attr("y2", d => d.target.position[1])
+	}
+
 	d3.select("#lines")
 	.selectAll(".line")
 	.data(lines, d => d.id)
-	.join("line")
+	.join(function(enter) {
+		return enter
+		.append('line')
+		.call(linesPositions)
+	})
 	.classed("line", true)
 	.transition()
 	.duration(1000)
 	.ease(d3.easeLinear)
-	.attr("x1", d => d.ship.position[0])
-	.attr("y1", d => d.ship.position[1])
-	.attr("x2", d => d.target.position[0])
-	.attr("y2", d => d.target.position[1])
+	.call(linesPositions)
 
 	if (typeof data["player-id"] !== "undefined") {
 		let ps = data.players[data["player-id"]]["net-worth"]
