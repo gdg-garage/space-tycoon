@@ -2,6 +2,7 @@ package stycoon
 
 import (
 	"database/sql"
+	"sort"
 	"strconv"
 
 	"github.com/rs/zerolog/log"
@@ -64,13 +65,13 @@ func (game *Game) fillProfiling(tick *int64) error {
 }
 
 // nil tick means fetching all previous ticks
-func (game *Game) fillPrices(tick *int64) error {
+func (game *Game) fillPricesAndAmounts(tick *int64) error {
 	var rows *sql.Rows
 	var err error
 	if tick == nil {
-		rows, err = game.db.Query("select `tick`, `resource`, `price` from t_report_resource_price order by `tick`")
+		rows, err = game.db.Query("select `tick`, `resource`, `price`, `amount` from t_report_resources order by `tick`")
 	} else {
-		rows, err = game.db.Query("select `resource`, `price` from t_report_resource_price where tick = ?", tick)
+		rows, err = game.db.Query("select `resource`, `price`, `amount` from t_report_resources where tick = ?", tick)
 	}
 	if err != nil {
 		return err
@@ -79,15 +80,18 @@ func (game *Game) fillPrices(tick *int64) error {
 	if game.Reports.Prices == nil {
 		game.Reports.Prices = make(map[string]map[string]int64)
 	}
+	if game.Reports.ResourceAmounts == nil {
+		game.Reports.ResourceAmounts = make(map[string]map[string]int64)
+	}
 
 	for rows.Next() {
-		var fetchedTick, resource, price int64
+		var fetchedTick, resource, price, amount int64
 		var strTick, strResource string
 		if tick == nil {
-			rows.Scan(&fetchedTick, &resource, &price)
+			rows.Scan(&fetchedTick, &resource, &price, &amount)
 			strTick = strconv.Itoa(int(fetchedTick))
 		} else {
-			rows.Scan(&resource, &price)
+			rows.Scan(&resource, &price, &amount)
 			strTick = strconv.Itoa(int(*tick))
 		}
 
@@ -96,9 +100,16 @@ func (game *Game) fillPrices(tick *int64) error {
 		if !ok {
 			priceValue = map[string]int64{}
 		}
+		amountValue, ok := game.Reports.ResourceAmounts[strResource]
+		if !ok {
+			amountValue = map[string]int64{}
+		}
 
 		priceValue[strTick] = price
 		game.Reports.Prices[strResource] = priceValue
+
+		amountValue[strTick] = amount
+		game.Reports.ResourceAmounts[strResource] = amountValue
 	}
 	return nil
 }
@@ -177,6 +188,11 @@ func (game *Game) fillTrades(tick *int64) error {
 	return nil
 }
 
+func (game *Game) fillSeasonAndTick() {
+	game.Reports.Tick = game.Tick.Tick
+	game.Reports.Season = game.Tick.Season
+}
+
 // nil tick means fetching all previous ticks
 func (game *Game) getReports(previousTick *int64) {
 	err := game.fillCombats(previousTick)
@@ -189,9 +205,9 @@ func (game *Game) getReports(previousTick *int64) {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_timing")
 		return
 	}
-	err = game.fillPrices(previousTick)
+	err = game.fillPricesAndAmounts(previousTick)
 	if err != nil {
-		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_resource_price")
+		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_resources")
 		return
 	}
 	err = game.fillScores(previousTick)
@@ -204,9 +220,10 @@ func (game *Game) getReports(previousTick *int64) {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_trade")
 		return
 	}
+	game.fillSeasonAndTick()
 }
 
-func (game *Game) getReportsForPreviousTick() {
+func (game *Game) fillAllReportsForPreviousTick() {
 	previousTick := game.Tick.Tick - 1
 	if previousTick < 0 {
 		return
@@ -214,6 +231,28 @@ func (game *Game) getReportsForPreviousTick() {
 	game.getReports(&previousTick)
 }
 
-func (game *Game) getReportsSinceSeasonStart() {
+func (game *Game) fillAllReportsSinceSeasonStart() {
 	game.getReports(nil)
+}
+
+func (game *Game) getDataReports() DataReports {
+	var tickReports DataReports
+	tick := game.Tick.Tick - 1
+	if tick < 0 {
+		return tickReports
+	}
+
+	c := game.Reports.Combat
+	pos := sort.Search(len(c), func(i int) bool { return c[i].Tick >= tick })
+	for pos < len(c) && c[pos].Tick == tick {
+		tickReports.Combat = append(tickReports.Combat, c[pos])
+		pos++
+	}
+	t := game.Reports.Trade
+	pos = sort.Search(len(t), func(i int) bool { return t[i].Tick >= tick })
+	for pos < len(t) && t[pos].Tick == tick {
+		tickReports.Trade = append(tickReports.Trade, t[pos])
+		pos++
+	}
+	return tickReports
 }

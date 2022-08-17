@@ -636,6 +636,26 @@ components:
         amount: 5,
         price: 450
       }
+    ResourceAmount:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties:
+          type: integer
+          format: int64
+      example: {
+        1: {
+          125: 400,
+          126: 450,
+          127: 450,
+          128: 500
+        },
+        5: {
+          127: 200,
+          128: 200
+        }
+      }
+
     Reports:
       type: object
       properties:
@@ -643,6 +663,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Combat'
+        trade:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trade'
         profiling:
           description: Profiling information about the game. Used by the visualization website.
           type: array
@@ -650,8 +674,23 @@ components:
             $ref: '#/components/schemas/Profiling'
         prices:
           $ref: '#/components/schemas/Price'
+        resourceAmounts:
+          $ref: '#/components/schemas/ResourceAmount'
         scores:
           $ref: '#/components/schemas/Score'
+        season:
+          type: integer
+          format: int64
+        tick:
+          type: integer
+          format: int64
+    DataReports:
+      type: object
+      properties:
+        combat:
+          type: array
+          items:
+            $ref: '#/components/schemas/Combat'
         trade:
           type: array
           items:
@@ -839,6 +878,8 @@ components:
           $ref: '#/components/schemas/Players'
         ships:
           $ref: '#/components/schemas/Ships'
+        reports:
+          $ref: '#/components/schemas/DataReports'
 
     CurrentTick:
       type: object
