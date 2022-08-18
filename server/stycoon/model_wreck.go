@@ -9,7 +9,7 @@
 
 package stycoon
 
-type Wrecks struct {
+type Wreck struct {
 
 	ShipClass string `json:"ship-class"`
 
@@ -22,8 +22,8 @@ type Wrecks struct {
 	Position *[]int64 `json:"position"`
 }
 
-// AssertWrecksRequired checks if the required fields are not zero-ed
-func AssertWrecksRequired(obj Wrecks) error {
+// AssertWreckRequired checks if the required fields are not zero-ed
+func AssertWreckRequired(obj Wreck) error {
 	elements := map[string]interface{}{
 		"ship-class": obj.ShipClass,
 		"name": obj.Name,
@@ -40,14 +40,14 @@ func AssertWrecksRequired(obj Wrecks) error {
 	return nil
 }
 
-// AssertRecurseWrecksRequired recursively checks if required fields are not zero-ed in a nested slice.
-// Accepts only nested slice of Wrecks (e.g. [][]Wrecks), otherwise ErrTypeAssertionError is thrown.
-func AssertRecurseWrecksRequired(objSlice interface{}) error {
+// AssertRecurseWreckRequired recursively checks if required fields are not zero-ed in a nested slice.
+// Accepts only nested slice of Wreck (e.g. [][]Wreck), otherwise ErrTypeAssertionError is thrown.
+func AssertRecurseWreckRequired(objSlice interface{}) error {
 	return AssertRecurseInterfaceRequired(objSlice, func(obj interface{}) error {
-		aWrecks, ok := obj.(Wrecks)
+		aWreck, ok := obj.(Wreck)
 		if !ok {
 			return ErrTypeAssertionError
 		}
-		return AssertWrecksRequired(aWrecks)
+		return AssertWreckRequired(aWreck)
 	})
 }

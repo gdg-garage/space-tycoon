@@ -712,7 +712,8 @@ components:
           $ref: '#/components/schemas/Color'
         net-worth:
           $ref: '#/components/schemas/NetWorth'
-    Wrecks:
+
+    Wreck:
       type: object
       required:
         - ship-class
@@ -840,7 +841,7 @@ components:
         wrecks:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/Wrecks'
+            $ref: '#/components/schemas/Wreck'
         reports:
           $ref: '#/components/schemas/DataReports'
       example: {
