@@ -21,6 +21,8 @@ type Data struct {
 
 	Ships map[string]Ship `json:"ships"`
 
+	Wrecks map[string]Wreck `json:"wrecks,omitempty"`
+
 	Reports DataReports `json:"reports,omitempty"`
 }
 

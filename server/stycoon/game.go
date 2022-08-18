@@ -117,6 +117,13 @@ func (game *Game) GetData(playerId *string) (Data, error) {
 		return data, err
 	}
 	data.Ships = ships
+
+	wrecks, err := game.GetWrecks()
+	if err != nil {
+		return data, err
+	}
+	data.Wrecks = wrecks
+
 	data.Reports = game.getDataReports()
 
 	return data, nil
@@ -184,6 +191,29 @@ func (game *Game) GetShips(playerId *string, resources *map[int]map[string]*Trad
 		return ships, fmt.Errorf("rows read failed: %v", err)
 	}
 	return ships, nil
+}
+
+func (game *Game) GetWrecks() (map[string]Wreck, error) {
+	var wrecks = make(map[string]Wreck)
+	rows, err := game.db.Query("select o.`id`, o.`name`, o.`pos_x`, o.`pos_y`, w.`class`, o.`owner`, w.`kill_tick` from t_object as o join t_wreck w on o.id = w.id")
+	if err != nil {
+		return wrecks, fmt.Errorf("query failed %v", err)
+	}
+	var id int
+	for rows.Next() {
+		var wreck Wreck
+		var pos = make([]int64, 2)
+		err = rows.Scan(&id, &wreck.Name, &pos[0], &pos[1], &wreck.ShipClass, &wreck.Player, &wreck.KillTick)
+		if err != nil {
+			return wrecks, fmt.Errorf("row read failed %v", err)
+		}
+		wreck.Position = &pos
+		wrecks[strconv.Itoa(id)] = wreck
+	}
+	if err = rows.Err(); err != nil {
+		return wrecks, fmt.Errorf("rows read failed: %v", err)
+	}
+	return wrecks, nil
 }
 
 func (game *Game) getPlayerCommands(playerId string) (map[int]Command, error) {
