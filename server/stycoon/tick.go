@@ -34,9 +34,9 @@ func (game *Game) GetGameTickState() CurrentTick {
 
 func (game *Game) EndTurn(userTick int64) CurrentTick {
 	game.TickCond.L.Lock()
-	for userTick > game.Tick.Tick {
+	defer game.TickCond.L.Unlock()
+	for userTick >= game.Tick.Tick {
 		game.TickCond.Wait()
 	}
-	defer game.TickCond.L.Unlock()
 	return game.GetGameTickState()
 }

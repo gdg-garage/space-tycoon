@@ -11,7 +11,7 @@ package stycoon
 
 type StaticData struct {
 
-	ShipClasses map[string]StaticDataShipClassesValue `json:"ship-classes,omitempty"`
+	ShipClasses map[string]ShipClass `json:"ship-classes,omitempty"`
 
 	ResourceNames map[string]string `json:"resource-names,omitempty"`
 }
