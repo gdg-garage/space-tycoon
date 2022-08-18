@@ -7286,7 +7286,9 @@ function clickInfo(e) {
 		t += "<table>"
 		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
 		t += "<tr><td>Class:<td>" + c.name
-		t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+		if (typeof d["life"] !== "undefined") {
+			t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+		}
 		t += "</table>"
 		if (typeof d.command !== "undefined") {
 			t += "<hr>"
@@ -7313,7 +7315,8 @@ function clickInfo(e) {
 			t += "</table>"
 		}
 	}
-	if (Object.keys(d.resources).length > 0) {
+
+	if (typeof d["resources"] !== "undefined" && Object.keys(d.resources).length > 0) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
 		if (!d["ship-class"]) {
@@ -7325,6 +7328,7 @@ function clickInfo(e) {
 		}
 		t += "</table>"
 	}
+
 	d3.select("#modalInfo")
 	.html(t)
 }
@@ -7335,6 +7339,11 @@ function planetColor(d) {
 	let h3 = hashInt(h2 + 741)
 	let c = [ h1 % 20 + 120, h2 % 20 + 120, h3 % 20 + 120 ]
 	return colorToRgb(c)
+}
+
+function wreckColor(d) {
+	let c = d.data.players[d.player].color
+	return colorToRgb([ c[0] * 0.2, c[1] * 0.2, c[2] * 0.2 ])
 }
 
 function shipColor(d) {
@@ -7367,6 +7376,32 @@ function mapRedraw(data) {
 	.html(d => "<title>" + d.name + "</title>")
 	.attr("fill", planetColor)
 	.attr("r", 7)
+	.attr("cx", d => d.position[0])
+	.attr("cy", d => d.position[1])
+
+	let wrecks = []
+	if (typeof data["wrecks"] !== "undefined") {
+		for (let wid of Object.keys(data.wrecks)) {
+			let w = data.wrecks[wid]
+			w.id = wid
+			w.data = data
+			wrecks.push(w)
+			data.objects[wid] = w
+			if (typeof w["prev-position"] === "undefined") {
+				w["prev-position"] = w.position
+			}
+		}
+	}
+
+	d3.select("#wrecks")
+	.selectAll(".wreck")
+	.data(wrecks, d => d.id)
+	.join("circle")
+	.classed("wreck", true)
+	.on("click", clickInfo)
+	.html(d => "<title>" + d.name + "</title>")
+	.attr("fill", wreckColor)
+	.attr("r", 4)
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
 
@@ -7522,11 +7557,15 @@ function spawnBloom(pos, radius, id) {
 }
 
 function spawnAttack(attacker, defender) {
-	if ((typeof attacker == "undefined") || (typeof defender == "undefined"))
-		return
 	spawnBeam(attacker, defender)
 	spawnParticles(defender["prev-position"], 3)
-	spawnBloom(defender["prev-position"], 25, "boomBloomGrad")
+	spawnBloom(defender["prev-position"], 25, "attackBloomGrad")
+}
+
+function spawnKill(attacker, defender) {
+	spawnBeam(attacker, defender)
+	spawnParticles(defender["prev-position"], 20)
+	spawnBloom(defender["prev-position"], 80, "killBloomGrad")
 }
 
 function spawnText(pos, direction, color, text, classes) {
@@ -7562,14 +7601,17 @@ function spawnTrade(data, tr) {
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
 	let rn = staticData["resource-names"][tr.resource]
-	spawnText(pos, [0, pl == p1 ? -1 : 1], c, tr.price, "trade-price")
+	spawnText(pos, [0, pl == p1 ? 1 : -1], c, tr.price, "trade-price")
 	spawnText(pos, [1, 0], c, rn, "trade-name")
 }
 
 function mapEvents(data) {
 	if (typeof data.reports["combat"] !== "undefined") {
 		for (let c of data.reports.combat) {
-			spawnAttack(data.objects[c.attacker], data.objects[c.defender])
+			if (typeof c["killed"] !== "undefined" && c.killed)
+				spawnKill(data.objects[c.attacker], data.objects[c.defender])
+			else
+				spawnAttack(data.objects[c.attacker], data.objects[c.defender])
 		}
 	}
 	if (typeof data.reports["trade"] !== "undefined") {
