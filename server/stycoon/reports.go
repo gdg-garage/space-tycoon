@@ -175,8 +175,8 @@ func (game *Game) fillTrades(tick *int64) error {
 		return err
 	}
 
-	var trade Trade
 	for rows.Next() {
+		var trade Trade
 		if tick == nil {
 			rows.Scan(&trade.Tick, &trade.Buyer, &trade.Seller, &trade.Resource, &trade.Amount, &trade.Price)
 		} else {

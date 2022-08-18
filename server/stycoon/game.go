@@ -153,7 +153,6 @@ func (game *Game) GetShips(playerId *string, resources *map[int]map[string]*Trad
 	if err != nil {
 		return ships, fmt.Errorf("query failed %v", err)
 	}
-	var id int
 	var commands map[int]Command
 	if playerId != nil {
 		commands, err = game.getPlayerCommands(*playerId)
@@ -162,6 +161,7 @@ func (game *Game) GetShips(playerId *string, resources *map[int]map[string]*Trad
 		}
 	}
 	for rows.Next() {
+		var id int
 		var ship ShipsValue
 		var pos = make([]int64, 2)
 		var posPrev = make([]int64, 2)
@@ -340,10 +340,10 @@ func (game *Game) CreatePlayersForUsers() error {
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
-	var id int
-	var name string
-	var playerId sql.NullInt64
 	for rows.Next() {
+		var id int
+		var name string
+		var playerId sql.NullInt64
 		err = rows.Scan(&id, &name, &playerId)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)

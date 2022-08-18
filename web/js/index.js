@@ -344,10 +344,52 @@ function spawnAttack(attacker, defender) {
 	spawnBloom(defender["prev-position"], 25, "boomBloomGrad")
 }
 
+function spawnText(pos, direction, color, text, classes) {
+	text = text.toString()
+	let x = pos[0] + direction[0] * 15
+	let y = pos[1] + direction[1] * 15
+	d3.select("#trades")
+	.append("text")
+	.text(text)
+	.attr("class", classes)
+	.attr("fill", color)
+	.attr("x", x)
+	.attr("y", y)
+	.attr("opacity", 1)
+	.transition()
+	.duration(5000)
+	.ease(d3.easeQuadOut)
+	.attr("x", x + direction[0] * 20)
+	.attr("y", y + direction[1] * 20)
+	.attr("opacity", 1)
+	.transition()
+	.duration(1500)
+	.attr("opacity", 0)
+	.remove()
+}
+
+function spawnTrade(data, tr) {
+	let p1 = data.objects[tr.buyer].player
+	let p2 = data.objects[tr.seller].player
+	let pl = p1 || p2
+	if (typeof pl == "undefined")
+		return
+	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
+	let c = colorToRgb(data.players[pl].color)
+	let rn = staticData["resource-names"][tr.resource]
+	spawnText(pos, [0, pl == p1 ? -1 : 1], c, tr.price, "trade-price")
+	spawnText(pos, [1, 0], c, rn, "trade-name")
+}
+
 function mapEvents(data) {
 	if (typeof data.reports["combat"] !== "undefined") {
 		for (let c of data.reports.combat) {
 			spawnAttack(data.objects[c.attacker], data.objects[c.defender])
+		}
+	}
+	if (typeof data.reports["trade"] !== "undefined") {
+		for (let tr of data.reports.trade) {
+			spawnTrade(data, tr)
 		}
 	}
 }

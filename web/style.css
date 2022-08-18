@@ -82,6 +82,17 @@ form {
 	fill: orange;
 }
 
+#themap .trade-price {
+	font-size: 30px;
+	text-anchor: middle;
+	dominant-baseline: middle;
+}
+
+#themap .trade-name {
+	font-size: 15px;
+	dominant-baseline: middle;
+}
+
 #modalContainer {
 	display: none;
 }
