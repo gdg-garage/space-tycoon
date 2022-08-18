@@ -712,6 +712,26 @@ components:
           $ref: '#/components/schemas/Color'
         net-worth:
           $ref: '#/components/schemas/NetWorth'
+    Wrecks:
+      type: object
+      required:
+        - ship-class
+        - name
+        - player
+        - kill-tick
+        - position
+      properties:
+        ship-class:
+          type: string
+        name:
+          type: string
+        player:
+          type: string
+        kill-tick:
+          type: integer
+          format: int64
+        position:
+          $ref: '#/components/schemas/Coordinates'
 
     Ship:
       type: object
@@ -817,6 +837,10 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/Ship'
+        wrecks:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Wrecks'
         reports:
           $ref: '#/components/schemas/DataReports'
       example: {
