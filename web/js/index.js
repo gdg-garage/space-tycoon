@@ -60,6 +60,10 @@ function parseCookies() {
 	}, {})
 }
 
+function last(p) {
+	return p[Object.keys(p)[Object.keys(p).length - 1]]
+}
+
 //////////////////////////////////////////
 // map
 //////////////////////////////////////////
@@ -201,7 +205,7 @@ function mapRedraw(data) {
 	.data(ships, d => d.id)
 	.join(function(enter) {
 		return enter
-		.append('use')
+		.append("use")
 		.call(shipsPositions)
 	})
 	.classed("ship", true)
@@ -242,7 +246,7 @@ function mapRedraw(data) {
 	.data(lines, d => d.id)
 	.join(function(enter) {
 		return enter
-		.append('line')
+		.append("line")
 		.call(linesPositions)
 	})
 	.classed("line", true)
@@ -276,9 +280,123 @@ function mapRedraw(data) {
 	.style("color", d => colorToRgb(d.color))
 }
 
+function spawnBeam(attacker, defender) {
+	d3.select("#particles")
+	.append("line")
+	.classed("beam", true)
+	.attr("x1", attacker["prev-position"][0])
+	.attr("y1", attacker["prev-position"][1])
+	.attr("x2", defender["prev-position"][0] + (Math.random() - 0.5) * 3)
+	.attr("y2", defender["prev-position"][1] + (Math.random() - 0.5) * 3)
+	.attr("opacity", 0.7)
+	.transition()
+	.duration(500)
+	.ease(d3.easeCubicOut)
+	.attr("opacity", 0)
+	.remove()
+}
+
+function spawnParticles(pos, cnt) {
+	for (let i = 0; i < cnt; i++) {
+		let x1 = pos[0] + (Math.random() - 0.5) * (Math.random() + 0.5) * 5
+		let y1 = pos[1] + (Math.random() - 0.5) * (Math.random() + 0.5) * 5
+		let x2 = pos[0] + (Math.random() - 0.5) * (Math.random() + 0.5) * 20
+		let y2 = pos[1] + (Math.random() - 0.5) * (Math.random() + 0.5) * 20
+		let r1 = Math.floor(Math.random() * 360)
+		let r2 = Math.floor(Math.random() * 360)
+		let s1 = Math.random() + 0.5
+		d3.select("#particles")
+		.append("use")
+		.attr("href", "#particle-" + Math.floor(Math.random() * 3))
+		.attr("class", "particle particle-" + Math.floor(Math.random() * 3))
+		.attr("transform", "translate(" + x1 + "," + y1 + ") rotate(" + r1 + ") scale(" + s1 + ")")
+		.attr("opacity", 1)
+		.transition()
+		.duration(1000 + Math.random() * 2000)
+		.ease(d3.easeCubicOut)
+		.attr("transform", "translate(" + x2 + "," + y2 + ") rotate(" + r2 + ") scale(" + s1 + ")")
+		.attr("opacity", Math.random() * 0.2 + 0.1)
+		.remove()
+	}
+}
+
+function spawnBloom(pos, radius, id) {
+	d3.select("#blooms")
+	.append("circle")
+	.attr("fill", "url(#" + id + ")")
+	.attr("cx", pos[0])
+	.attr("cy", pos[1])
+	.attr("r", radius)
+	.attr("opacity", 1)
+	.transition()
+	.duration(500)
+	.ease(d3.easeCubicOut)
+	.attr("r", radius * 2)
+	.attr("opacity", 0)
+	.remove()
+}
+
+function spawnAttack(attacker, defender) {
+	if ((typeof attacker == "undefined") || (typeof defender == "undefined"))
+		return
+	spawnBeam(attacker, defender)
+	spawnParticles(defender["prev-position"], 3)
+	spawnBloom(defender["prev-position"], 25, "boomBloomGrad")
+}
+
+function spawnText(pos, direction, color, text, classes) {
+	text = text.toString()
+	let x = pos[0] + direction[0] * 15
+	let y = pos[1] + direction[1] * 15
+	d3.select("#trades")
+	.append("text")
+	.text(text)
+	.attr("class", classes)
+	.attr("fill", color)
+	.attr("x", x)
+	.attr("y", y)
+	.attr("opacity", 1)
+	.transition()
+	.duration(5000)
+	.ease(d3.easeQuadOut)
+	.attr("x", x + direction[0] * 20)
+	.attr("y", y + direction[1] * 20)
+	.attr("opacity", 1)
+	.transition()
+	.duration(1500)
+	.attr("opacity", 0)
+	.remove()
+}
+
+function spawnTrade(data, tr) {
+	let p1 = data.objects[tr.buyer].player
+	let p2 = data.objects[tr.seller].player
+	let pl = p1 || p2
+	if (typeof pl == "undefined")
+		return
+	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
+	let c = colorToRgb(data.players[pl].color)
+	let rn = staticData["resource-names"][tr.resource]
+	spawnText(pos, [0, pl == p1 ? -1 : 1], c, tr.price, "trade-price")
+	spawnText(pos, [1, 0], c, rn, "trade-name")
+}
+
+function mapEvents(data) {
+	if (typeof data.reports["combat"] !== "undefined") {
+		for (let c of data.reports.combat) {
+			spawnAttack(data.objects[c.attacker], data.objects[c.defender])
+		}
+	}
+	if (typeof data.reports["trade"] !== "undefined") {
+		for (let tr of data.reports.trade) {
+			spawnTrade(data, tr)
+		}
+	}
+}
+
 function mapRefresh() {
 	if (!staticData) {
-		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+		(new STC.GameApi()).staticDataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -287,7 +405,7 @@ function mapRefresh() {
 		})
 	}
 
-	(new STC.DataApi()).dataGet(function(error, data, response) {
+	(new STC.GameApi()).dataGet(function(error, data, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
@@ -296,6 +414,7 @@ function mapRefresh() {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}
 				mapRedraw(data)
+				mapEvents(data)
 			}
 		}
 	})
@@ -303,7 +422,7 @@ function mapRefresh() {
 
 function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
-		(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
+		(new STC.GameApi()).currentTickGet(function(error, data, response) {
 			if (error) {
 				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
@@ -422,44 +541,17 @@ function graphsRedrawPlayers(data) {
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = s.total[Object.keys(s.total)[Object.keys(s.total).length - 1]]
+		l.value = last(s.total)
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
 }
 
-function graphsPrepareResourcesVolumes(data) {
-	let res = {}
-	for (let rid of Object.keys(data.prices)) {
-		res[rid] = {}
-		for (let k of Object.keys(data.prices[rid]))
-			res[rid][k] = 0
-	}
-	for (let tr of Object.values(data.trade)) {
-		console.log(tr)
-		res[tr.resource][tr.tick] += tr.amount
-	}
-	return res
-}
-
-function graphsRedrawResources(data) {
-	let arr
-	let allowLegends = true
-	if (graphsOptions.type == "resources-prices")
-		arr = data.prices
-	else if (graphsOptions.type == "resources-amounts")
-		arr = data.prices // todo
-	else if (graphsOptions.type == "resources-totals")
-		arr = data.prices // todo
-	else if (graphsOptions.type == "resources-volumes") {
-		arr = graphsPrepareResourcesVolumes(data)
-		allowLegends = false
-	}
-
+function graphsRedrawResourcesPrices(data) {
 	let lines = []
 	let legends = []
-	for (let rid of Object.keys(arr)) {
-		let p = arr[rid]
+	for (let rid of Object.keys(data.prices)) {
+		let p = data.prices[rid]
 		let name = staticData["resource-names"][rid]
 		let color = staticData.resourceColors[rid]
 
@@ -477,15 +569,104 @@ function graphsRedrawResources(data) {
 		l.id = rid
 		l.name = name
 		l.color = color
-		l.value = p[Object.keys(p)[Object.keys(p).length - 1]]
+		l.value = last(p)
 		legends.push(l)
 	}
-	multiLineGraph(lines, allowLegends ? legends : null)
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesAmounts(data) {
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(data.resourceAmounts)) {
+		let p = data.resourceAmounts[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesTotals(data) {
+	let lines = []
+	let legends = []
+	for (let rid of Object.keys(data.prices)) {
+		let p = data.prices[rid]
+		let a = data.resourceAmounts[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] * a[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p) * last(a)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawResourcesVolumes(data) {
+	let res = {}
+	for (let rid of Object.keys(data.prices)) {
+		res[rid] = {}
+		for (let k of Object.keys(data.prices[rid]))
+			res[rid][k] = 0
+	}
+	if (typeof data["trade"] !== "undefined") {
+		for (let tr of Object.values(data.trade)) {
+			res[tr.resource][tr.tick] += tr.amount
+		}
+	}
+
+	let lines = []
+	for (let rid of Object.keys(res)) {
+		let p = res[rid]
+		let name = staticData["resource-names"][rid]
+		let color = staticData.resourceColors[rid]
+
+		let m = {}
+		m.id = rid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(p))
+			m.values.push([ parseInt(x), p[x] ])
+		lines.push(m)
+	}
+	multiLineGraph(lines, null)
 }
 
 function graphsRefresh(data) {
 	if (!staticData) {
-		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+		(new STC.GameApi()).staticDataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -496,7 +677,7 @@ function graphsRefresh(data) {
 	}
 
 	if (!playerData) {
-		(new STC.DataApi()).dataGet(function(error, data, response) {
+		(new STC.GameApi()).dataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -508,19 +689,30 @@ function graphsRefresh(data) {
 	if (staticData && playerData) {
 		if (graphsOptions.type == "players")
 			graphsRedrawPlayers(data)
-		else
-			graphsRedrawResources(data)
+		else if (graphsOptions.type == "resources-prices")
+			graphsRedrawResourcesPrices(data)
+		else if (graphsOptions.type == "resources-amounts")
+			graphsRedrawResourcesAmounts(data)
+		else if (graphsOptions.type == "resources-totals")
+			graphsRedrawResourcesTotals(data)
+		else if (graphsOptions.type == "resources-volumes")
+			graphsRedrawResourcesVolumes(data)
 	}
 }
 
 function graphsTimerLoop() {
 	setTimeout(graphsTimerLoop, 1000)
 	if (document.visibilityState === "visible") {
-		(new STC.ReportsApi()).reportsGet(function(error, data, response) {
+		(new STC.GameApi()).reportsGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
 				d3.select("#tickInfo").text("")
+				if (data.season != currentTick.season) {
+					staticData = undefined
+					playerData = undefined
+					currentTick.season = data.season
+				}
 				graphsRefresh(data)
 			}
 		})
