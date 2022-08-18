@@ -61,6 +61,38 @@ form {
 	stroke-width: 0.1;
 }
 
+#themap .beam {
+	stroke: red;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+}
+#themap .particle {
+	stroke-width: 0.25;
+}
+#themap .particle-0 {
+	stroke: yellow;
+	fill: white;
+}
+#themap .particle-1 {
+	stroke: red;
+	fill: chocolate;
+}
+#themap .particle-2 {
+	stroke: gold;
+	fill: orange;
+}
+
+#themap .trade-price {
+	font-size: 30px;
+	text-anchor: middle;
+	dominant-baseline: middle;
+}
+
+#themap .trade-name {
+	font-size: 15px;
+	dominant-baseline: middle;
+}
+
 #modalContainer {
 	display: none;
 }

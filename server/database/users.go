@@ -43,8 +43,8 @@ func IsObjectOwnedByPlayer(db *sql.DB, playerId int64, objectId int64) (bool, er
 	if err != nil {
 		return false, fmt.Errorf("query failed %v", err)
 	}
-	var id int64
 	for rows.Next() {
+		var id int64
 		err = rows.Scan(&id)
 		if err != nil {
 			return false, fmt.Errorf("row read failed %v", err)
@@ -65,8 +65,8 @@ func GetPlayerOwnedShips(db *sql.DB, playerId string) (map[int64]struct{}, error
 	if err != nil {
 		return ownedShips, fmt.Errorf("query failed %v", err)
 	}
-	var id int64
 	for rows.Next() {
+		var id int64
 		err = rows.Scan(&id)
 		if err != nil {
 			return ownedShips, fmt.Errorf("row read failed %v", err)
