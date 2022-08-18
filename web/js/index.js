@@ -396,7 +396,7 @@ function mapEvents(data) {
 
 function mapRefresh() {
 	if (!staticData) {
-		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+		(new STC.GameApi()).staticDataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -405,7 +405,7 @@ function mapRefresh() {
 		})
 	}
 
-	(new STC.DataApi()).dataGet(function(error, data, response) {
+	(new STC.GameApi()).dataGet(function(error, data, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
@@ -422,7 +422,7 @@ function mapRefresh() {
 
 function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
-		(new STC.CurrentTickApi()).currentTickGet(function(error, data, response) {
+		(new STC.GameApi()).currentTickGet(function(error, data, response) {
 			if (error) {
 				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
@@ -666,7 +666,7 @@ function graphsRedrawResourcesVolumes(data) {
 
 function graphsRefresh(data) {
 	if (!staticData) {
-		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
+		(new STC.GameApi()).staticDataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -677,7 +677,7 @@ function graphsRefresh(data) {
 	}
 
 	if (!playerData) {
-		(new STC.DataApi()).dataGet(function(error, data, response) {
+		(new STC.GameApi()).dataGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -703,7 +703,7 @@ function graphsRefresh(data) {
 function graphsTimerLoop() {
 	setTimeout(graphsTimerLoop, 1000)
 	if (document.visibilityState === "visible") {
-		(new STC.ReportsApi()).reportsGet(function(error, data, response) {
+		(new STC.GameApi()).reportsGet(function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
