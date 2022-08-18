@@ -2098,6 +2098,7 @@ DELETE FROM t_recipe;
 DELETE FROM t_planet;
 DELETE FROM t_command;
 DELETE FROM t_ship;
+DELETE FROM t_wreck;
 DELETE FROM t_object;
 DELETE FROM t_player;
 
@@ -2552,6 +2553,11 @@ DELETE t_command FROM t_command JOIN t_ship ON t_ship.id = t_command.target WHER
 # the cargo is lost
 DELETE t_commodity FROM t_commodity JOIN t_ship ON t_ship.id = t_commodity.object WHERE t_ship.life = 0;
 
+INSERT INTO t_wreck (id, class, kill_tick)
+SELECT id, class, (SELECT tick FROM t_game LIMIT 1)
+FROM t_ship
+WHERE t_ship.life = 0;
+
 # actually delete the ships
 DELETE t_ship FROM t_ship WHERE t_ship.life = 0;
 
@@ -2838,6 +2844,7 @@ ALTER TABLE t_recipe AUTO_INCREMENT = 1;
 ALTER TABLE t_planet AUTO_INCREMENT = 1;
 ALTER TABLE t_command AUTO_INCREMENT = 1;
 ALTER TABLE t_ship AUTO_INCREMENT = 1;
+ALTER TABLE t_wreck AUTO_INCREMENT = 1;
 ALTER TABLE t_object AUTO_INCREMENT = 1;
 ALTER TABLE t_player AUTO_INCREMENT = 1;
 UPDATE t_game SET season = 1, tick = 1;
@@ -3235,6 +3242,22 @@ CREATE TABLE IF NOT EXISTS `t_ship` (
 -- Dumping data for table space_tycoon.t_ship: ~0 rows (approximately)
 /*!40000 ALTER TABLE `t_ship` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_ship` ENABLE KEYS */;
+
+-- Dumping structure for table space_tycoon.t_wreck
+DROP TABLE IF EXISTS `t_wreck`;
+CREATE TABLE IF NOT EXISTS `t_wreck` (
+  `id` int(11) NOT NULL,
+  `class` int(11) NOT NULL,
+  `kill_tick` int(11) NOT NULL COMMENT 'the tick in which the ship was destroyed',
+  PRIMARY KEY (`id`),
+  KEY `FK_t_wreck_d_class_2` (`class`),
+  CONSTRAINT `FK_t_wreck_d_class_2` FOREIGN KEY (`class`) REFERENCES `d_class` (`id`),
+  CONSTRAINT `FK_t_wreck_t_object` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.t_wreck: ~0 rows (approximately)
+/*!40000 ALTER TABLE `t_wreck` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_wreck` ENABLE KEYS */;
 
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
