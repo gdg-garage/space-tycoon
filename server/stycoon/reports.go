@@ -232,6 +232,7 @@ func (game *Game) fillAllReportsForPreviousTick() {
 }
 
 func (game *Game) fillAllReportsSinceSeasonStart() {
+	game.Reports = Reports{}
 	game.getReports(nil)
 }
 
