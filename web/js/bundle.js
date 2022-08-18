@@ -7720,6 +7720,44 @@ function mapRedraw(data) {
 	.style("color", d => colorToRgb(d.color))
 }
 
+function spawnParticles(pos, cnt) {
+	for (let i = 0; i < cnt; i++) {
+		let x1 = pos[0] + (Math.random() - 0.5) * (Math.random() + 0.5) * 5
+		let y1 = pos[1] + (Math.random() - 0.5) * (Math.random() + 0.5) * 5
+		let x2 = pos[0] + (Math.random() - 0.5) * (Math.random() + 0.5) * 20
+		let y2 = pos[1] + (Math.random() - 0.5) * (Math.random() + 0.5) * 20
+		let r1 = Math.floor(Math.random() * 360)
+		let r2 = Math.floor(Math.random() * 360)
+		let s1 = Math.random() + 0.5
+		d3.select("#effects")
+		.append("use")
+		.attr("href", "#particle-" + Math.floor(Math.random() * 3))
+		.attr("class", "particle particle-" + Math.floor(Math.random() * 3))
+		.attr("transform", "translate(" + x1 + "," + y1 + ") rotate(" + r1 + ") scale(" + s1 + ")")
+		.attr("opacity", 1)
+		.transition()
+		.duration(1000 + Math.random() * 2000)
+		.ease(d3.easeCubicOut)
+		.attr("transform", "translate(" + x2 + "," + y2 + ") rotate(" + r2 + ") scale(" + s1 + ")")
+		.attr("opacity", Math.random() * 0.2 + 0.1)
+		.remove()
+	}
+}
+
+function spawnAttack(attacker, defender) {
+	if ((typeof attacker == "undefined") || (typeof defender == "undefined"))
+		return
+	spawnParticles(defender["prev-position"], 3)
+}
+
+function mapEvents(data) {
+	if (typeof data.reports["combat"] !== "undefined") {
+		for (let c of data.reports.combat) {
+			spawnAttack(data.objects[c.attacker], data.objects[c.defender])
+		}
+	}
+}
+
 function mapRefresh() {
 	if (!staticData) {
 		(new STC.StaticDataApi()).staticDataGet(function(error, data, response) {
@@ -7740,6 +7778,7 @@ function mapRefresh() {
 					delete data["player-id"] // the supposedly logged-in player does not exist
 				}
 				mapRedraw(data)
+				mapEvents(data)
 			}
 		}
 	})

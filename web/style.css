@@ -61,6 +61,22 @@ form {
 	stroke-width: 0.1;
 }
 
+#themap .particle {
+	stroke-width: 0.25;
+}
+#themap .particle-0 {
+	stroke: yellow;
+	fill: white;
+}
+#themap .particle-1 {
+	stroke: red;
+	fill: chocolate;
+}
+#themap .particle-2 {
+	stroke: gold;
+	fill: orange;
+}
+
 #modalContainer {
 	display: none;
 }
