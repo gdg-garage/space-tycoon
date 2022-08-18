@@ -8148,6 +8148,11 @@ function graphsTimerLoop() {
 				d3.select("#tickInfo").text(error)
 			} else {
 				d3.select("#tickInfo").text("")
+				if (data.season != currentTick.season) {
+					staticData = undefined
+					playerData = undefined
+					currentTick.season = data.season
+				}
 				graphsRefresh(data)
 			}
 		})
