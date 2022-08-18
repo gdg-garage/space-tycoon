@@ -13,13 +13,13 @@ type Data struct {
 
 	CurrentTick CurrentTick `json:"current-tick"`
 
-	Planets map[string]PlanetsValue `json:"planets"`
+	Planets map[string]Planet `json:"planets"`
 
 	PlayerId *string `json:"player-id,omitempty"`
 
-	Players map[string]PlayersValue `json:"players"`
+	Players map[string]Player `json:"players"`
 
-	Ships map[string]ShipsValue `json:"ships"`
+	Ships map[string]Ship `json:"ships"`
 
 	Reports DataReports `json:"reports,omitempty"`
 }

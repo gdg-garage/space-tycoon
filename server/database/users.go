@@ -61,7 +61,7 @@ func GetPlayerOwnedShips(db *sql.DB, playerId string) (map[int64]struct{}, error
 	if err != nil {
 		return ownedShips, err
 	}
-	rows, err := db.Query("select t_object.id from t_object join t_ship on t_ship.id = t_object.id where t_object.owner = ?", playerIdInt)
+	rows, err := db.Query("select t_object.`id` from t_object join t_ship on t_ship.id = t_object.id where t_object.owner = ?", playerIdInt)
 	if err != nil {
 		return ownedShips, fmt.Errorf("query failed %v", err)
 	}
