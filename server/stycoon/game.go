@@ -118,7 +118,7 @@ func (game *Game) GetData(playerId *string) (Data, error) {
 	}
 	data.Ships = ships
 
-	wrecks, err := game.GetWrecks(playerId, &resources)
+	wrecks, err := game.GetWrecks()
 	if err != nil {
 		return data, err
 	}
