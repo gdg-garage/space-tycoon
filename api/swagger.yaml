@@ -614,6 +614,23 @@ components:
         amount: 5,
         price: 450
       }
+    ResourceAmount:
+      type: object
+      additionalProperties:
+        type: integer
+        format: int64
+      example: {
+        1: {
+          125: 400,
+          126: 450,
+          127: 450,
+          128: 500
+        },
+        5: {
+          127: 200,
+          128: 200
+        }
+      }
 
     Reports:
       type: object
@@ -622,6 +639,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Combat'
+        trade:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trade'
         profiling:
           description: Profiling information about the game. Used by the visualization website.
           type: array
@@ -629,8 +650,25 @@ components:
             $ref: '#/components/schemas/Profiling'
         prices:
           $ref: '#/components/schemas/Price'
+        resourceAmounts:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ResourceAmount'
         scores:
           $ref: '#/components/schemas/Score'
+        season:
+          type: integer
+          format: int64
+        tick:
+          type: integer
+          format: int64
+    DataReports:
+      type: object
+      properties:
+        combat:
+          type: array
+          items:
+            $ref: '#/components/schemas/Combat'
         trade:
           type: array
           items:
@@ -779,6 +817,8 @@ components:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/Ship'
+        reports:
+          $ref: '#/components/schemas/DataReports'
       example: {
         planets: {
           10: {

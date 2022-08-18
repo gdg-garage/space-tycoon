@@ -2087,7 +2087,7 @@ CREATE PROCEDURE `p_clear_all`()
     COMMENT 'deletes all data from all runtime tables - used when starting a new season'
 BEGIN
 
-DELETE FROM t_report_resource_price;
+DELETE FROM t_report_resources;
 DELETE FROM t_report_player_score;
 DELETE FROM t_report_timing;
 DELETE FROM t_report_combat;
@@ -2392,6 +2392,13 @@ HAVING dx != 0 OR dy != 0;
 UPDATE t_ship_moves SET speed = LEAST(speed / SQRT(f_sqr(dx) + f_sqr(dy)), 1), dx = dx * speed, dy = dy * speed;
 
 UPDATE t_object JOIN t_ship_moves USING(id) SET pos_x = pos_x + dx, pos_y = pos_y + dy;
+
+# delete finished moves
+DELETE t_command
+FROM t_command
+JOIN t_object AS me ON me.id = t_command.ship
+JOIN t_object AS tgt ON tgt.id = t_command.target
+WHERE t_command.type = "move" AND me.pos_x = tgt.pos_x AND me.pos_y = tgt.pos_y;
 
 END//
 DELIMITER ;
@@ -2820,7 +2827,7 @@ DELETE FROM d_user_score;
 DELETE FROM d_user;
 ALTER TABLE d_user AUTO_INCREMENT = 1;
 
-ALTER TABLE t_report_resource_price AUTO_INCREMENT = 1;
+ALTER TABLE t_report_resources AUTO_INCREMENT = 1;
 ALTER TABLE t_report_player_score AUTO_INCREMENT = 1;
 ALTER TABLE t_report_timing AUTO_INCREMENT = 1;
 ALTER TABLE t_report_combat AUTO_INCREMENT = 1;
@@ -2850,9 +2857,11 @@ SELECT t_player.id, (SELECT tick FROM t_game LIMIT 1), v.commodities, v.ships, v
 FROM t_player
 JOIN v_player_total_worth AS v ON v.player = t_player.id;
 
-INSERT INTO t_report_resource_price
-SELECT resource, (SELECT tick FROM t_game LIMIT 1), sell
-FROM v_resource_price;
+INSERT INTO t_report_resources
+SELECT v_resource_price.resource, (SELECT tick FROM t_game LIMIT 1), v_resource_price.sell, IFNULL(SUM(t_commodity.amount), 0)
+FROM v_resource_price
+LEFT JOIN t_commodity ON t_commodity.resource = v_resource_price.resource
+GROUP BY v_resource_price.resource;
 
 END//
 DELIMITER ;
@@ -3150,19 +3159,20 @@ CREATE TABLE IF NOT EXISTS `t_report_player_score` (
 /*!40000 ALTER TABLE `t_report_player_score` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_report_player_score` ENABLE KEYS */;
 
--- Dumping structure for table space_tycoon.t_report_resource_price
-DROP TABLE IF EXISTS `t_report_resource_price`;
-CREATE TABLE IF NOT EXISTS `t_report_resource_price` (
+-- Dumping structure for table space_tycoon.t_report_resources
+DROP TABLE IF EXISTS `t_report_resources`;
+CREATE TABLE IF NOT EXISTS `t_report_resources` (
   `resource` int(11) NOT NULL,
   `tick` int(11) NOT NULL,
-  `price` int(11) NOT NULL,
+  `price` int(11) NOT NULL COMMENT 'average price from all planets',
+  `amount` int(11) NOT NULL COMMENT 'total amount of the resource from all planets and ships',
   PRIMARY KEY (`resource`,`tick`),
   CONSTRAINT `FK_t_report_resource_price_d_resource` FOREIGN KEY (`resource`) REFERENCES `d_resource` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
--- Dumping data for table space_tycoon.t_report_resource_price: ~0 rows (approximately)
-/*!40000 ALTER TABLE `t_report_resource_price` DISABLE KEYS */;
-/*!40000 ALTER TABLE `t_report_resource_price` ENABLE KEYS */;
+-- Dumping data for table space_tycoon.t_report_resources: ~0 rows (approximately)
+/*!40000 ALTER TABLE `t_report_resources` DISABLE KEYS */;
+/*!40000 ALTER TABLE `t_report_resources` ENABLE KEYS */;
 
 -- Dumping structure for table space_tycoon.t_report_timing
 DROP TABLE IF EXISTS `t_report_timing`;

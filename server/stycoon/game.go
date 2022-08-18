@@ -64,7 +64,7 @@ func (game *Game) Init() error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating default players failed")
 	}
-	game.getReportsSinceSeasonStart()
+	game.fillAllReportsSinceSeasonStart()
 	return nil
 }
 
@@ -117,6 +117,7 @@ func (game *Game) GetData(playerId *string) (Data, error) {
 		return data, err
 	}
 	data.Ships = ships
+	data.Reports = game.getDataReports()
 
 	return data, nil
 }
