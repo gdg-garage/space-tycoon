@@ -61,6 +61,11 @@ form {
 	stroke-width: 0.1;
 }
 
+#themap .beam {
+	stroke: red;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+}
 #themap .particle {
 	stroke-width: 0.25;
 }

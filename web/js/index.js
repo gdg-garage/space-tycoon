@@ -205,7 +205,7 @@ function mapRedraw(data) {
 	.data(ships, d => d.id)
 	.join(function(enter) {
 		return enter
-		.append('use')
+		.append("use")
 		.call(shipsPositions)
 	})
 	.classed("ship", true)
@@ -246,7 +246,7 @@ function mapRedraw(data) {
 	.data(lines, d => d.id)
 	.join(function(enter) {
 		return enter
-		.append('line')
+		.append("line")
 		.call(linesPositions)
 	})
 	.classed("line", true)
@@ -280,6 +280,22 @@ function mapRedraw(data) {
 	.style("color", d => colorToRgb(d.color))
 }
 
+function spawnBeam(attacker, defender) {
+	d3.select("#particles")
+	.append("line")
+	.classed("beam", true)
+	.attr("x1", attacker["prev-position"][0])
+	.attr("y1", attacker["prev-position"][1])
+	.attr("x2", defender["prev-position"][0] + (Math.random() - 0.5) * 3)
+	.attr("y2", defender["prev-position"][1] + (Math.random() - 0.5) * 3)
+	.attr("opacity", 0.7)
+	.transition()
+	.duration(500)
+	.ease(d3.easeCubicOut)
+	.attr("opacity", 0)
+	.remove()
+}
+
 function spawnParticles(pos, cnt) {
 	for (let i = 0; i < cnt; i++) {
 		let x1 = pos[0] + (Math.random() - 0.5) * (Math.random() + 0.5) * 5
@@ -289,7 +305,7 @@ function spawnParticles(pos, cnt) {
 		let r1 = Math.floor(Math.random() * 360)
 		let r2 = Math.floor(Math.random() * 360)
 		let s1 = Math.random() + 0.5
-		d3.select("#effects")
+		d3.select("#particles")
 		.append("use")
 		.attr("href", "#particle-" + Math.floor(Math.random() * 3))
 		.attr("class", "particle particle-" + Math.floor(Math.random() * 3))
@@ -304,10 +320,28 @@ function spawnParticles(pos, cnt) {
 	}
 }
 
+function spawnBloom(pos, radius, id) {
+	d3.select("#blooms")
+	.append("circle")
+	.attr("fill", "url(#" + id + ")")
+	.attr("cx", pos[0])
+	.attr("cy", pos[1])
+	.attr("r", radius)
+	.attr("opacity", 1)
+	.transition()
+	.duration(500)
+	.ease(d3.easeCubicOut)
+	.attr("r", radius * 2)
+	.attr("opacity", 0)
+	.remove()
+}
+
 function spawnAttack(attacker, defender) {
 	if ((typeof attacker == "undefined") || (typeof defender == "undefined"))
 		return
+	spawnBeam(attacker, defender)
 	spawnParticles(defender["prev-position"], 3)
+	spawnBloom(defender["prev-position"], 25, "boomBloomGrad")
 }
 
 function mapEvents(data) {
