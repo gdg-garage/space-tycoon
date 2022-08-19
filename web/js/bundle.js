@@ -7192,7 +7192,6 @@ console.log(STC)
 
 var currentTick = new STC.CurrentTick()
 var staticData
-var playerData
 var zoom
 var graphsOptions = {}
 
@@ -7247,6 +7246,36 @@ function parseCookies() {
 
 function last(p) {
 	return p[Object.keys(p)[Object.keys(p).length - 1]]
+}
+
+function generateObjects(data) {
+	data.objects = {}
+
+	for (let pid of Object.keys(data.planets)) {
+		let p = data.planets[pid]
+		p.id = pid
+		p.data = data
+		data.objects[pid] = p
+	}
+
+	if (typeof data["wrecks"] !== "undefined") {
+		for (let wid of Object.keys(data.wrecks)) {
+			let w = data.wrecks[wid]
+			w.id = wid
+			w.data = data
+			data.objects[wid] = w
+			if (typeof w["prev-position"] === "undefined") {
+				w["prev-position"] = w.position
+			}
+		}
+	}
+
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		s.id = sid
+		s.data = data
+		data.objects[sid] = s
+	}
 }
 
 //////////////////////////////////////////
@@ -7356,15 +7385,11 @@ function shipHref(d) {
 }
 
 function mapRedraw(data) {
-	data.objects = {}
+	generateObjects(data)
 
 	let planets = []
 	for (let pid of Object.keys(data.planets)) {
-		let p = data.planets[pid]
-		p.id = pid
-		p.data = data
-		planets.push(p)
-		data.objects[pid] = p
+		planets.push(data.planets[pid])
 	}
 
 	d3.select("#planets")
@@ -7382,14 +7407,7 @@ function mapRedraw(data) {
 	let wrecks = []
 	if (typeof data["wrecks"] !== "undefined") {
 		for (let wid of Object.keys(data.wrecks)) {
-			let w = data.wrecks[wid]
-			w.id = wid
-			w.data = data
-			wrecks.push(w)
-			data.objects[wid] = w
-			if (typeof w["prev-position"] === "undefined") {
-				w["prev-position"] = w.position
-			}
+			wrecks.push(data.wrecks[wid])
 		}
 	}
 
@@ -7407,11 +7425,7 @@ function mapRedraw(data) {
 
 	let ships = []
 	for (let sid of Object.keys(data.ships)) {
-		let s = data.ships[sid]
-		s.id = sid
-		s.data = data
-		ships.push(s)
-		data.objects[sid] = s
+		ships.push(data.ships[sid])
 	}
 
 	let shipsPositions = function(sel) {
@@ -7739,13 +7753,25 @@ function multiLineGraph(lines, legends) {
 	}
 }
 
-function graphsRedrawPlayers(data) {
+function prefixAccumulate(res) {
+	for (let k of Object.keys(res)) {
+		let values = res[k]
+		let add = 0
+		for (let i of Object.keys(values)) {
+			let tmp = values[i]
+			values[i] += add
+			add += tmp
+		}
+	}
+}
+
+function graphsRedrawPlayers(data, enabled) {
 	let lines = []
 	let legends = []
 	for (let sid of Object.keys(data.scores)) {
 		let s = data.scores[sid]
-		let name = playerData[sid].name
-		let color = colorToRgb(playerData[sid].color)
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
 
 		function category(key) {
 			let m = {}
@@ -7759,16 +7785,65 @@ function graphsRedrawPlayers(data) {
 			lines.push(m)
 		}
 
-		category("resources")
-		category("ships")
-		category("money")
-		category("total")
+		if (enabled[0])
+			category("resources")
+		if (enabled[1])
+			category("ships")
+		if (enabled[2])
+			category("money")
+		if (enabled[3])
+			category("total")
 
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
 		l.value = last(s.total)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawDamage(data, attackerMultiplier, defenderMultiplier) {
+	let res = {}
+	for (let sid of Object.keys(data.scores)) {
+		res[sid] = {}
+		for (let k of Object.keys(data.scores[sid].total))
+			res[sid][k] = 0
+	}
+	if (typeof data["combat"] !== "undefined") {
+		for (let c of Object.values(data.combat)) {
+			let a = data.world.objects[c.attacker]
+			let d = data.world.objects[c.defender]
+			let dmg = staticData["ship-classes"][a["ship-class"]].damage
+			res[a.player][c.tick] += dmg * attackerMultiplier
+			res[d.player][c.tick] += dmg * defenderMultiplier
+		}
+	}
+	prefixAccumulate(res)
+
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(res)) {
+		let s = res[sid]
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
+
+		let m = {}
+		m.id = sid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(s))
+			m.values.push([ parseInt(x), s[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = last(s)
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
@@ -7871,8 +7946,10 @@ function graphsRedrawResourcesVolumes(data) {
 			res[tr.resource][tr.tick] += tr.amount
 		}
 	}
+	prefixAccumulate(res)
 
 	let lines = []
+	let legends = []
 	for (let rid of Object.keys(res)) {
 		let p = res[rid]
 		let name = staticData["resource-names"][rid]
@@ -7887,8 +7964,15 @@ function graphsRedrawResourcesVolumes(data) {
 		for (let x of Object.keys(p))
 			m.values.push([ parseInt(x), p[x] ])
 		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p)
+		legends.push(l)
 	}
-	multiLineGraph(lines, null)
+	multiLineGraph(lines, legends)
 }
 
 function graphsRefresh(data) {
@@ -7903,28 +7987,38 @@ function graphsRefresh(data) {
 		})
 	}
 
-	if (!playerData) {
-		(new STC.GameApi()).dataGet(function(error, data, response) {
-			if (error) {
-				d3.select("#tickInfo").text(error)
-			} else {
-				playerData = data.players
+	(new STC.GameApi()).dataGet(function(error, world, response) {
+		if (error) {
+			d3.select("#tickInfo").text(error)
+		} else {
+			generateObjects(world)
+			data.world = world
+			if (staticData) {
+				if (graphsOptions.type == "players")
+					graphsRedrawPlayers(data, [true, true, true, true])
+				else if (graphsOptions.type == "players-total")
+					graphsRedrawPlayers(data, [false, false, false, true])
+				else if (graphsOptions.type == "players-money")
+					graphsRedrawPlayers(data, [false, false, true, false])
+				else if (graphsOptions.type == "players-resources")
+					graphsRedrawPlayers(data, [true, false, false, false])
+				else if (graphsOptions.type == "damage-dealt")
+					graphsRedrawDamage(data, 1, 0)
+				else if (graphsOptions.type == "damage-received")
+					graphsRedrawDamage(data, 0, 1)
+				else if (graphsOptions.type == "damage-difference")
+					graphsRedrawDamage(data, 1, -1)
+				else if (graphsOptions.type == "resources-prices")
+					graphsRedrawResourcesPrices(data)
+				else if (graphsOptions.type == "resources-amounts")
+					graphsRedrawResourcesAmounts(data)
+				else if (graphsOptions.type == "resources-totals")
+					graphsRedrawResourcesTotals(data)
+				else if (graphsOptions.type == "resources-volumes")
+					graphsRedrawResourcesVolumes(data)
 			}
-		})
-	}
-
-	if (staticData && playerData) {
-		if (graphsOptions.type == "players")
-			graphsRedrawPlayers(data)
-		else if (graphsOptions.type == "resources-prices")
-			graphsRedrawResourcesPrices(data)
-		else if (graphsOptions.type == "resources-amounts")
-			graphsRedrawResourcesAmounts(data)
-		else if (graphsOptions.type == "resources-totals")
-			graphsRedrawResourcesTotals(data)
-		else if (graphsOptions.type == "resources-volumes")
-			graphsRedrawResourcesVolumes(data)
-	}
+		}
+	})
 }
 
 function graphsTimerLoop() {
