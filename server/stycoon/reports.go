@@ -38,8 +38,8 @@ func (game *Game) fillCombats(tick *int64) error {
 		newReports = append(newReports, combat)
 	}
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	game.Reports.Combat = append(game.Reports.Combat, newReports...)
+	game.Ready.Unlock()
 	return nil
 }
 
@@ -67,8 +67,8 @@ func (game *Game) fillProfiling(tick *int64) error {
 		newReports = append(newReports, profiling)
 	}
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	game.Reports.Profiling = append(game.Reports.Profiling, newReports...)
+	game.Ready.Unlock()
 	return nil
 }
 
@@ -88,7 +88,6 @@ func (game *Game) fillPricesAndAmounts(tick *int64) error {
 	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
 	//	 if this lock takes too long and slows down the game.
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	if game.Reports.Prices == nil {
 		game.Reports.Prices = make(map[string]map[string]int64)
 	}
@@ -123,6 +122,7 @@ func (game *Game) fillPricesAndAmounts(tick *int64) error {
 		amountValue[strTick] = amount
 		game.Reports.ResourceAmounts[strResource] = amountValue
 	}
+	game.Ready.Unlock()
 	return nil
 }
 
@@ -142,7 +142,6 @@ func (game *Game) fillScores(tick *int64) error {
 	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
 	//	 if this lock takes too long and slows down the game.
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	if game.Reports.Scores == nil {
 		game.Reports.Scores = make(map[string]ScoreValue)
 	}
@@ -175,6 +174,7 @@ func (game *Game) fillScores(tick *int64) error {
 
 		game.Reports.Scores[strconv.Itoa(int(player))] = scoreValue
 	}
+	game.Ready.Unlock()
 	return nil
 }
 
@@ -203,16 +203,16 @@ func (game *Game) fillTrades(tick *int64) error {
 		newReports = append(newReports, trade)
 	}
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	game.Reports.Trade = append(game.Reports.Trade, newReports...)
+	game.Ready.Unlock()
 	return nil
 }
 
 func (game *Game) fillSeasonAndTick() {
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	game.Reports.Tick = game.Tick.Tick
 	game.Reports.Season = game.Tick.Season
+	game.Ready.Unlock()
 }
 
 // nil tick means fetching all previous ticks
@@ -260,8 +260,6 @@ func (game *Game) fillAllReportsSinceSeasonStart() {
 
 func (game *Game) getDataReports() DataReports {
 	var tickReports DataReports
-	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	tick := game.Tick.Tick - 1
 	if tick < 0 {
 		return tickReports
