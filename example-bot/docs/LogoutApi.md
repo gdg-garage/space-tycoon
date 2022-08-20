@@ -19,8 +19,14 @@ import space_tycoon_client
 from space_tycoon_client.rest import ApiException
 from pprint import pprint
 
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
 # create an instance of the API class
-api_instance = space_tycoon_client.LogoutApi()
+api_instance = space_tycoon_client.LogoutApi(space_tycoon_client.ApiClient(configuration))
 
 try:
     api_instance.logout_get()
@@ -37,7 +43,7 @@ void (empty response body)
 
 ### Authorization
 
-No authorization required
+[cookieAuth](../README.md#cookieAuth)
 
 ### HTTP request headers
 

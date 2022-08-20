@@ -111,7 +111,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/commands', 'POST',
@@ -196,7 +196,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/current-tick', 'GET',
@@ -223,6 +223,8 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
+        :param int tick:
         :return: Data
                  If the method is called asynchronously,
                  returns the request thread.
@@ -243,12 +245,14 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
+        :param int tick:
         :return: Data
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['season', 'tick']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -269,6 +273,10 @@ class GameApi(object):
         path_params = {}
 
         query_params = []
+        if 'season' in params:
+            query_params.append(('season', params['season']))  # noqa: E501
+        if 'tick' in params:
+            query_params.append(('tick', params['tick']))  # noqa: E501
 
         header_params = {}
 
@@ -281,7 +289,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/data', 'GET',
@@ -378,7 +386,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/end-turn', 'POST',
@@ -475,7 +483,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/login', 'POST',
@@ -502,6 +510,7 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
         :return: Reports
                  If the method is called asynchronously,
                  returns the request thread.
@@ -522,12 +531,13 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
         :return: Reports
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['season']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -548,6 +558,8 @@ class GameApi(object):
         path_params = {}
 
         query_params = []
+        if 'season' in params:
+            query_params.append(('season', params['season']))  # noqa: E501
 
         header_params = {}
 
@@ -560,7 +572,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/reports', 'GET',
@@ -587,6 +599,7 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
         :return: StaticData
                  If the method is called asynchronously,
                  returns the request thread.
@@ -607,12 +620,13 @@ class GameApi(object):
         >>> result = thread.get()
 
         :param async_req bool
+        :param int season:
         :return: StaticData
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = []  # noqa: E501
+        all_params = ['season']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -633,6 +647,8 @@ class GameApi(object):
         path_params = {}
 
         query_params = []
+        if 'season' in params:
+            query_params.append(('season', params['season']))  # noqa: E501
 
         header_params = {}
 
@@ -645,7 +661,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/static-data', 'GET',
