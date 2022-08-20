@@ -94,6 +94,9 @@ func main() {
 	http.HandleFunc("/commands", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Commands(game, w, r)
 	}))
+	http.HandleFunc("/reports", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Reports(game, w, r)
+	}))
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()

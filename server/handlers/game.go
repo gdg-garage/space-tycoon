@@ -101,8 +101,13 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		w.WriteHeader(http.StatusBadRequest)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	}
+}
+
+func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
+	// TODO: all the ****
+	reports, _ := json.Marshal(game.Reports)
+	w.Write(reports)
 }
 
 func History(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {

@@ -13,13 +13,17 @@ type Data struct {
 
 	CurrentTick CurrentTick `json:"current-tick"`
 
-	Planets map[string]PlanetsValue `json:"planets"`
+	Planets map[string]Planet `json:"planets"`
 
 	PlayerId *string `json:"player-id,omitempty"`
 
-	Players map[string]PlayersValue `json:"players"`
+	Players map[string]Player `json:"players"`
 
-	Ships map[string]ShipsValue `json:"ships"`
+	Ships map[string]Ship `json:"ships"`
+
+	Wrecks map[string]Wreck `json:"wrecks,omitempty"`
+
+	Reports DataReports `json:"reports,omitempty"`
 }
 
 // AssertDataRequired checks if the required fields are not zero-ed
@@ -37,6 +41,9 @@ func AssertDataRequired(obj Data) error {
 	}
 
 	if err := AssertCurrentTickRequired(obj.CurrentTick); err != nil {
+		return err
+	}
+	if err := AssertDataReportsRequired(obj.Reports); err != nil {
 		return err
 	}
 	return nil

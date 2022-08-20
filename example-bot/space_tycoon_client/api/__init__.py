@@ -1,3 +1,7 @@
-# do not import all apis into this module because that uses a lot of memory and stack frames
-# if you need the ability to import all apis from one package, import them with
-# from space_tycoon_client.apis import CommandsApi
+from __future__ import absolute_import
+
+# flake8: noqa
+
+# import apis into api package
+from space_tycoon_client.api.game_api import GameApi
+from space_tycoon_client.api.logout_api import LogoutApi
