@@ -2043,15 +2043,14 @@ CREATE TABLE `d_history`
 (
     `season`      int(11) NOT NULL,
     `tick`        int(11) NOT NULL,
-    `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`reports`)),
     `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
 
     PRIMARY KEY (`season`, `tick`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3;
 
-DROP TABLE IF EXISTS `d_static_history`;
-CREATE TABLE `d_static_history`
+DROP TABLE IF EXISTS `d_season_history`;
+CREATE TABLE `d_season_history`
 (
     `season`      int(11) NOT NULL,
     `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),

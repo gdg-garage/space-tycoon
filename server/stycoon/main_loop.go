@@ -62,9 +62,16 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			}
 			game.TickCond.L.Lock()
 			game.setGameTick()
+			// todo if season does not correspond with the current on we have to do init
 			game.TickCond.L.Unlock()
 			game.TickCond.Broadcast()
 			go game.fillAllReportsForPreviousTick()
+			go func(game *Game) {
+				err := game.reportHistory()
+				if err != nil {
+					log.Warn().Err(err).Msg("history report failed")
+				}
+			}(game)
 			game.Ready.Unlock()
 			log.Info().Int64("tick", game.Tick.Tick).Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 )
 
-func (game *Game) reportStaticData() error {
-	_, err := game.db.Exec("replace into d_static_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
+func (game *Game) reportHistoryStaticData() error {
+	_, err := game.db.Exec("replace into d_season_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
 	return err
 }
 
-func (game *Game) report() error {
+func (game *Game) reportHistory() error {
 	// TODO report report
 	reportUserId := "-1"
 	data, err := game.GetData(&reportUserId)
@@ -25,7 +25,7 @@ func (game *Game) report() error {
 	return err
 }
 
-func FilterCommands(playerId *string, ships *map[string]ShipsValue) {
+func FilterCommands(playerId *string, ships *map[string]Ship) {
 	for k, ship := range *ships {
 		if ship.Command == nil {
 			continue
@@ -40,45 +40,32 @@ func FilterCommands(playerId *string, ships *map[string]ShipsValue) {
 	}
 }
 
-func (game *Game) History(id HistoryIdentifier, playerId *string) (HistoryEntry, error) {
-	var entry HistoryEntry
-	var staticData sql.NullString
-	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", id.Season).Scan(&staticData)
-	if err != nil {
-		return entry, err
-	}
-	if staticData.Valid {
-		err = json.Unmarshal([]byte(staticData.String), &entry.StaticData)
-		if err != nil {
-			return entry, err
-		}
-	} else {
-		return entry, sql.ErrNoRows
-	}
+func (game *Game) HistoryData(season int64, tick int64, playerId *string) (Data, error) {
+	var entry Data
 	// TODO add report
 	var data sql.NullString
-	err = game.db.QueryRow("select `data` from d_history where `season` = ? and `tick` = ?", id.Season, id.Tick).Scan(&data)
+	err := game.db.QueryRow("select `data` from d_history where `season` = ? and `tick` = ?", season, tick).Scan(&data)
 	if err != nil {
 		return entry, err
 	}
 	if data.Valid {
-		err = json.Unmarshal([]byte(data.String), &entry.Data)
+		err = json.Unmarshal([]byte(data.String), &entry)
 		if err != nil {
 			return entry, err
 		}
 	} else {
 		return entry, sql.ErrNoRows
 	}
-	entry.Data.PlayerId = playerId
+	entry.PlayerId = playerId
 	// Do not reveal commands data to other users in the current tick
-	if id.Season == game.Tick.Season {
-		FilterCommands(playerId, &entry.Data.Ships)
+	if season == game.Tick.Season {
+		FilterCommands(playerId, &entry.Ships)
 	}
 	return entry, nil
 }
 
 func (game *Game) HistoricStaticData(season int) (string, error) {
 	var staticData string
-	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", season).Scan(&staticData)
+	err := game.db.QueryRow("select `static-data` from d_season_history where `season` = ?", season).Scan(&staticData)
 	return staticData, err
 }

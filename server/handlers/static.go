@@ -15,6 +15,10 @@ func StaticGameData(game *stycoon.Game, w http.ResponseWriter, req *http.Request
 	}
 	if req.URL.Query().Has(querySeasonParam) {
 		requestedSeason, err := strconv.Atoi(req.URL.Query().Get(querySeasonParam))
+		if err != nil {
+			http.Error(w, `{"message": "season param is not valid int"}`, http.StatusBadRequest)
+			return
+		}
 		staticData, err := game.HistoricStaticData(requestedSeason)
 		if err != nil {
 			log.Warn().Err(err).Int("season", requestedSeason).Msg("fetch historic static data failed")

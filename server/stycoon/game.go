@@ -65,7 +65,7 @@ func (game *Game) Init() error {
 		return err
 	}
 	go func(game *Game) {
-		err := game.reportStaticData()
+		err := game.reportHistoryStaticData()
 		if err != nil {
 			log.Warn().Err(err).Msg("Reporting season failed")
 		}
@@ -417,7 +417,7 @@ func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
 	p := palette.Rainbow(playerNr+1, 0, 1, 1.0 /*saturation*/, 1.0 /*value*/, 1.0 /*alpha*/)
 	for i := range p.Colors() {
 		r, g, b, _ := p.Colors()[i].RGBA()
-		// RGBA() method rerturns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
+		// RGBA() method returns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
 		color, err := json.Marshal([]uint32{r >> 8, g >> 8, b >> 8})
 		if err != nil {
 			return colors, err
@@ -455,7 +455,6 @@ func (game *Game) CreatePlayersForUsers() error {
 			// Player already exists for this user
 			continue
 		}
-		// TODO let user change the player name
 		pos := playerPositions[counter]
 		color := playerColors[counter]
 		log.Info().Str("user", name).Msg("Creating player for user")

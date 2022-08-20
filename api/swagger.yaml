@@ -217,6 +217,10 @@ paths:
                 $ref: "#/components/schemas/Reports"
         "400":
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         "403":
           description: Please login again
           content:
