@@ -372,9 +372,9 @@ func (game *Game) setPlayers() error {
 
 func (game *Game) getPlayersNr() (int, error) {
 	var playerNr int
-	err := game.db.QueryRow("select count(*) from d_user left join t_player as tp on d_user.id = tp.user").Scan(&playerNr)
+	err := game.db.QueryRow("select count(*) from t_player").Scan(&playerNr)
 	if err != nil {
-		return 0, fmt.Errorf("query failed %v", err)
+		return 0, err
 	}
 	return playerNr, nil
 }
@@ -400,9 +400,11 @@ func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
 
 func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
 	var colors [][]byte
+	// The pallete.Rainbow returns first and last color identical, that's why we uses playerNr + 1
 	p := palette.Rainbow(playerNr+1, 0, 1, 1.0 /*saturation*/, 1.0 /*value*/, 1.0 /*alpha*/)
 	for i := range p.Colors() {
 		r, g, b, _ := p.Colors()[i].RGBA()
+		// RGBA() method rerturns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
 		color, err := json.Marshal([]uint32{r >> 8, g >> 8, b >> 8})
 		if err != nil {
 			return colors, err
