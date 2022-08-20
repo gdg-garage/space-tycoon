@@ -61,7 +61,7 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-	db = database.ConnectDB()
+	db = database.ConnectDBWithRetries()
 	defer database.CloseDB(db)
 	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
 	game, err := stycoon.NewGame(db, sessionManager)
