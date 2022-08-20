@@ -254,7 +254,9 @@ func (game *Game) fillAllReportsForPreviousTick() {
 }
 
 func (game *Game) fillAllReportsSinceSeasonStart() {
+	game.Ready.Lock()
 	game.Reports = Reports{}
+	game.Ready.Unlock()
 	game.getReports(nil)
 }
 
