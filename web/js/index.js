@@ -7,7 +7,6 @@ console.log(STC)
 
 var currentTick = new STC.CurrentTick()
 var staticData
-var playerData
 var zoom
 var graphsOptions = {}
 
@@ -64,6 +63,36 @@ function last(p) {
 	return p[Object.keys(p)[Object.keys(p).length - 1]]
 }
 
+function generateObjects(data) {
+	data.objects = {}
+
+	for (let pid of Object.keys(data.planets)) {
+		let p = data.planets[pid]
+		p.id = pid
+		p.data = data
+		data.objects[pid] = p
+	}
+
+	if (typeof data["wrecks"] !== "undefined") {
+		for (let wid of Object.keys(data.wrecks)) {
+			let w = data.wrecks[wid]
+			w.id = wid
+			w.data = data
+			data.objects[wid] = w
+			if (typeof w["prev-position"] === "undefined") {
+				w["prev-position"] = w.position
+			}
+		}
+	}
+
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		s.id = sid
+		s.data = data
+		data.objects[sid] = s
+	}
+}
+
 //////////////////////////////////////////
 // map
 //////////////////////////////////////////
@@ -101,7 +130,9 @@ function clickInfo(e) {
 		t += "<table>"
 		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
 		t += "<tr><td>Class:<td>" + c.name
-		t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+		if (typeof d["life"] !== "undefined") {
+			t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+		}
 		t += "</table>"
 		if (typeof d.command !== "undefined") {
 			t += "<hr>"
@@ -128,7 +159,8 @@ function clickInfo(e) {
 			t += "</table>"
 		}
 	}
-	if (Object.keys(d.resources).length > 0) {
+
+	if (typeof d["resources"] !== "undefined" && Object.keys(d.resources).length > 0) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
 		if (!d["ship-class"]) {
@@ -140,6 +172,7 @@ function clickInfo(e) {
 		}
 		t += "</table>"
 	}
+
 	d3.select("#modalInfo")
 	.html(t)
 }
@@ -152,6 +185,11 @@ function planetColor(d) {
 	return colorToRgb(c)
 }
 
+function wreckColor(d) {
+	let c = d.data.players[d.player].color
+	return colorToRgb([ c[0] * 0.2, c[1] * 0.2, c[2] * 0.2 ])
+}
+
 function shipColor(d) {
 	let c = d.data.players[d.player].color
 	return colorToRgb(c)
@@ -162,15 +200,11 @@ function shipHref(d) {
 }
 
 function mapRedraw(data) {
-	data.objects = {}
+	generateObjects(data)
 
 	let planets = []
 	for (let pid of Object.keys(data.planets)) {
-		let p = data.planets[pid]
-		p.id = pid
-		p.data = data
-		planets.push(p)
-		data.objects[pid] = p
+		planets.push(data.planets[pid])
 	}
 
 	d3.select("#planets")
@@ -185,13 +219,28 @@ function mapRedraw(data) {
 	.attr("cx", d => d.position[0])
 	.attr("cy", d => d.position[1])
 
+	let wrecks = []
+	if (typeof data["wrecks"] !== "undefined") {
+		for (let wid of Object.keys(data.wrecks)) {
+			wrecks.push(data.wrecks[wid])
+		}
+	}
+
+	d3.select("#wrecks")
+	.selectAll(".wreck")
+	.data(wrecks, d => d.id)
+	.join("circle")
+	.classed("wreck", true)
+	.on("click", clickInfo)
+	.html(d => "<title>" + d.name + "</title>")
+	.attr("fill", wreckColor)
+	.attr("r", 4)
+	.attr("cx", d => d.position[0])
+	.attr("cy", d => d.position[1])
+
 	let ships = []
 	for (let sid of Object.keys(data.ships)) {
-		let s = data.ships[sid]
-		s.id = sid
-		s.data = data
-		ships.push(s)
-		data.objects[sid] = s
+		ships.push(data.ships[sid])
 	}
 
 	let shipsPositions = function(sel) {
@@ -337,11 +386,15 @@ function spawnBloom(pos, radius, id) {
 }
 
 function spawnAttack(attacker, defender) {
-	if ((typeof attacker == "undefined") || (typeof defender == "undefined"))
-		return
 	spawnBeam(attacker, defender)
 	spawnParticles(defender["prev-position"], 3)
-	spawnBloom(defender["prev-position"], 25, "boomBloomGrad")
+	spawnBloom(defender["prev-position"], 25, "attackBloomGrad")
+}
+
+function spawnKill(attacker, defender) {
+	spawnBeam(attacker, defender)
+	spawnParticles(defender["prev-position"], 20)
+	spawnBloom(defender["prev-position"], 80, "killBloomGrad")
 }
 
 function spawnText(pos, direction, color, text, classes) {
@@ -377,14 +430,17 @@ function spawnTrade(data, tr) {
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
 	let rn = staticData["resource-names"][tr.resource]
-	spawnText(pos, [0, pl == p1 ? -1 : 1], c, tr.price, "trade-price")
+	spawnText(pos, [0, pl == p1 ? 1 : -1], c, tr.price, "trade-price")
 	spawnText(pos, [1, 0], c, rn, "trade-name")
 }
 
 function mapEvents(data) {
 	if (typeof data.reports["combat"] !== "undefined") {
 		for (let c of data.reports.combat) {
-			spawnAttack(data.objects[c.attacker], data.objects[c.defender])
+			if (typeof c["killed"] !== "undefined" && c.killed)
+				spawnKill(data.objects[c.attacker], data.objects[c.defender])
+			else
+				spawnAttack(data.objects[c.attacker], data.objects[c.defender])
 		}
 	}
 	if (typeof data.reports["trade"] !== "undefined") {
@@ -512,13 +568,25 @@ function multiLineGraph(lines, legends) {
 	}
 }
 
-function graphsRedrawPlayers(data) {
+function prefixAccumulate(res) {
+	for (let k of Object.keys(res)) {
+		let values = res[k]
+		let add = 0
+		for (let i of Object.keys(values)) {
+			let tmp = values[i]
+			values[i] += add
+			add += tmp
+		}
+	}
+}
+
+function graphsRedrawPlayers(data, enabled) {
 	let lines = []
 	let legends = []
 	for (let sid of Object.keys(data.scores)) {
 		let s = data.scores[sid]
-		let name = playerData[sid].name
-		let color = colorToRgb(playerData[sid].color)
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
 
 		function category(key) {
 			let m = {}
@@ -532,16 +600,65 @@ function graphsRedrawPlayers(data) {
 			lines.push(m)
 		}
 
-		category("resources")
-		category("ships")
-		category("money")
-		category("total")
+		if (enabled[0])
+			category("resources")
+		if (enabled[1])
+			category("ships")
+		if (enabled[2])
+			category("money")
+		if (enabled[3])
+			category("total")
 
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
 		l.value = last(s.total)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
+function graphsRedrawDamage(data, attackerMultiplier, defenderMultiplier) {
+	let res = {}
+	for (let sid of Object.keys(data.scores)) {
+		res[sid] = {}
+		for (let k of Object.keys(data.scores[sid].total))
+			res[sid][k] = 0
+	}
+	if (typeof data["combat"] !== "undefined") {
+		for (let c of Object.values(data.combat)) {
+			let a = data.world.objects[c.attacker]
+			let d = data.world.objects[c.defender]
+			let dmg = staticData["ship-classes"][a["ship-class"]].damage
+			res[a.player][c.tick] += dmg * attackerMultiplier
+			res[d.player][c.tick] += dmg * defenderMultiplier
+		}
+	}
+	prefixAccumulate(res)
+
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(res)) {
+		let s = res[sid]
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
+
+		let m = {}
+		m.id = sid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(s))
+			m.values.push([ parseInt(x), s[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = last(s)
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
@@ -644,8 +761,10 @@ function graphsRedrawResourcesVolumes(data) {
 			res[tr.resource][tr.tick] += tr.amount
 		}
 	}
+	prefixAccumulate(res)
 
 	let lines = []
+	let legends = []
 	for (let rid of Object.keys(res)) {
 		let p = res[rid]
 		let name = staticData["resource-names"][rid]
@@ -660,8 +779,15 @@ function graphsRedrawResourcesVolumes(data) {
 		for (let x of Object.keys(p))
 			m.values.push([ parseInt(x), p[x] ])
 		lines.push(m)
+
+		let l = {}
+		l.id = rid
+		l.name = name
+		l.color = color
+		l.value = last(p)
+		legends.push(l)
 	}
-	multiLineGraph(lines, null)
+	multiLineGraph(lines, legends)
 }
 
 function graphsRefresh(data) {
@@ -676,28 +802,38 @@ function graphsRefresh(data) {
 		})
 	}
 
-	if (!playerData) {
-		(new STC.GameApi()).dataGet(function(error, data, response) {
-			if (error) {
-				d3.select("#tickInfo").text(error)
-			} else {
-				playerData = data.players
+	(new STC.GameApi()).dataGet(function(error, world, response) {
+		if (error) {
+			d3.select("#tickInfo").text(error)
+		} else {
+			generateObjects(world)
+			data.world = world
+			if (staticData) {
+				if (graphsOptions.type == "players")
+					graphsRedrawPlayers(data, [true, true, true, true])
+				else if (graphsOptions.type == "players-total")
+					graphsRedrawPlayers(data, [false, false, false, true])
+				else if (graphsOptions.type == "players-money")
+					graphsRedrawPlayers(data, [false, false, true, false])
+				else if (graphsOptions.type == "players-resources")
+					graphsRedrawPlayers(data, [true, false, false, false])
+				else if (graphsOptions.type == "damage-dealt")
+					graphsRedrawDamage(data, 1, 0)
+				else if (graphsOptions.type == "damage-received")
+					graphsRedrawDamage(data, 0, 1)
+				else if (graphsOptions.type == "damage-difference")
+					graphsRedrawDamage(data, 1, -1)
+				else if (graphsOptions.type == "resources-prices")
+					graphsRedrawResourcesPrices(data)
+				else if (graphsOptions.type == "resources-amounts")
+					graphsRedrawResourcesAmounts(data)
+				else if (graphsOptions.type == "resources-totals")
+					graphsRedrawResourcesTotals(data)
+				else if (graphsOptions.type == "resources-volumes")
+					graphsRedrawResourcesVolumes(data)
 			}
-		})
-	}
-
-	if (staticData && playerData) {
-		if (graphsOptions.type == "players")
-			graphsRedrawPlayers(data)
-		else if (graphsOptions.type == "resources-prices")
-			graphsRedrawResourcesPrices(data)
-		else if (graphsOptions.type == "resources-amounts")
-			graphsRedrawResourcesAmounts(data)
-		else if (graphsOptions.type == "resources-totals")
-			graphsRedrawResourcesTotals(data)
-		else if (graphsOptions.type == "resources-volumes")
-			graphsRedrawResourcesVolumes(data)
-	}
+		}
+	})
 }
 
 function graphsTimerLoop() {

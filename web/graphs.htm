@@ -11,7 +11,17 @@
 		<nav>
 			<a href="index.htm">Home</a>
 			<select id="graphSelect">
-				<option value="players">Players</option>
+				<optgroup label="Score">
+					<option value="players">Combined</option>
+					<option value="players-total">Total</option>
+					<option value="players-money">Money</option>
+					<option value="players-resources">Resources</option>
+				</optgroup>
+				<optgroup label="Damage">
+					<option value="damage-dealt">Dealt</option>
+					<option value="damage-received">Received</option>
+					<option value="damage-difference">Difference</option>
+				</optgroup>
 				<optgroup label="Resources">
 					<option value="resources-prices">Prices</option>
 					<option value="resources-amounts">Amounts</option>
