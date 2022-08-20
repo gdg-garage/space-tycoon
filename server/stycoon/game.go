@@ -4,9 +4,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
+	"math/rand"
 	"strconv"
 	"sync"
 	"time"
+
+	"gonum.org/v1/plot/palette"
 
 	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
@@ -366,11 +370,66 @@ func (game *Game) setPlayers() error {
 	return nil
 }
 
+func (game *Game) getPlayersNr() (int, error) {
+	var playerNr int
+	err := game.db.QueryRow("select count(*) from t_player").Scan(&playerNr)
+	if err != nil {
+		return 0, err
+	}
+	return playerNr, nil
+}
+
+func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
+	var playerPositions [][]float64
+
+	if playerNr == 0 {
+		return playerPositions
+	}
+
+	segmentSize := 2 * math.Pi / float64(playerNr)
+	currDist := 0.0
+	for i := 0; i < playerNr; i++ {
+		diameter := (1-rand.Float64()*rand.Float64())*1000 + 250
+		x := math.Cos(currDist) * diameter
+		y := math.Sin(currDist) * diameter
+		playerPositions = append(playerPositions, []float64{x, y})
+		currDist += segmentSize
+	}
+	return playerPositions
+}
+
+func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
+	var colors [][]byte
+	// The pallete.Rainbow returns first and last color identical, that's why we uses playerNr + 1
+	p := palette.Rainbow(playerNr+1, 0, 1, 1.0 /*saturation*/, 1.0 /*value*/, 1.0 /*alpha*/)
+	for i := range p.Colors() {
+		r, g, b, _ := p.Colors()[i].RGBA()
+		// RGBA() method rerturns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
+		color, err := json.Marshal([]uint32{r >> 8, g >> 8, b >> 8})
+		if err != nil {
+			return colors, err
+		}
+		colors = append(colors, color)
+	}
+	return colors, nil
+}
+
 func (game *Game) CreatePlayersForUsers() error {
 	rows, err := game.db.Query("select d_user.`id`, d_user.`name`, tp.`id` from d_user left join t_player as tp on d_user.id = tp.user")
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
+	playerNr, err := game.getPlayersNr()
+	if err != nil {
+		return fmt.Errorf("query failed %v", err)
+	}
+	playerPositions := game.generatePlayerPositions(playerNr)
+	playerColors, err := game.generatePlayerColors(playerNr)
+	if err != nil {
+		return fmt.Errorf("color generation failed %v", err)
+	}
+
+	counter := 0
 	for rows.Next() {
 		var id int
 		var name string
@@ -383,14 +442,15 @@ func (game *Game) CreatePlayersForUsers() error {
 			// Player already exists for this user
 			continue
 		}
-		// TODO use color from pre-defined or-random set of colors
 		// TODO let user change the player name
+		pos := playerPositions[counter]
+		color := playerColors[counter]
 		log.Info().Str("user", name).Msg("Creating player for user")
-		_, err := game.db.Exec("select p_create_player(?, ?, ?, ?, ?)", id, 0, 0, name, "[0,0,0]")
+		_, err = game.db.Exec("select p_create_player(?, ?, ?, ?, ?)", id, pos[0], pos[1], name, color)
 		if err != nil {
 			return err
 		}
-
+		counter++
 	}
 	if err = rows.Err(); err != nil {
 		return fmt.Errorf("rows read failed: %v", err)
