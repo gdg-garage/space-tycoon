@@ -372,7 +372,7 @@ func (game *Game) setPlayers() error {
 
 func (game *Game) getPlayersNr() (int, error) {
 	var playerNr int
-	err := game.db.QueryRow("select count(*) from t_player").Scan(&playerNr)
+	err := game.db.QueryRow("select count(*) from d_user left join t_player as tp on d_user.id = tp.user where tp.`id` is null").Scan(&playerNr)
 	if err != nil {
 		return 0, err
 	}
