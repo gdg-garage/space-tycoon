@@ -14,24 +14,8 @@ externalDocs:
 servers:
   - url: https://space-tycoon.garage-trip.cz/api/
 tags:
-- name: game
-  description: Interact with the game
-- name: login
-  description: Get user session
-- name: logout
-  description: Remove user session
-- name: static-data
-  description: Data that do not change during entire season, such as ships classes.
-- name: data
-  description: "Dynamic game data (scores, prices, spaceship positions)"
-- name: commands
-  description: Specify commands for your ships
-- name: current-tick
-  description: Returns the current tick, season and the approximate time until the next tick.
-- name: end-turn
-  description: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
-- name: reports
-  description: Fetch statistical data about all players.
+  - name: game
+    description: Interact with the game
 paths:
   /login:
     post:
@@ -56,7 +40,7 @@ paths:
                 type: string
                 example: SESSION_ID=abcde12345; Path=/; HttpOnly
           description:
-            Successfully authenticated. 
+            Successfully authenticated.
             The session ID is returned in a cookie named `SESSION_ID`. You need to include this cookie in subsequent requests.
         "400":
           description: Invalid input
@@ -87,10 +71,10 @@ paths:
         - game
       summary: Data that do not change during entire season, such as ships classes.
       parameters:
-      - in: query
-        name: season
-        schema:
-          type: integer
+        - in: query
+          name: season
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -113,14 +97,14 @@ paths:
         - game
         - data
       parameters:
-      - in: query
-        name: season
-        schema:
-          type: integer
-      - in: query
-        name: tick
-        schema:
-          type: integer
+        - in: query
+          name: season
+          schema:
+            type: integer
+        - in: query
+          name: tick
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -150,7 +134,7 @@ paths:
       responses:
         "200":
           description: OK
-          content: {}
+          content: { }
         "400":
           description: Invalid input
         "403":
@@ -237,7 +221,7 @@ paths:
 
 components:
   securitySchemes:
-    cookieAuth:         # arbitrary name for the security scheme; will be used in the "security" key later
+    cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
       type: apiKey
       in: cookie
       name: SESSION_ID  # cookie name
@@ -592,7 +576,7 @@ components:
             additionalProperties:
               type: integer
               format: int64
-      example: 
+      example:
         1: {
           money: {
             125: 123456,
@@ -1047,4 +1031,4 @@ components:
       }
 
 security:
-  - cookieAuth: []
+  - cookieAuth: [ ]
