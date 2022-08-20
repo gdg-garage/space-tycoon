@@ -26,6 +26,10 @@ func (game *Game) processTrade(id int64, playerOwnedShips map[int64]struct{}, pl
 	_, shipOwnedByPlayer := playerOwnedShips[id]
 	_, targetIsPlanet := planetIDs[id]
 
+	if !shipOwnedByPlayer && !targetIsPlanet {
+		return fmt.Errorf("trading with another players ship is forbidden")
+	}
+
 	target, err := strconv.Atoi(*c.Target)
 	if err != nil {
 		return err
@@ -36,8 +40,13 @@ func (game *Game) processTrade(id int64, playerOwnedShips map[int64]struct{}, pl
 		return err
 	}
 
-	if shipOwnedByPlayer || targetIsPlanet {
-		return database.ReplaceTradeCommand(game.db, id, command.Type, int64(target), int64(resource), *c.Amount)
+	err = database.CheckPlanetCanTrade(game.db, int64(target), int64(resource), int(*command.Amount))
+	if err != nil {
+		return err
 	}
-	return fmt.Errorf("trading with another players ship is forbidden")
+	err = database.CheckShipCanTrade(game.db, id, int64(resource), int(*command.Amount))
+	if err != nil {
+		return err
+	}
+	return database.ReplaceTradeCommand(game.db, id, command.Type, int64(target), int64(resource), *c.Amount)
 }
