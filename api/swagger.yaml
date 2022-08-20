@@ -203,6 +203,11 @@ paths:
       summary: Fetch statistical data about all players.
       tags:
         - game
+      parameters:
+        - in: query
+          name: season
+          schema:
+            type: integer
       responses:
         "200":
           description: OK

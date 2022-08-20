@@ -29,9 +29,10 @@ func StaticGameData(game *stycoon.Game, w http.ResponseWriter, req *http.Request
 		}
 		return
 	}
+
+	// we want data for the current tick
 	game.Ready.RLock()
 	defer game.Ready.RUnlock()
-
 	if stycoon.SeasonChanged(game, req, game.SessionManager) {
 		http.Error(w, "season changed", http.StatusForbidden)
 		return
