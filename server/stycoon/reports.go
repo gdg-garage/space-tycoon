@@ -10,6 +10,7 @@ import (
 
 // nil tick means fetching all previous ticks
 func (game *Game) fillCombats(tick *int64) error {
+	var newReports []Combat
 	var rows *sql.Rows
 	var err error
 	if tick == nil {
@@ -34,13 +35,17 @@ func (game *Game) fillCombats(tick *int64) error {
 		} else {
 			combat.Killed = false
 		}
-		game.Reports.Combat = append(game.Reports.Combat, combat)
+		newReports = append(newReports, combat)
 	}
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
+	game.Reports.Combat = append(game.Reports.Combat, newReports...)
 	return nil
 }
 
 // nil tick means fetching all previous ticks
 func (game *Game) fillProfiling(tick *int64) error {
+	var newReports []Profiling
 	var rows *sql.Rows
 	var err error
 	if tick == nil {
@@ -59,8 +64,11 @@ func (game *Game) fillProfiling(tick *int64) error {
 			rows.Scan(&profiling.Movement, &profiling.Attacks, &profiling.Trades, &profiling.Recipes, &profiling.Prices, &profiling.Constructions, &profiling.Report, &profiling.Total, &profiling.Overall, &profiling.At)
 			profiling.Tick = *tick
 		}
-		game.Reports.Profiling = append(game.Reports.Profiling, profiling)
+		newReports = append(newReports, profiling)
 	}
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
+	game.Reports.Profiling = append(game.Reports.Profiling, newReports...)
 	return nil
 }
 
@@ -77,6 +85,10 @@ func (game *Game) fillPricesAndAmounts(tick *int64) error {
 		return err
 	}
 
+	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
+	//	 if this lock takes too long and slows down the game.
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
 	if game.Reports.Prices == nil {
 		game.Reports.Prices = make(map[string]map[string]int64)
 	}
@@ -127,6 +139,10 @@ func (game *Game) fillScores(tick *int64) error {
 		return err
 	}
 
+	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
+	//	 if this lock takes too long and slows down the game.
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
 	if game.Reports.Scores == nil {
 		game.Reports.Scores = make(map[string]ScoreValue)
 	}
@@ -164,6 +180,7 @@ func (game *Game) fillScores(tick *int64) error {
 
 // nil tick means fetching all previous ticks
 func (game *Game) fillTrades(tick *int64) error {
+	var newReports []Trade
 	var rows *sql.Rows
 	var err error
 	if tick == nil {
@@ -183,12 +200,17 @@ func (game *Game) fillTrades(tick *int64) error {
 			rows.Scan(&trade.Buyer, &trade.Seller, &trade.Resource, &trade.Amount, &trade.Price)
 			trade.Tick = *tick
 		}
-		game.Reports.Trade = append(game.Reports.Trade, trade)
+		newReports = append(newReports, trade)
 	}
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
+	game.Reports.Trade = append(game.Reports.Trade, newReports...)
 	return nil
 }
 
 func (game *Game) fillSeasonAndTick() {
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
 	game.Reports.Tick = game.Tick.Tick
 	game.Reports.Season = game.Tick.Season
 }
@@ -238,6 +260,8 @@ func (game *Game) fillAllReportsSinceSeasonStart() {
 
 func (game *Game) getDataReports() DataReports {
 	var tickReports DataReports
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
 	tick := game.Tick.Tick - 1
 	if tick < 0 {
 		return tickReports
