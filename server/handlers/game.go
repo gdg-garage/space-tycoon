@@ -3,10 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
 )
@@ -151,9 +152,37 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 }
 
 func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
-	// TODO: all the ****
-	reports, _ := json.Marshal(game.Reports)
-	w.Write(reports)
+	if req.Method != http.MethodGet {
+		log.Warn().Str("method", req.Method).Msg("Unsupported method")
+		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		return
+	}
+	game.Ready.RLock()
+	defer game.Ready.RUnlock()
+	if stycoon.SeasonChanged(game, req, game.SessionManager) {
+		http.Error(w, "season changed", http.StatusForbidden)
+		return
+	}
+	// TODO: maybe only for logged users?
+	// var err error
+	// _, err = stycoon.LoggedUserFromSession(req, game.SessionManager)
+	// if err != nil {
+	// 	log.Warn().Err(err).Msg("User is not logged in")
+	// 	http.Error(w, "only for logged users", http.StatusForbidden)
+	// 	return
+	// }
+	// TODO: maybe only return player reports?
+	reports, err := json.Marshal(game.Reports)
+	if err != nil {
+		log.Warn().Err(err).Msg("Json marshall failed")
+		http.Error(w, "response failed", http.StatusInternalServerError)
+		return
+	}
+	_, err = w.Write(reports)
+	if err != nil {
+		log.Warn().Err(err).Msg("response write failed")
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 //func HistoryData(game *stycoon.Game, sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {

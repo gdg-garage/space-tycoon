@@ -1996,7 +1996,7 @@ INSERT INTO `d_resource` (`id`, `name`) VALUES
 	(6, 'Human Body Replacement Parts'),
 	(7, 'Significant Other\'s Barks'),
 	(8, 'Parallel Timelines'),
-	(9, 'Sex Toys'),
+	(9, 'Sex Toys (Size Does Matter)'),
 	(10, 'Puppies & Kittens'),
 	(11, 'Internet Memes'),
 	(12, 'Memories of Ancient Earth'),
