@@ -47,14 +47,14 @@ func ConnectDBWithRetries() *sql.DB {
 		var err error
 		db, err = ConnectDB(cfg)
 		if err != nil {
-			log2 := log.With().Err(err).Int("retry", retry).Int("max_retries", max_retries).Logger()
+			retryLog := log.With().Err(err).Int("retry", retry).Int("max_retries", max_retries).Logger()
 			if retry < max_retries {
-				log2.Error().Msg("DB connection failed - retrying")
+				retryLog.Error().Msg("DB connection failed - retrying")
 				retry++
 				time.Sleep(retry_backoff)
 				continue
 			} else {
-				log2.Fatal().Err(err).Msg("DB connection failed - too many retires - giving up")
+				retryLog.Fatal().Err(err).Msg("DB connection failed - too many retires - giving up")
 			}
 		}
 		break
