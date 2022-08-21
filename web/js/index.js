@@ -522,6 +522,11 @@ window.initializeMap = function() {
 // graphs
 //////////////////////////////////////////
 
+function graphsHandleZoom(e) {
+	d3.selectAll("#panzoom")
+	.attr("transform", e.transform)
+}
+
 function multiLineGraph(lines, legends) {
 	let size = d3.select("#thegraph").node().getBoundingClientRect()
 
@@ -857,11 +862,17 @@ function graphsTimerLoop() {
 
 function graphsStartLoop() {
 	d3.select("#tickInfo").text("Connecting...")
-	setTimeout(graphsTimerLoop, 0)
+
+	zoom = d3.zoom().on("zoom", mapHandleZoom)
+	d3.select("#thegraph").call(zoom)
+
 	graphsOptions.type = "players"
 	d3.select("#graphSelect").on("change", function(e) {
+		d3.select("#thegraph").call(zoom.transform, d3.zoomIdentity)
 		graphsOptions.type = e.target.value
 	})
+
+	setTimeout(graphsTimerLoop, 0)
 }
 
 window.initializeGraphs = function() {
