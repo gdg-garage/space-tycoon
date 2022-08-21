@@ -30,8 +30,8 @@ func ConnectDB(cfg mysql.Config) (*sql.DB, error) {
 }
 
 func ConnectDBWithRetries() *sql.DB {
-	max_retries := 3
-	retry_backoff := 300 * time.Millisecond
+	max_retries := 5
+	retry_backoff := 500 * time.Millisecond
 	cfg := mysql.Config{
 		User:                 "root",
 		Passwd:               "secret", // TODO load config
