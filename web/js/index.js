@@ -96,33 +96,33 @@ function generateObjects(data) {
 }
 
 function positionIsEqual(pos1, pos2) {
-    return pos1[0] === pos2[0] && pos1[1] === pos2[1]
+	return pos1[0] === pos2[0] && pos1[1] === pos2[1]
 }
 
 function getObjectsOnPosition(data, pos) {
-    let objects = []
+	let objects = []
 
 	for (let pid of Object.keys(data.planets)) {
 		let p = data.planets[pid]
-        if (positionIsEqual(p.position, pos)) {
-            objects.push(p)
-        }
+		if (positionIsEqual(p.position, pos)) {
+			objects.push(p)
+		}
 	}
 	for (let sid of Object.keys(data.ships)) {
 		let s = data.ships[sid]
-        if (positionIsEqual(s.position, pos)) {
-            objects.push(s)
-        }
+		if (positionIsEqual(s.position, pos)) {
+			objects.push(s)
+		}
 	}
 	if (typeof data["wrecks"] !== "undefined") {
 		for (let wid of Object.keys(data.wrecks)) {
 			let w = data.wrecks[wid]
-            if (positionIsEqual(w.position, pos)) {
-                objects.push(w)
-            }
+			if (positionIsEqual(w.position, pos)) {
+				objects.push(w)
+			}
 		}
 	}
-    return objects
+	return objects
 }
 
 //////////////////////////////////////////
@@ -192,36 +192,36 @@ function drawModal(e, d) {
 		t += "</table>"
 	}
 
-    // window contents
-    let titleHtml = "<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>"
-    let title = "<div class=\"modalTitle\">" + titleHtml + "</div>"
-    let info = "<div class=\"modalInfo\">" + t + "</div>"
+	// window contents
+	let titleHtml = "<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>"
+	let title = "<div class=\"modalTitle\">" + titleHtml + "</div>"
+	let info = "<div class=\"modalInfo\">" + t + "</div>"
 
-    // window itself
-    let html = "<div class=\"modalWindowItem\">" + title + info + "</div>"
+	// window itself
+	let html = "<div class=\"modalWindowItem\">" + title + info + "</div>"
 
-    return html
+	return html
 }
 
 function clickInfo(e) {
 	let d = this["__data__"]
-    let objects = getObjectsOnPosition(d.data, d.position)
+	let objects = getObjectsOnPosition(d.data, d.position)
 
-    let html = ""
-    // draw clicked object first
-    html += drawModal(e, d)
-    for (let i = 0; i < objects.length; i++) {
-        if (d.id == objects[i].id) {
-            // skip drawing clicked object (its already drawn)
-            continue
-        }
-        html += drawModal(e, objects[i])
-    }
-    let style = "left: " + e.x + "px; top: " + e.y + "px;"
-    let finalHtml = "<div class=\"modalWindow\" style=\"" + style + "\">" + html + "</div>"
+	let html = ""
+	// draw clicked object first
+	html += drawModal(e, d)
+	for (let i = 0; i < objects.length; i++) {
+		if (d.id == objects[i].id) {
+			// skip drawing clicked object (its already drawn)
+			continue
+		}
+		html += drawModal(e, objects[i])
+	}
+	let style = "left: " + e.x + "px; top: " + e.y + "px;"
+	let finalHtml = "<div class=\"modalWindow\" style=\"" + style + "\">" + html + "</div>"
 
 	d3.select("#modalContainer")
-    .html(finalHtml)
+	.html(finalHtml)
 	.style("display", "block")
 	.on("click", modalClose)
 }
