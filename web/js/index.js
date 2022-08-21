@@ -626,20 +626,28 @@ function graphsRedrawPlayers(data, enabled) {
 			lines.push(m)
 		}
 
-		if (enabled[0])
-			category("resources")
-		if (enabled[1])
-			category("ships")
-		if (enabled[2])
-			category("money")
-		if (enabled[3])
-			category("total")
-
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = last(s.total)
+
+		if (enabled[0]) {
+			l.value = last(s.resources)
+			category("resources")
+		}
+		if (enabled[1]) {
+			l.value = last(s.ships)
+			category("ships")
+		}
+		if (enabled[2]) {
+			l.value = last(s.money)
+			category("money")
+		}
+		if (enabled[3]) {
+			l.value = last(s.total)
+			category("total")
+		}
+
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
