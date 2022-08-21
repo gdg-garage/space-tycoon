@@ -178,6 +178,7 @@ paths:
         "405":
           description: Invalid input
           content: { }
+
   /current-tick:
     get:
       summary: Returns the current tick, season and the approximate time until the next tick.
@@ -987,11 +988,16 @@ components:
         tick:
           type: integer
           format: int64
+        season:
+          type: integer
+          format: int64
       required:
         - tick
+        - season
       example:
         {
-          tick: 3600
+          tick: 3600,
+          season: 2
         }
 
     Error:

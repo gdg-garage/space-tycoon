@@ -32,10 +32,10 @@ func (game *Game) GetGameTickState() CurrentTick {
 	return tickData
 }
 
-func (game *Game) EndTurn(userTick int64) CurrentTick {
+func (game *Game) EndTurn(userExpectations EndTurn) CurrentTick {
 	game.TickCond.L.Lock()
 	defer game.TickCond.L.Unlock()
-	for userTick >= game.Tick.Tick {
+	for userExpectations.Tick >= game.Tick.Tick && userExpectations.Season == game.Tick.Season {
 		game.TickCond.Wait()
 	}
 	return game.GetGameTickState()

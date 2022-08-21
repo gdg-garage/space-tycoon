@@ -28,18 +28,22 @@ class EndTurn(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'tick': 'int'
+        'tick': 'int',
+        'season': 'int'
     }
 
     attribute_map = {
-        'tick': 'tick'
+        'tick': 'tick',
+        'season': 'season'
     }
 
-    def __init__(self, tick=None):  # noqa: E501
+    def __init__(self, tick=None, season=None):  # noqa: E501
         """EndTurn - a model defined in Swagger"""  # noqa: E501
         self._tick = None
+        self._season = None
         self.discriminator = None
         self.tick = tick
+        self.season = season
 
     @property
     def tick(self):
@@ -63,6 +67,29 @@ class EndTurn(object):
             raise ValueError("Invalid value for `tick`, must not be `None`")  # noqa: E501
 
         self._tick = tick
+
+    @property
+    def season(self):
+        """Gets the season of this EndTurn.  # noqa: E501
+
+
+        :return: The season of this EndTurn.  # noqa: E501
+        :rtype: int
+        """
+        return self._season
+
+    @season.setter
+    def season(self, season):
+        """Sets the season of this EndTurn.
+
+
+        :param season: The season of this EndTurn.  # noqa: E501
+        :type: int
+        """
+        if season is None:
+            raise ValueError("Invalid value for `season`, must not be `None`")  # noqa: E501
+
+        self._season = season
 
     def to_dict(self):
         """Returns the model properties as a dict"""

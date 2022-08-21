@@ -68,7 +68,7 @@ func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	tickData := game.EndTurn(userTick.Tick)
+	tickData := game.EndTurn(userTick)
 	tick, err := json.Marshal(tickData)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")

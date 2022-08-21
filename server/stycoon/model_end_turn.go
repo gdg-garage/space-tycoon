@@ -12,12 +12,15 @@ package stycoon
 type EndTurn struct {
 
 	Tick int64 `json:"tick"`
+
+	Season int64 `json:"season"`
 }
 
 // AssertEndTurnRequired checks if the required fields are not zero-ed
 func AssertEndTurnRequired(obj EndTurn) error {
 	elements := map[string]interface{}{
 		"tick": obj.Tick,
+		"season": obj.Season,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

@@ -52,8 +52,10 @@ class Game:
                 self.game_logic()
                 current_tick: CurrentTick = self.client.end_turn_post(EndTurn(
                     tick=self.tick,
+                    season=self.season
                 ))
                 self.tick = current_tick.tick
+                self.season = current_tick.season
             except ApiException as e:
                 if e.status == 403:
                     print(f"New season started or login expired: {e}")
