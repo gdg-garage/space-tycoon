@@ -10,6 +10,7 @@
 package stycoon
 
 type Profiling struct {
+
 	Tick int64 `json:"tick,omitempty"`
 
 	Movement int64 `json:"movement,omitempty"`

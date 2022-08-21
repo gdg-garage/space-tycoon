@@ -2049,11 +2049,21 @@ CREATE TABLE `d_history`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3;
 
-DROP TABLE IF EXISTS `d_season_history`;
-CREATE TABLE `d_season_history`
+DROP TABLE IF EXISTS `d_static_history`;
+CREATE TABLE `d_static_history`
 (
     `season`      int(11) NOT NULL,
     `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),
+
+    PRIMARY KEY (`season`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb3;
+
+DROP TABLE IF EXISTS `d_reports_history`;
+CREATE TABLE `d_reports_history`
+(
+    `season`      int(11) NOT NULL,
+    `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`reports`)),
 
     PRIMARY KEY (`season`)
 ) ENGINE = InnoDB
@@ -3101,7 +3111,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   `user` int(11) NOT NULL,
   `name` tinytext NOT NULL,
   `money` bigint(20) NOT NULL DEFAULT 5000000,
-  `color` tinytext NOT NULL DEFAULT '',
+  `color` tinytext NOT NULL DEFAULT '[0,0,0]' CHECK (json_valid(`color`)),
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 3` (`name`(255)),
   KEY `FK_t_player_t_user` (`user`),

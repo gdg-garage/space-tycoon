@@ -23,7 +23,7 @@ func (game *Game) callUpdate() {
 	}
 }
 
-func (game *Game) nextSeason() {
+func (game *Game) NextSeason() {
 	err := game.db.QueryRow("call p_reset_all()").Scan()
 	if err != nil {
 		if err != sql.ErrNoRows {
@@ -52,7 +52,7 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			expectedSeason := game.Tick.Season
 			if game.Tick.Tick > seasonDuration {
 				log.Warn().Msg("Starting new season")
-				game.nextSeason()
+				game.NextSeason()
 				expectedSeason++
 			} else {
 				game.callUpdate()
@@ -73,13 +73,15 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")
 			}
-			go game.fillAllReportsForPreviousTick()
-			go func(game *Game) {
-				err := game.reportHistory()
+			game.fillDataReportsForPreviousTick()
+			reportsReady := make(chan struct{}, 1)
+			go game.fillReportsForPreviousTick(reportsReady)
+			go func(game *Game, reportsReady chan struct{}) {
+				err := game.reportHistory(reportsReady)
 				if err != nil {
 					log.Warn().Err(err).Msg("history report failed")
 				}
-			}(game)
+			}(game, reportsReady)
 			game.Ready.Unlock()
 			log.Info().Int64("tick", game.Tick.Tick).Msgf("Update took %d ms", time.Since(start).Milliseconds())
 		case <-ctx.Done():

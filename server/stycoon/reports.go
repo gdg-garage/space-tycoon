@@ -37,9 +37,7 @@ func (game *Game) fillCombats(tick *int64) error {
 		}
 		newReports = append(newReports, combat)
 	}
-	game.Ready.Lock()
 	game.Reports.Combat = append(game.Reports.Combat, newReports...)
-	game.Ready.Unlock()
 	return nil
 }
 
@@ -66,9 +64,7 @@ func (game *Game) fillProfiling(tick *int64) error {
 		}
 		newReports = append(newReports, profiling)
 	}
-	game.Ready.Lock()
 	game.Reports.Profiling = append(game.Reports.Profiling, newReports...)
-	game.Ready.Unlock()
 	return nil
 }
 
@@ -85,9 +81,6 @@ func (game *Game) fillPricesAndAmounts(tick *int64) error {
 		return err
 	}
 
-	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
-	//	 if this lock takes too long and slows down the game.
-	game.Ready.Lock()
 	if game.Reports.Prices == nil {
 		game.Reports.Prices = make(map[string]map[string]int64)
 	}
@@ -122,7 +115,6 @@ func (game *Game) fillPricesAndAmounts(tick *int64) error {
 		amountValue[strTick] = amount
 		game.Reports.ResourceAmounts[strResource] = amountValue
 	}
-	game.Ready.Unlock()
 	return nil
 }
 
@@ -139,9 +131,6 @@ func (game *Game) fillScores(tick *int64) error {
 		return err
 	}
 
-	// TODO: Rewrite this to batch write new reports like we do for Combat and Profiling
-	//	 if this lock takes too long and slows down the game.
-	game.Ready.Lock()
 	if game.Reports.Scores == nil {
 		game.Reports.Scores = make(map[string]ScoreValue)
 	}
@@ -174,7 +163,6 @@ func (game *Game) fillScores(tick *int64) error {
 
 		game.Reports.Scores[strconv.Itoa(int(player))] = scoreValue
 	}
-	game.Ready.Unlock()
 	return nil
 }
 
@@ -202,27 +190,34 @@ func (game *Game) fillTrades(tick *int64) error {
 		}
 		newReports = append(newReports, trade)
 	}
-	game.Ready.Lock()
 	game.Reports.Trade = append(game.Reports.Trade, newReports...)
-	game.Ready.Unlock()
 	return nil
 }
 
 func (game *Game) fillSeasonAndTick() {
-	game.Ready.Lock()
 	game.Reports.Tick = game.Tick.Tick
 	game.Reports.Season = game.Tick.Season
-	game.Ready.Unlock()
 }
 
 // nil tick means fetching all previous ticks
-func (game *Game) getReports(previousTick *int64) {
+// Those updates are needed to data endpoint - therefore they have to block in the main loop
+func (game *Game) updateDataReports(previousTick *int64) {
 	err := game.fillCombats(previousTick)
 	if err != nil {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_combat")
 		return
 	}
-	err = game.fillProfiling(previousTick)
+	err = game.fillTrades(previousTick)
+	if err != nil {
+		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_trade")
+		return
+	}
+}
+
+// nil tick means fetching all previous ticks
+// Those reports are needed only in reports endpoint
+func (game *Game) updateReports(previousTick *int64) {
+	err := game.fillProfiling(previousTick)
 	if err != nil {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_timing")
 		return
@@ -237,25 +232,34 @@ func (game *Game) getReports(previousTick *int64) {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_player_score")
 		return
 	}
-	err = game.fillTrades(previousTick)
-	if err != nil {
-		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_trade")
-		return
-	}
+
 	game.fillSeasonAndTick()
 }
 
-func (game *Game) fillAllReportsForPreviousTick() {
+func (game *Game) fillDataReportsForPreviousTick() {
 	previousTick := game.Tick.Tick - 1
 	if previousTick < 0 {
 		return
 	}
-	game.getReports(&previousTick)
+
+	game.updateDataReports(&previousTick)
+}
+
+func (game *Game) fillReportsForPreviousTick(reportsReady chan struct{}) {
+	previousTick := game.Tick.Tick - 1
+	if previousTick < 0 {
+		return
+	}
+	game.ReportsReady.Lock()
+	defer game.ReportsReady.Unlock()
+	game.updateReports(&previousTick)
+	reportsReady <- struct{}{}
 }
 
 func (game *Game) fillAllReportsSinceSeasonStart() {
 	game.Reports = Reports{}
-	game.getReports(nil)
+	game.updateDataReports(nil)
+	game.updateReports(nil)
 }
 
 func (game *Game) getDataReports() DataReports {

@@ -208,6 +208,10 @@ paths:
           name: season
           schema:
             type: integer
+        - in: query
+          name: tick
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
@@ -655,6 +659,15 @@ components:
 
     Reports:
       type: object
+      required:
+        - combat
+        - trade
+        - profiling
+        - prices
+        - resourceAmounts
+        - scores
+        - season
+        - tick
       properties:
         combat:
           type: array

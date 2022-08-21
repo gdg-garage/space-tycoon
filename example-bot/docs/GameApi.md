@@ -270,7 +270,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **reports_get**
-> Reports reports_get(season=season)
+> Reports reports_get(season=season, tick=tick)
 
 Fetch statistical data about all players.
 
@@ -291,10 +291,11 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
 season = 56 # int |  (optional)
+tick = 56 # int |  (optional)
 
 try:
     # Fetch statistical data about all players.
-    api_response = api_instance.reports_get(season=season)
+    api_response = api_instance.reports_get(season=season, tick=tick)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->reports_get: %s\n" % e)
@@ -305,6 +306,7 @@ except ApiException as e:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **season** | **int**|  | [optional] 
+ **tick** | **int**|  | [optional] 
 
 ### Return type
 

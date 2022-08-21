@@ -22,6 +22,7 @@ type Game struct {
 	ShipClasses          map[string]ShipClass
 	SerializedStaticData []byte
 	Ready                *sync.RWMutex
+	ReportsReady         *sync.RWMutex
 	TickCond             *sync.Cond
 	SessionManager       sessions.Store
 	Reports              Reports
@@ -40,10 +41,19 @@ func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 		SessionManager:   sessionManager,
 		TickCond:         sync.NewCond(&sync.Mutex{}),
 		Ready:            &sync.RWMutex{},
+		ReportsReady:     &sync.RWMutex{},
 	}
 	game.Ready.Lock()
-	defer game.Ready.Unlock()
 	err := game.Init()
+	game.Ready.Unlock()
+
+	reportsReady := make(chan struct{}, 1)
+	reportsReady <- struct{}{}
+	err = game.reportHistory(reportsReady)
+	if err != nil {
+		return &game, err
+	}
+
 	return &game, err
 }
 
@@ -66,12 +76,10 @@ func (game *Game) Init() error {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		return err
 	}
-	go func(game *Game) {
-		err := game.reportHistoryStaticData()
-		if err != nil {
-			log.Warn().Err(err).Msg("Reporting season failed")
-		}
-	}(game)
+	err = game.reportHistoryStaticData()
+	if err != nil {
+		log.Warn().Err(err).Msg("Reporting season failed")
+	}
 	err = game.CreatePlayersForUsers()
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating default players failed")
@@ -415,7 +423,7 @@ func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
 
 func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
 	var colors [][]byte
-	// The pallete.Rainbow returns first and last color identical, that's why we uses playerNr + 1
+	// The pallete.Rainbow returns first and last color identical, that's why we use playerNr + 1
 	p := palette.Rainbow(playerNr+1, 0, 1, 1.0 /*saturation*/, 1.0 /*value*/, 1.0 /*alpha*/)
 	for i := range p.Colors() {
 		r, g, b, _ := p.Colors()[i].RGBA()

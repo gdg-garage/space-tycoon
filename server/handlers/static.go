@@ -13,13 +13,14 @@ func StaticGameData(game *stycoon.Game, w http.ResponseWriter, req *http.Request
 		http.Error(w, "only GET method is supported", http.StatusBadRequest)
 		return
 	}
+	// history
 	if req.URL.Query().Has(querySeasonParam) {
 		requestedSeason, err := strconv.Atoi(req.URL.Query().Get(querySeasonParam))
 		if err != nil {
 			http.Error(w, `{"message": "season param is not valid int"}`, http.StatusBadRequest)
 			return
 		}
-		staticData, err := game.HistoricStaticData(requestedSeason)
+		staticData, err := game.GetHistoricStaticData(requestedSeason)
 		if err != nil {
 			log.Warn().Err(err).Int("season", requestedSeason).Msg("fetch historic static data failed")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -34,7 +35,7 @@ func StaticGameData(game *stycoon.Game, w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	// we want data for the current tick
+	// data for the current tick
 	game.Ready.RLock()
 	defer game.Ready.RUnlock()
 	if stycoon.SeasonChanged(game, req, game.SessionManager) {

@@ -511,6 +511,7 @@ class GameApi(object):
 
         :param async_req bool
         :param int season:
+        :param int tick:
         :return: Reports
                  If the method is called asynchronously,
                  returns the request thread.
@@ -532,12 +533,13 @@ class GameApi(object):
 
         :param async_req bool
         :param int season:
+        :param int tick:
         :return: Reports
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['season']  # noqa: E501
+        all_params = ['season', 'tick']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -560,6 +562,8 @@ class GameApi(object):
         query_params = []
         if 'season' in params:
             query_params.append(('season', params['season']))  # noqa: E501
+        if 'tick' in params:
+            query_params.append(('tick', params['tick']))  # noqa: E501
 
         header_params = {}
 

@@ -73,6 +73,10 @@ func main() {
 	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateUser(game, db, w, r)
 	}))
+	// TODO: disable based on config
+	http.HandleFunc("/reset", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Reset(game, w, r)
+	}))
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(game, db, w, r)
 	}))
