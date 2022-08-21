@@ -55,7 +55,13 @@ var ApiClient = /*#__PURE__*/function () {
      * @type {Array.<String>}
      */
 
-    this.authentications = {};
+    this.authentications = {
+      'cookieAuth': {
+        type: 'apiKey',
+        'in': 'query',
+        name: 'SESSION_ID'
+      }
+    };
     /**
      * The default HTTP headers to be included for all API calls.
      * @type {Array.<String>}
@@ -849,7 +855,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = null;
@@ -877,7 +883,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _CurrentTick["default"];
@@ -905,7 +911,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _Data["default"];
@@ -939,7 +945,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _CurrentTick["default"];
@@ -973,7 +979,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _PlayerId["default"];
@@ -1001,7 +1007,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _Reports["default"];
@@ -1029,7 +1035,7 @@ var GameApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = ['application/json'];
       var returnType = _StaticData["default"];
@@ -1098,7 +1104,7 @@ var LogoutApi = /*#__PURE__*/function () {
       var queryParams = {};
       var headerParams = {};
       var formParams = {};
-      var authNames = [];
+      var authNames = ['cookieAuth'];
       var contentTypes = [];
       var accepts = [];
       var returnType = null;
