@@ -683,6 +683,7 @@ components:
         tick:
           type: integer
           format: int64
+
     DataReports:
       type: object
       properties:
