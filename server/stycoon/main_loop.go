@@ -49,22 +49,30 @@ func (game *Game) MainLoop(ctx context.Context, wg *sync.WaitGroup) {
 			start := time.Now()
 			game.lastTickEstimate = time.Now()
 			game.Ready.Lock()
+			expectedSeason := game.Tick.Season
 			if game.Tick.Tick > seasonDuration {
 				log.Warn().Msg("Starting new season")
 				game.nextSeason()
+				expectedSeason++
 			} else {
 				game.callUpdate()
 			}
 			game.lastTickReal = time.Now()
+			game.TickCond.L.Lock()
+			game.setGameTick()
+			if game.Tick.Season != expectedSeason {
+				log.Warn().Msg("season changed in the DB - adjusting to that")
+				err := game.Init()
+				if err != nil {
+					log.Error().Err(err).Msg("Init game after season correction failed")
+				}
+			}
+			game.TickCond.L.Unlock()
+			game.TickCond.Broadcast()
 			err := game.setPlayers()
 			if err != nil {
 				log.Error().Err(err).Msg("Players fetch failed")
 			}
-			game.TickCond.L.Lock()
-			game.setGameTick()
-			// todo if season does not correspond with the current on we have to do init
-			game.TickCond.L.Unlock()
-			game.TickCond.Broadcast()
 			go game.fillAllReportsForPreviousTick()
 			go func(game *Game) {
 				err := game.reportHistory()
