@@ -527,7 +527,28 @@ function graphsHandleZoom(e) {
 	.attr("transform", e.transform)
 }
 
+function filterLinePoints(values) {
+	if (values.length < 10)
+		return values
+	let res = [ values[0] ]
+	let buf = []
+	for (let p of values) {
+		buf.push(p)
+		if (buf.length == 3) {
+			if (buf[0][1] != buf[1][1] || buf[1][1] != buf[2][1]) {
+				res.push(buf[1])
+			}
+			buf.shift()
+		}
+	}
+	res.push(buf[1])
+	return res
+}
+
 function multiLineGraph(lines, legends) {
+	for (let k of Object.keys(lines))
+		lines[k].values = filterLinePoints(lines[k].values)
+
 	let size = d3.select("#thegraph").node().getBoundingClientRect()
 
 	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
