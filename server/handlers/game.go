@@ -152,6 +152,7 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		log.Warn().Err(processingErr).Msg("Command processing failed")
 		w.WriteHeader(http.StatusInternalServerError)
 	} else if len(errs) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
 		b, err := json.Marshal(errs)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
@@ -162,7 +163,6 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 			log.Warn().Err(err).Msg("response write failed")
 			w.WriteHeader(http.StatusInternalServerError)
 		}
-		w.WriteHeader(http.StatusBadRequest)
 	}
 }
 

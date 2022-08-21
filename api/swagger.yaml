@@ -137,18 +137,16 @@ paths:
           content: { }
         "400":
           description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandError'
         "403":
           description: Please login again
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        "405":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommandError'
   /end-turn:
     post:
       summary: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
