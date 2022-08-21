@@ -254,9 +254,7 @@ func (game *Game) fillAllReportsForPreviousTick() {
 }
 
 func (game *Game) fillAllReportsSinceSeasonStart() {
-	game.Ready.Lock()
 	game.Reports = Reports{}
-	game.Ready.Unlock()
 	game.getReports(nil)
 }
 
@@ -267,6 +265,7 @@ func (game *Game) getDataReports() DataReports {
 		return tickReports
 	}
 
+	// TODO may be optimized by using a map to index of a first element in the tick
 	c := game.Reports.Combat
 	pos := sort.Search(len(c), func(i int) bool { return c[i].Tick >= tick })
 	for pos < len(c) && c[pos].Tick == tick {

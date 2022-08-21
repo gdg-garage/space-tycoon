@@ -41,6 +41,8 @@ func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 		TickCond:         sync.NewCond(&sync.Mutex{}),
 		Ready:            &sync.RWMutex{},
 	}
+	game.Ready.Lock()
+	defer game.Ready.Unlock()
 	err := game.Init()
 	return &game, err
 }
