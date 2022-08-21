@@ -60,6 +60,7 @@ function parseCookies() {
 }
 
 function last(p) {
+	// returns last element of an array
 	return p[Object.keys(p)[Object.keys(p).length - 1]]
 }
 
@@ -398,7 +399,6 @@ function spawnKill(attacker, defender) {
 }
 
 function spawnText(pos, direction, color, text, classes) {
-	text = text.toString()
 	let x = pos[0] + direction[0] * 15
 	let y = pos[1] + direction[1] * 15
 	d3.select("#trades")
@@ -430,8 +430,8 @@ function spawnTrade(data, tr) {
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
 	let rn = staticData["resource-names"][tr.resource]
-	spawnText(pos, [0, pl == p1 ? 1 : -1], c, tr.price, "trade-price")
-	spawnText(pos, [1, 0], c, rn, "trade-name")
+	spawnText(pos, [0, pl == p1 ? 1 : -1], c, (pl == p1 ? "-" : "+") + tr.price, "trade-price")
+	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
 
 function mapEvents(data) {
