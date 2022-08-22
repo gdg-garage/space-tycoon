@@ -28,45 +28,23 @@ class RenameCommand(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'type': 'str',
-        'name': 'str'
+        'name': 'str',
+        'type': 'str'
     }
 
     attribute_map = {
-        'type': 'type',
-        'name': 'name'
+        'name': 'name',
+        'type': 'type'
     }
 
-    def __init__(self, type=None, name=None):  # noqa: E501
+    def __init__(self, name=None, type='rename'):  # noqa: E501
         """RenameCommand - a model defined in Swagger"""  # noqa: E501
-        self._type = None
         self._name = None
+        self._type = None
         self.discriminator = None
-        self.type = type
         self.name = name
-
-    @property
-    def type(self):
-        """Gets the type of this RenameCommand.  # noqa: E501
-
-
-        :return: The type of this RenameCommand.  # noqa: E501
-        :rtype: str
-        """
-        return self._type
-
-    @type.setter
-    def type(self, type):
-        """Sets the type of this RenameCommand.
-
-
-        :param type: The type of this RenameCommand.  # noqa: E501
-        :type: str
-        """
-        if type is None:
-            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
-
-        self._type = type
+        if type is not None:
+            self.type = type
 
     @property
     def name(self):
@@ -90,6 +68,27 @@ class RenameCommand(object):
             raise ValueError("Invalid value for `name`, must not be `None`")  # noqa: E501
 
         self._name = name
+
+    @property
+    def type(self):
+        """Gets the type of this RenameCommand.  # noqa: E501
+
+
+        :return: The type of this RenameCommand.  # noqa: E501
+        :rtype: str
+        """
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        """Sets the type of this RenameCommand.
+
+
+        :param type: The type of this RenameCommand.  # noqa: E501
+        :type: str
+        """
+
+        self._type = type
 
     def to_dict(self):
         """Returns the model properties as a dict"""

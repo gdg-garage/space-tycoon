@@ -95,7 +95,7 @@ class LogoutApi(object):
 
         body_params = None
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/logout', 'GET',

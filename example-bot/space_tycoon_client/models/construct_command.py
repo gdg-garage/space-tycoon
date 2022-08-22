@@ -37,13 +37,14 @@ class ConstructCommand(object):
         'type': 'type'
     }
 
-    def __init__(self, ship_class=None, type=None):  # noqa: E501
+    def __init__(self, ship_class=None, type='construct'):  # noqa: E501
         """ConstructCommand - a model defined in Swagger"""  # noqa: E501
         self._ship_class = None
         self._type = None
         self.discriminator = None
         self.ship_class = ship_class
-        self.type = type
+        if type is not None:
+            self.type = type
 
     @property
     def ship_class(self):
@@ -86,8 +87,6 @@ class ConstructCommand(object):
         :param type: The type of this ConstructCommand.  # noqa: E501
         :type: str
         """
-        if type is None:
-            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
         self._type = type
 

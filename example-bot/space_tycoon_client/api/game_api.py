@@ -111,7 +111,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/commands', 'POST',
@@ -196,7 +196,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/current-tick', 'GET',
@@ -281,7 +281,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/data', 'GET',
@@ -378,7 +378,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/end-turn', 'POST',
@@ -475,7 +475,7 @@ class GameApi(object):
             ['*/*'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/login', 'POST',
@@ -560,7 +560,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/reports', 'GET',
@@ -645,7 +645,7 @@ class GameApi(object):
             ['application/json'])  # noqa: E501
 
         # Authentication setting
-        auth_settings = []  # noqa: E501
+        auth_settings = ['cookieAuth']  # noqa: E501
 
         return self.api_client.call_api(
             '/static-data', 'GET',
