@@ -2431,6 +2431,7 @@ SELECT t_command.ship AS attacker, t_command.target AS defender
 FROM t_command
 JOIN t_object AS a ON a.id = t_command.ship
 JOIN t_object AS b ON b.id = t_command.target
+JOIN t_ship ON t_ship.id = t_command.target # ensure that only ships can be attacked
 WHERE t_command.type = 'attack' AND ((a.pos_x = b.pos_x AND a.pos_y = b.pos_y) OR (a.pos_x = b.pos_x_prev AND a.pos_y = b.pos_y_prev));
 
 DROP TEMPORARY TABLE IF EXISTS t_ship_damages;
