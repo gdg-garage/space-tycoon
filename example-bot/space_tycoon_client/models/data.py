@@ -32,7 +32,9 @@ class Data(object):
         'planets': 'dict(str, Planet)',
         'player_id': 'str',
         'players': 'dict(str, Player)',
-        'ships': 'dict(str, Ship)'
+        'ships': 'dict(str, Ship)',
+        'wrecks': 'dict(str, Wreck)',
+        'reports': 'DataReports'
     }
 
     attribute_map = {
@@ -40,16 +42,20 @@ class Data(object):
         'planets': 'planets',
         'player_id': 'player-id',
         'players': 'players',
-        'ships': 'ships'
+        'ships': 'ships',
+        'wrecks': 'wrecks',
+        'reports': 'reports'
     }
 
-    def __init__(self, current_tick=None, planets=None, player_id=None, players=None, ships=None):  # noqa: E501
+    def __init__(self, current_tick=None, planets=None, player_id=None, players=None, ships=None, wrecks=None, reports=None):  # noqa: E501
         """Data - a model defined in Swagger"""  # noqa: E501
         self._current_tick = None
         self._planets = None
         self._player_id = None
         self._players = None
         self._ships = None
+        self._wrecks = None
+        self._reports = None
         self.discriminator = None
         self.current_tick = current_tick
         self.planets = planets
@@ -57,6 +63,10 @@ class Data(object):
             self.player_id = player_id
         self.players = players
         self.ships = ships
+        if wrecks is not None:
+            self.wrecks = wrecks
+        if reports is not None:
+            self.reports = reports
 
     @property
     def current_tick(self):
@@ -170,6 +180,48 @@ class Data(object):
             raise ValueError("Invalid value for `ships`, must not be `None`")  # noqa: E501
 
         self._ships = ships
+
+    @property
+    def wrecks(self):
+        """Gets the wrecks of this Data.  # noqa: E501
+
+
+        :return: The wrecks of this Data.  # noqa: E501
+        :rtype: dict(str, Wreck)
+        """
+        return self._wrecks
+
+    @wrecks.setter
+    def wrecks(self, wrecks):
+        """Sets the wrecks of this Data.
+
+
+        :param wrecks: The wrecks of this Data.  # noqa: E501
+        :type: dict(str, Wreck)
+        """
+
+        self._wrecks = wrecks
+
+    @property
+    def reports(self):
+        """Gets the reports of this Data.  # noqa: E501
+
+
+        :return: The reports of this Data.  # noqa: E501
+        :rtype: DataReports
+        """
+        return self._reports
+
+    @reports.setter
+    def reports(self, reports):
+        """Sets the reports of this Data.
+
+
+        :param reports: The reports of this Data.  # noqa: E501
+        :type: DataReports
+        """
+
+        self._reports = reports
 
     def to_dict(self):
         """Returns the model properties as a dict"""

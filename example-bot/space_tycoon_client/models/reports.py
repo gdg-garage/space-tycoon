@@ -29,38 +29,53 @@ class Reports(object):
     """
     swagger_types = {
         'combat': 'list[Combat]',
+        'trade': 'list[Trade]',
         'profiling': 'list[Profiling]',
         'prices': 'Price',
+        'resource_amounts': 'dict(str, ResourceAmount)',
         'scores': 'Score',
-        'trade': 'list[Trade]'
+        'season': 'int',
+        'tick': 'int'
     }
 
     attribute_map = {
         'combat': 'combat',
+        'trade': 'trade',
         'profiling': 'profiling',
         'prices': 'prices',
+        'resource_amounts': 'resourceAmounts',
         'scores': 'scores',
-        'trade': 'trade'
+        'season': 'season',
+        'tick': 'tick'
     }
 
-    def __init__(self, combat=None, profiling=None, prices=None, scores=None, trade=None):  # noqa: E501
+    def __init__(self, combat=None, trade=None, profiling=None, prices=None, resource_amounts=None, scores=None, season=None, tick=None):  # noqa: E501
         """Reports - a model defined in Swagger"""  # noqa: E501
         self._combat = None
+        self._trade = None
         self._profiling = None
         self._prices = None
+        self._resource_amounts = None
         self._scores = None
-        self._trade = None
+        self._season = None
+        self._tick = None
         self.discriminator = None
         if combat is not None:
             self.combat = combat
+        if trade is not None:
+            self.trade = trade
         if profiling is not None:
             self.profiling = profiling
         if prices is not None:
             self.prices = prices
+        if resource_amounts is not None:
+            self.resource_amounts = resource_amounts
         if scores is not None:
             self.scores = scores
-        if trade is not None:
-            self.trade = trade
+        if season is not None:
+            self.season = season
+        if tick is not None:
+            self.tick = tick
 
     @property
     def combat(self):
@@ -82,6 +97,27 @@ class Reports(object):
         """
 
         self._combat = combat
+
+    @property
+    def trade(self):
+        """Gets the trade of this Reports.  # noqa: E501
+
+
+        :return: The trade of this Reports.  # noqa: E501
+        :rtype: list[Trade]
+        """
+        return self._trade
+
+    @trade.setter
+    def trade(self, trade):
+        """Sets the trade of this Reports.
+
+
+        :param trade: The trade of this Reports.  # noqa: E501
+        :type: list[Trade]
+        """
+
+        self._trade = trade
 
     @property
     def profiling(self):
@@ -128,6 +164,27 @@ class Reports(object):
         self._prices = prices
 
     @property
+    def resource_amounts(self):
+        """Gets the resource_amounts of this Reports.  # noqa: E501
+
+
+        :return: The resource_amounts of this Reports.  # noqa: E501
+        :rtype: dict(str, ResourceAmount)
+        """
+        return self._resource_amounts
+
+    @resource_amounts.setter
+    def resource_amounts(self, resource_amounts):
+        """Sets the resource_amounts of this Reports.
+
+
+        :param resource_amounts: The resource_amounts of this Reports.  # noqa: E501
+        :type: dict(str, ResourceAmount)
+        """
+
+        self._resource_amounts = resource_amounts
+
+    @property
     def scores(self):
         """Gets the scores of this Reports.  # noqa: E501
 
@@ -149,25 +206,46 @@ class Reports(object):
         self._scores = scores
 
     @property
-    def trade(self):
-        """Gets the trade of this Reports.  # noqa: E501
+    def season(self):
+        """Gets the season of this Reports.  # noqa: E501
 
 
-        :return: The trade of this Reports.  # noqa: E501
-        :rtype: list[Trade]
+        :return: The season of this Reports.  # noqa: E501
+        :rtype: int
         """
-        return self._trade
+        return self._season
 
-    @trade.setter
-    def trade(self, trade):
-        """Sets the trade of this Reports.
+    @season.setter
+    def season(self, season):
+        """Sets the season of this Reports.
 
 
-        :param trade: The trade of this Reports.  # noqa: E501
-        :type: list[Trade]
+        :param season: The season of this Reports.  # noqa: E501
+        :type: int
         """
 
-        self._trade = trade
+        self._season = season
+
+    @property
+    def tick(self):
+        """Gets the tick of this Reports.  # noqa: E501
+
+
+        :return: The tick of this Reports.  # noqa: E501
+        :rtype: int
+        """
+        return self._tick
+
+    @tick.setter
+    def tick(self, tick):
+        """Sets the tick of this Reports.
+
+
+        :param tick: The tick of this Reports.  # noqa: E501
+        :type: int
+        """
+
+        self._tick = tick
 
     def to_dict(self):
         """Returns the model properties as a dict"""

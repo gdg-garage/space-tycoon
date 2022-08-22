@@ -32,6 +32,7 @@ from space_tycoon_client.models.coordinates import Coordinates
 from space_tycoon_client.models.credentials import Credentials
 from space_tycoon_client.models.current_tick import CurrentTick
 from space_tycoon_client.models.data import Data
+from space_tycoon_client.models.data_reports import DataReports
 from space_tycoon_client.models.decommission_command import DecommissionCommand
 from space_tycoon_client.models.destination import Destination
 from space_tycoon_client.models.end_turn import EndTurn
@@ -47,6 +48,7 @@ from space_tycoon_client.models.rename_command import RenameCommand
 from space_tycoon_client.models.repair_command import RepairCommand
 from space_tycoon_client.models.reports import Reports
 from space_tycoon_client.models.resource import Resource
+from space_tycoon_client.models.resource_amount import ResourceAmount
 from space_tycoon_client.models.resources import Resources
 from space_tycoon_client.models.score import Score
 from space_tycoon_client.models.ship import Ship
@@ -57,3 +59,4 @@ from space_tycoon_client.models.trade import Trade
 from space_tycoon_client.models.trade_command import TradeCommand
 from space_tycoon_client.models.trading_resource import TradingResource
 from space_tycoon_client.models.waypoint import Waypoint
+from space_tycoon_client.models.wreck import Wreck

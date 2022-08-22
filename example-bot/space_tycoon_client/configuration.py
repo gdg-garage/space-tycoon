@@ -229,6 +229,13 @@ class Configuration(six.with_metaclass(TypeWithDefault, object)):
         :return: The Auth Settings information dict.
         """
         return {
+            'cookieAuth':
+                {
+                    'type': 'api_key',
+                    'in': 'query',
+                    'key': 'SESSION_ID',
+                    'value': self.get_api_key_with_prefix('SESSION_ID')
+                },
         }
 
     def to_debug_report(self):
