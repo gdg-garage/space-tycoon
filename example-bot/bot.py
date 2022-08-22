@@ -95,7 +95,7 @@ class Game:
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
             commands[mothership_id] = ConstructCommand(
-                ship_class=shipper_class_id, type="construct")
+                ship_class=shipper_class_id)
 
         # send shippers to buy something
         idle_shippers: Tuple[str, List[Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
@@ -124,7 +124,6 @@ class Game:
 
                 max_amount = min(current_money // res.buy_price, res.amount)
                 commands[shipper[0]] = TradeCommand(
-                    type="trade",
                     amount=min(max_amount, self.static_data.ship_classes[shipper[1].ship_class].cargo_capacity),
                     resource=res_id, target=planet_id)
                 d = Game.dist(planet.position, shipper[1].position)
@@ -142,7 +141,7 @@ class Game:
                     continue
                 for sId, s in res_to_shipper[rId].items():
                     amount = s.resources[rId]["amount"]
-                    commands[sId] = TradeCommand(type="trade", amount=-amount, resource=rId, target=planet_id)
+                    commands[sId] = TradeCommand(amount=-amount, resource=rId, target=planet_id)
                     print(f"selling {amount} of {rId}")
                     del res_to_shipper[rId]
 
