@@ -2611,6 +2611,10 @@ SELECT * FROM t_recipe_result;
 
 DELETE FROM t_commodity WHERE amount = 0;
 
+UPDATE t_planet AS p
+JOIN t_recipe_planets AS r ON r.planet = p.id
+SET recipe_count = recipe_count + 1, recipe_tick = (SELECT tick FROM t_game LIMIT 1);
+
 END//
 DELIMITER ;
 
@@ -3079,6 +3083,8 @@ CREATE TABLE IF NOT EXISTS `t_object` (
 DROP TABLE IF EXISTS `t_planet`;
 CREATE TABLE IF NOT EXISTS `t_planet` (
   `id` int(11) NOT NULL,
+  `recipe_count` int(11) NOT NULL DEFAULT 0 COMMENT 'number of times the recipe has been processed on this planet',
+  `recipe_tick` int(11) NOT NULL DEFAULT 0 COMMENT 'tick when the recipe was last processed on this planet',
   PRIMARY KEY (`id`),
   CONSTRAINT `FK__object_id` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
