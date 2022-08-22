@@ -553,13 +553,13 @@ function multiLineGraph(lines, legends) {
 
 	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
 	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 10])
 	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
 	d3.select("#xaxis").call(xAxis)
 
 	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
 	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([35, size.height - 10])
 	let yAxis = d3.axisRight().scale(yScale).ticks(10)
 	d3.select("#yaxis").call(yAxis)
 
@@ -583,7 +583,7 @@ function multiLineGraph(lines, legends) {
 		.classed("legend", true)
 		.text(d => d.name)
 		.attr("fill", d => d.color)
-		.attr("x", size.width - 20)
+		.attr("x", size.width - 15)
 		.transition()
 		.duration(1000)
 		.attr("y", d => yScale(d.value) - 3)
@@ -877,10 +877,9 @@ function graphsTimerLoop() {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
-				d3.select("#tickInfo").text("")
+				d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 				if (data.season != currentTick.season) {
 					staticData = undefined
-					playerData = undefined
 					currentTick.season = data.season
 				}
 				graphsRefresh(data)
