@@ -11,27 +11,43 @@ package stycoon
 
 type Reports struct {
 
-	Combat []Combat `json:"combat,omitempty"`
+	Combat []Combat `json:"combat"`
 
-	Trade []Trade `json:"trade,omitempty"`
+	Trade []Trade `json:"trade"`
 
 	// Profiling information about the game. Used by the visualization website.
-	Profiling []Profiling `json:"profiling,omitempty"`
+	Profiling []Profiling `json:"profiling"`
 
 	// Prices are average across all planets.
-	Prices map[string]map[string]int64 `json:"prices,omitempty"`
+	Prices map[string]map[string]int64 `json:"prices"`
 
-	ResourceAmounts map[string]map[string]int64 `json:"resourceAmounts,omitempty"`
+	ResourceAmounts map[string]map[string]int64 `json:"resourceAmounts"`
 
-	Scores map[string]ScoreValue `json:"scores,omitempty"`
+	Scores map[string]ScoreValue `json:"scores"`
 
-	Season int64 `json:"season,omitempty"`
+	Season int64 `json:"season"`
 
-	Tick int64 `json:"tick,omitempty"`
+	Tick int64 `json:"tick"`
 }
 
 // AssertReportsRequired checks if the required fields are not zero-ed
 func AssertReportsRequired(obj Reports) error {
+	elements := map[string]interface{}{
+		"combat": obj.Combat,
+		"trade": obj.Trade,
+		"profiling": obj.Profiling,
+		"prices": obj.Prices,
+		"resourceAmounts": obj.ResourceAmounts,
+		"scores": obj.Scores,
+		"season": obj.Season,
+		"tick": obj.Tick,
+	}
+	for name, el := range elements {
+		if isZero := IsZeroValue(el); isZero {
+			return &RequiredError{Field: name}
+		}
+	}
+
 	for _, el := range obj.Combat {
 		if err := AssertCombatRequired(el); err != nil {
 			return err

@@ -8,7 +8,7 @@ import (
 )
 
 func InsertUser(db *sql.DB, username string, password string) error {
-	_, err := db.Exec(`insert into d_user (name, password) values (?, ?)`, username, password)
+	_, err := db.Exec("insert into d_user (name, password) values (?, ?)", username, password)
 	return err
 }
 

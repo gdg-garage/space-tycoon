@@ -30,8 +30,8 @@ func ConnectDB(cfg mysql.Config) (*sql.DB, error) {
 }
 
 func ConnectDBWithRetries() *sql.DB {
-	max_retries := 5
-	retry_backoff := 500 * time.Millisecond
+	maxRetries := 5
+	retryBackoff := 500 * time.Millisecond
 	cfg := mysql.Config{
 		User:                 "root",
 		Passwd:               "secret", // TODO load config
@@ -47,11 +47,11 @@ func ConnectDBWithRetries() *sql.DB {
 		var err error
 		db, err = ConnectDB(cfg)
 		if err != nil {
-			retryLog := log.With().Err(err).Int("retry", retry).Int("max_retries", max_retries).Logger()
-			if retry < max_retries {
+			retryLog := log.With().Err(err).Int("retry", retry).Int("max_retries", maxRetries).Logger()
+			if retry < maxRetries {
 				retryLog.Error().Msg("DB connection failed - retrying")
 				retry++
-				time.Sleep(retry_backoff)
+				time.Sleep(retryBackoff)
 				continue
 			} else {
 				retryLog.Fatal().Err(err).Msg("DB connection failed - too many retires - giving up")

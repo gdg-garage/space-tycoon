@@ -92,10 +92,12 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+season = 56 # int |  (optional)
+tick = 56 # int |  (optional)
 
 try:
     # Dynamic game data (scores, prices, spaceship positions)
-    api_response = api_instance.data_get()
+    api_response = api_instance.data_get(season=season, tick=tick)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->data_get: %s\n" % e)
@@ -144,8 +146,24 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
 
 try:
+    api_instance.logout_get()
+except ApiException as e:
+    print("Exception when calling GameApi->logout_get: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+season = 56 # int |  (optional)
+tick = 56 # int |  (optional)
+
+try:
     # Fetch statistical data about all players.
-    api_response = api_instance.reports_get()
+    api_response = api_instance.reports_get(season=season, tick=tick)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->reports_get: %s\n" % e)
@@ -158,10 +176,11 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+season = 56 # int |  (optional)
 
 try:
     # Data that do not change during entire season, such as ships classes.
-    api_response = api_instance.static_data_get()
+    api_response = api_instance.static_data_get(season=season)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->static_data_get: %s\n" % e)
@@ -178,9 +197,9 @@ Class | Method | HTTP request | Description
 *GameApi* | [**data_get**](docs/GameApi.md#data_get) | **GET** /data | Dynamic game data (scores, prices, spaceship positions)
 *GameApi* | [**end_turn_post**](docs/GameApi.md#end_turn_post) | **POST** /end-turn | Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
 *GameApi* | [**login_post**](docs/GameApi.md#login_post) | **POST** /login | Get user session
+*GameApi* | [**logout_get**](docs/GameApi.md#logout_get) | **GET** /logout | 
 *GameApi* | [**reports_get**](docs/GameApi.md#reports_get) | **GET** /reports | Fetch statistical data about all players.
 *GameApi* | [**static_data_get**](docs/GameApi.md#static_data_get) | **GET** /static-data | Data that do not change during entire season, such as ships classes.
-*LogoutApi* | [**logout_get**](docs/LogoutApi.md#logout_get) | **GET** /logout | 
 
 ## Documentation For Models
 

@@ -3,18 +3,17 @@ package main
 import (
 	"context"
 	"database/sql"
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -73,6 +72,10 @@ func main() {
 	// TODO: disable based on config
 	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.CreateUser(game, db, w, r)
+	}))
+	// TODO: disable based on config
+	http.HandleFunc("/reset", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+		handlers.Reset(game, w, r)
 	}))
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(game, db, w, r)

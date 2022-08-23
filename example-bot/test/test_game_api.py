@@ -63,6 +63,12 @@ class TestGameApi(unittest.TestCase):
         """
         pass
 
+    def test_logout_get(self):
+        """Test case for logout_get
+
+        """
+        pass
+
     def test_reports_get(self):
         """Test case for reports_get
 

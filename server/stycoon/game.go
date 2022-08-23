@@ -22,6 +22,7 @@ type Game struct {
 	ShipClasses          map[string]ShipClass
 	SerializedStaticData []byte
 	Ready                *sync.RWMutex
+	ReportsReady         *sync.RWMutex
 	TickCond             *sync.Cond
 	SessionManager       sessions.Store
 	Reports              Reports
@@ -40,8 +41,19 @@ func NewGame(db *sql.DB, sessionManager sessions.Store) (*Game, error) {
 		SessionManager:   sessionManager,
 		TickCond:         sync.NewCond(&sync.Mutex{}),
 		Ready:            &sync.RWMutex{},
+		ReportsReady:     &sync.RWMutex{},
 	}
+	game.Ready.Lock()
 	err := game.Init()
+	game.Ready.Unlock()
+
+	reportsReady := make(chan struct{}, 1)
+	reportsReady <- struct{}{}
+	err = game.reportHistory(reportsReady)
+	if err != nil {
+		return &game, err
+	}
+
 	return &game, err
 }
 
@@ -63,6 +75,10 @@ func (game *Game) Init() error {
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
 		return err
+	}
+	err = game.reportHistoryStaticData()
+	if err != nil {
+		log.Warn().Err(err).Msg("Reporting season failed")
 	}
 	err = game.CreatePlayersForUsers()
 	if err != nil {
@@ -222,11 +238,18 @@ func (game *Game) GetWrecks() (map[string]Wreck, error) {
 
 func (game *Game) getPlayerCommands(playerId string) (map[int]Command, error) {
 	commands := make(map[int]Command)
-	playerIdInt, err := strconv.Atoi(playerId)
+	var err error
 	if err != nil {
 		return commands, err
 	}
-	rows, err := game.db.Query("select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id where object.`owner` = ?", playerIdInt)
+	var rows *sql.Rows
+	// return all commands for history report
+	allCommandsQuery := "select object.`id`, `type`, `target`, `resource`, `amount`, `class` from t_command join t_object object on t_command.ship = object.id"
+	if playerId == "-1" {
+		rows, err = game.db.Query(allCommandsQuery)
+	} else {
+		rows, err = game.db.Query(allCommandsQuery+" where object.`owner` = ?", playerId)
+	}
 	if err != nil {
 		return commands, err
 	}
@@ -400,11 +423,11 @@ func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
 
 func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
 	var colors [][]byte
-	// The pallete.Rainbow returns first and last color identical, that's why we uses playerNr + 1
+	// The pallete.Rainbow returns first and last color identical, that's why we use playerNr + 1
 	p := palette.Rainbow(playerNr+1, 0, 1, 1.0 /*saturation*/, 1.0 /*value*/, 1.0 /*alpha*/)
 	for i := range p.Colors() {
 		r, g, b, _ := p.Colors()[i].RGBA()
-		// RGBA() method rerturns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
+		// RGBA() method returns colors shifted to 32-bit range (r << 8), so we need to reverse the operation
 		color, err := json.Marshal([]uint32{r >> 8, g >> 8, b >> 8})
 		if err != nil {
 			return colors, err
@@ -442,7 +465,6 @@ func (game *Game) CreatePlayersForUsers() error {
 			// Player already exists for this user
 			continue
 		}
-		// TODO let user change the player name
 		pos := playerPositions[counter]
 		color := playerColors[counter]
 		log.Info().Str("user", name).Msg("Creating player for user")
