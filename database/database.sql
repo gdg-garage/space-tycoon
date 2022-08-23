@@ -2213,47 +2213,6 @@ UPDATE t_object SET pos_x_prev = pos_x, pos_y_prev = pos_y;
 END//
 DELIMITER ;
 
--- Dumping structure for procedure space_tycoon.p_generate_prices
-DROP PROCEDURE IF EXISTS `p_generate_prices`;
-DELIMITER //
-CREATE PROCEDURE `p_generate_prices`()
-    SQL SECURITY INVOKER
-BEGIN
-
-DELETE FROM t_price;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_supply_demand;
-CREATE TEMPORARY TABLE t_price_supply_demand
-(PRIMARY KEY(resource))
-SELECT resource, SUM(if(production > 0, production, 0)) AS supply, SUM(if(production < 0, -production, 0)) AS demand, SUM(ABS(production)) * 0.5 AS volume
-FROM t_recipe GROUP BY resource;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_supply_demand_avg;
-CREATE TEMPORARY TABLE t_price_supply_demand_avg
-SELECT AVG(supply) AS supply_avg, AVG(demand) AS demand_avg, AVG(volume) AS volume_avg
-FROM t_price_supply_demand;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_planet_resource_weight;
-CREATE TEMPORARY TABLE t_price_planet_resource_weight
-(INDEX(planet), INDEX(resource), PRIMARY KEY(planet, resource))
-SELECT a.planet, a.resource,
-ABS(a.production) * SUM(SIGN(a.production) = SIGN(b.production)) / SUM(if(SIGN(a.production) = SIGN(b.production), ABS(b.production), 0)) AS weight
-FROM t_recipe AS a
-JOIN t_recipe AS b USING(planet)
-GROUP BY a.planet, a.resource;
-
-INSERT INTO t_price (planet, resource, buy, sell)
-SELECT planet, resource,
-if(production > 0, 100 * demand / supply / weight * demand_avg / supply_avg, NULL),
-if(production < 0, 100 * demand / supply * weight, NULL)
-FROM t_recipe
-JOIN t_price_planet_resource_weight USING(planet, resource)
-JOIN t_price_supply_demand USING(resource)
-JOIN t_price_supply_demand_avg;
-
-END//
-DELIMITER ;
-
 -- Dumping structure for procedure space_tycoon.p_generate_random_commands
 DROP PROCEDURE IF EXISTS `p_generate_random_commands`;
 DELIMITER //
@@ -2910,8 +2869,6 @@ UPDATE t_game SET season = season + 1, tick = 1;
 CALL p_clear_all;
 CALL p_generate_planets;
 CALL p_generate_resources;
-CALL p_process_recipes;
-CALL p_generate_prices;
 CALL p_update_prices;
 
 COMMIT;
@@ -2994,7 +2951,24 @@ CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
 BEGIN
 
-# TODO
+DROP TEMPORARY TABLE IF EXISTS t_recipe_stats;
+CREATE TEMPORARY TABLE t_recipe_stats
+(PRIMARY KEY(planet, resource))
+SELECT t_recipe.planet, t_recipe.resource,
+	if(production > 0, ifnull(amount, 0), 0) AS surplus,
+	if(production < 0, GREATEST(production * -2 - ifnull(amount, 0), 0), 0) AS lack,
+	(SELECT tick FROM t_game LIMIT 1) - t_planet.recipe_tick AS elapsed
+FROM t_planet
+JOIN t_recipe ON t_recipe.planet = t_planet.id
+left JOIN t_commodity ON t_commodity.object = t_recipe.planet AND t_commodity.resource = t_recipe.resource;
+
+UPDATE t_price SET buy = NULL, sell = null;
+
+REPLACE INTO t_price (planet, resource, buy, sell)
+SELECT planet, resource, if(surplus > 0, 1000 / SQRT(surplus + 10), NULL), if(lack > 0, (lack + 100) * (elapsed + 100) * 0.01, NULL)
+FROM t_recipe_stats;
+
+DELETE FROM t_price WHERE buy IS NULL AND sell IS NULL;
 
 END//
 DELIMITER ;
