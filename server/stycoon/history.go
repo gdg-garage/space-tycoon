@@ -6,7 +6,7 @@ import (
 )
 
 func (game *Game) reportHistoryStaticData() error {
-	_, err := game.db.Exec("replace into d_static_history (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
+	_, err := game.db.Exec("replace into d_history_static (`season`, `static-data`) values (?, ?)", game.Tick.Season, game.SerializedStaticData)
 	return err
 }
 
@@ -17,7 +17,7 @@ func (game *Game) reportReportHistory() error {
 	if err != nil {
 		return err
 	}
-	_, err = game.db.Exec("replace into d_reports_history (`season`, `reports`) values (?, ?)", game.Tick.Season, serializedReports)
+	_, err = game.db.Exec("replace into d_history_reports (`season`, `reports`) values (?, ?)", game.Tick.Season, serializedReports)
 	return err
 }
 
@@ -44,7 +44,7 @@ func (game *Game) reportDataHistory() error {
 	if err != nil {
 		return err
 	}
-	_, err = game.db.Exec("replace into d_history (`season`, `tick`, `data`) values (?, ?, ?)", game.Tick.Season, game.Tick.Tick, serializedData)
+	_, err = game.db.Exec("replace into d_history_data (`season`, `tick`, `data`) values (?, ?, ?)", game.Tick.Season, game.Tick.Tick, serializedData)
 	return err
 }
 
@@ -175,7 +175,7 @@ func FilterReportsUpToTick(fullReports *Reports, tick int64) Reports {
 func (game *Game) GetHistoryData(season int64, tick int64, playerId *string) (Data, error) {
 	var entry Data
 	var data string
-	err := game.db.QueryRow("select `data` from d_history where `season` = ? and `tick` = ?", season, tick).Scan(&data)
+	err := game.db.QueryRow("select `data` from d_history_data where `season` = ? and `tick` = ?", season, tick).Scan(&data)
 	if err != nil {
 		return entry, err
 	}
@@ -193,14 +193,14 @@ func (game *Game) GetHistoryData(season int64, tick int64, playerId *string) (Da
 
 func (game *Game) GetHistoricStaticData(season int) (string, error) {
 	var staticData string
-	err := game.db.QueryRow("select `static-data` from d_static_history where `season` = ?", season).Scan(&staticData)
+	err := game.db.QueryRow("select `static-data` from d_history_static where `season` = ?", season).Scan(&staticData)
 	return staticData, err
 }
 
 func (game *Game) GetHistoryReports(season int64, tick int64) (Reports, error) {
 	var entry Reports
 	var jsonReports string
-	err := game.db.QueryRow("select `reports` from d_reports_history where `season` = ?", season).Scan(&jsonReports)
+	err := game.db.QueryRow("select `reports` from d_history_reports where `season` = ?", season).Scan(&jsonReports)
 	if err != nil {
 		return entry, err
 	}
