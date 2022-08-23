@@ -59,7 +59,7 @@ paths:
   /logout:
     get:
       tags:
-        - logout
+        - game
       responses:
         "200":
           description: OK
@@ -95,7 +95,6 @@ paths:
       summary: "Dynamic game data (scores, prices, spaceship positions)"
       tags:
         - game
-        - data
       parameters:
         - in: query
           name: season
