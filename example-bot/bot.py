@@ -21,7 +21,6 @@ from space_tycoon_client.models.player_id import PlayerId
 from space_tycoon_client.models.ship import Ship
 from space_tycoon_client.models.static_data import StaticData
 from space_tycoon_client.models.trade_command import TradeCommand
-from space_tycoon_client.models.construct_command import ConstructCommand
 from space_tycoon_client.rest import ApiException
 
 
@@ -185,7 +184,6 @@ class Game:
                     break
 
                 commands[ship_id] = TradeCommand(
-                    type="trade",
                     amount=amount,
                     resource=trade["resource_id"], target=trade["buy_planet_id"])
                 print(
@@ -205,7 +203,7 @@ class Game:
                                                                      self.data.planets[x[0]].position) / 2000)))
                 amount = ship.resources[resource_id]["amount"]
                 print(amount)
-                commands[ship_id] = TradeCommand(type="trade", amount=-amount, resource=resource_id,
+                commands[ship_id] = TradeCommand(amount=-amount, resource=resource_id,
                                                  target=sell_planet_id)
                 print(
                     f"selling {amount} of [{self.static_data.resource_names[resource_id]}] distance {self.dist(ship.position, sell_planet.position)}")
@@ -226,7 +224,7 @@ class Game:
 
             for ship_id, ship in idle_attack_ships:
                 # attack on self should fail
-                commands[ship_id] = AttackCommand(type="attack", target=target_id)
+                commands[ship_id] = AttackCommand(target=target_id)
 
         # defense
         # check if someone is close to our mothership
@@ -236,7 +234,7 @@ class Game:
         # mothership defends itself
         if len(close_ships) > 0:
             print(f"There are {len(close_ships)} alien ships close to our Mothership!")
-            commands[mothership_id] = AttackCommand(type="attack", target=list(close_ships.keys())[0])
+            commands[mothership_id] = AttackCommand(target=list(close_ships.keys())[0])
 
         pprint(commands) if commands else None
         try:
