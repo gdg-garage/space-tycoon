@@ -12,6 +12,19 @@ services:
     volumes:
       - ./sessions:/app/sessions
 
+  dev-server:
+    build: server
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      - SESSION_KEY=thisisverysecret
+    volumes:
+      - ./sessions:/app/sessions
+    command:
+      - "--dev"
+
   server-tidy:
     image: golang:1.18-alpine
     working_dir: /app
