@@ -27,7 +27,7 @@ func (game *Game) processTrade(id int64, playerOwnedShips map[int64]struct{}, pl
 	_, targetIsPlanet := planetIDs[id]
 
 	if !shipOwnedByPlayer && !targetIsPlanet {
-		return fmt.Errorf("trading with another players ship is forbidden")
+		return fmt.Errorf("trading with wreck or another players ship is forbidden")
 	}
 
 	target, err := strconv.Atoi(*c.Target)
