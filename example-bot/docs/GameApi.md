@@ -112,7 +112,7 @@ This endpoint does not need any parameter.
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **data_get**
-> Data data_get(season=season, tick=tick)
+> Data data_get()
 
 Dynamic game data (scores, prices, spaceship positions)
 
@@ -132,23 +132,17 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
-season = 56 # int |  (optional)
-tick = 56 # int |  (optional)
 
 try:
     # Dynamic game data (scores, prices, spaceship positions)
-    api_response = api_instance.data_get(season=season, tick=tick)
+    api_response = api_instance.data_get()
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->data_get: %s\n" % e)
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **season** | **int**|  | [optional] 
- **tick** | **int**|  | [optional] 
+This endpoint does not need any parameter.
 
 ### Return type
 
@@ -270,7 +264,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **reports_get**
-> Reports reports_get(season=season, tick=tick)
+> Reports reports_get()
 
 Fetch statistical data about all players.
 
@@ -290,23 +284,17 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
-season = 56 # int |  (optional)
-tick = 56 # int |  (optional)
 
 try:
     # Fetch statistical data about all players.
-    api_response = api_instance.reports_get(season=season, tick=tick)
+    api_response = api_instance.reports_get()
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->reports_get: %s\n" % e)
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **season** | **int**|  | [optional] 
- **tick** | **int**|  | [optional] 
+This endpoint does not need any parameter.
 
 ### Return type
 
@@ -324,7 +312,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **static_data_get**
-> StaticData static_data_get(season=season)
+> StaticData static_data_get()
 
 Data that do not change during entire season, such as ships classes.
 
@@ -344,21 +332,17 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 
 # create an instance of the API class
 api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
-season = 56 # int |  (optional)
 
 try:
     # Data that do not change during entire season, such as ships classes.
-    api_response = api_instance.static_data_get(season=season)
+    api_response = api_instance.static_data_get()
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling GameApi->static_data_get: %s\n" % e)
 ```
 
 ### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **season** | **int**|  | [optional] 
+This endpoint does not need any parameter.
 
 ### Return type
 

@@ -59,16 +59,112 @@ configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
 # configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
 
 # create an instance of the API class
-api_instance = space_tycoon_client.DataApi(space_tycoon_client.ApiClient(configuration))
-season = 56 # int |  (optional)
-tick = 56 # int |  (optional)
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+body = NULL # dict(str, Command) | 
+
+try:
+    # Specify commands for your ships
+    api_instance.commands_post(body)
+except ApiException as e:
+    print("Exception when calling GameApi->commands_post: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+
+try:
+    # Returns the current tick, season and the approximate time until the next tick.
+    api_response = api_instance.current_tick_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling GameApi->current_tick_get: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
 
 try:
     # Dynamic game data (scores, prices, spaceship positions)
-    api_response = api_instance.data_get(season=season, tick=tick)
+    api_response = api_instance.data_get()
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling DataApi->data_get: %s\n" % e)
+    print("Exception when calling GameApi->data_get: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+body = space_tycoon_client.EndTurn() # EndTurn | 
+
+try:
+    # Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
+    api_response = api_instance.end_turn_post(body)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling GameApi->end_turn_post: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+body = space_tycoon_client.Credentials() # Credentials | 
+
+try:
+    # Get user session
+    api_response = api_instance.login_post(body)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling GameApi->login_post: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+
+try:
+    # Fetch statistical data about all players.
+    api_response = api_instance.reports_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling GameApi->reports_get: %s\n" % e)
+
+# Configure API key authorization: cookieAuth
+configuration = space_tycoon_client.Configuration()
+configuration.api_key['SESSION_ID'] = 'YOUR_API_KEY'
+# Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+# configuration.api_key_prefix['SESSION_ID'] = 'Bearer'
+
+# create an instance of the API class
+api_instance = space_tycoon_client.GameApi(space_tycoon_client.ApiClient(configuration))
+
+try:
+    # Data that do not change during entire season, such as ships classes.
+    api_response = api_instance.static_data_get()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling GameApi->static_data_get: %s\n" % e)
 ```
 
 ## Documentation for API Endpoints
@@ -77,7 +173,6 @@ All URIs are relative to *https://space-tycoon.garage-trip.cz/api/*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DataApi* | [**data_get**](docs/DataApi.md#data_get) | **GET** /data | Dynamic game data (scores, prices, spaceship positions)
 *GameApi* | [**commands_post**](docs/GameApi.md#commands_post) | **POST** /commands | Specify commands for your ships
 *GameApi* | [**current_tick_get**](docs/GameApi.md#current_tick_get) | **GET** /current-tick | Returns the current tick, season and the approximate time until the next tick.
 *GameApi* | [**data_get**](docs/GameApi.md#data_get) | **GET** /data | Dynamic game data (scores, prices, spaceship positions)

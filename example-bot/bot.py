@@ -21,6 +21,7 @@ from space_tycoon_client.models.player_id import PlayerId
 from space_tycoon_client.models.ship import Ship
 from space_tycoon_client.models.static_data import StaticData
 from space_tycoon_client.models.trade_command import TradeCommand
+from space_tycoon_client.models.construct_command import ConstructCommand
 from space_tycoon_client.rest import ApiException
 
 
@@ -106,7 +107,7 @@ class Game:
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
             commands[mothership_id] = ConstructCommand(
-                ship_class=shipper_class_id, type="construct")
+                ship_class=shipper_class_id)
 
         # move example
         # commands[ship_id] = MoveCommand(type="move", destination=Destination(target=1))

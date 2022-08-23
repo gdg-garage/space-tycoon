@@ -60,14 +60,22 @@ class Reports(object):
         self._season = None
         self._tick = None
         self.discriminator = None
-        self.combat = combat
-        self.trade = trade
-        self.profiling = profiling
-        self.prices = prices
-        self.resource_amounts = resource_amounts
-        self.scores = scores
-        self.season = season
-        self.tick = tick
+        if combat is not None:
+            self.combat = combat
+        if trade is not None:
+            self.trade = trade
+        if profiling is not None:
+            self.profiling = profiling
+        if prices is not None:
+            self.prices = prices
+        if resource_amounts is not None:
+            self.resource_amounts = resource_amounts
+        if scores is not None:
+            self.scores = scores
+        if season is not None:
+            self.season = season
+        if tick is not None:
+            self.tick = tick
 
     @property
     def combat(self):
@@ -87,8 +95,6 @@ class Reports(object):
         :param combat: The combat of this Reports.  # noqa: E501
         :type: list[Combat]
         """
-        if combat is None:
-            raise ValueError("Invalid value for `combat`, must not be `None`")  # noqa: E501
 
         self._combat = combat
 
@@ -110,8 +116,6 @@ class Reports(object):
         :param trade: The trade of this Reports.  # noqa: E501
         :type: list[Trade]
         """
-        if trade is None:
-            raise ValueError("Invalid value for `trade`, must not be `None`")  # noqa: E501
 
         self._trade = trade
 
@@ -135,8 +139,6 @@ class Reports(object):
         :param profiling: The profiling of this Reports.  # noqa: E501
         :type: list[Profiling]
         """
-        if profiling is None:
-            raise ValueError("Invalid value for `profiling`, must not be `None`")  # noqa: E501
 
         self._profiling = profiling
 
@@ -158,8 +160,6 @@ class Reports(object):
         :param prices: The prices of this Reports.  # noqa: E501
         :type: Price
         """
-        if prices is None:
-            raise ValueError("Invalid value for `prices`, must not be `None`")  # noqa: E501
 
         self._prices = prices
 
@@ -181,8 +181,6 @@ class Reports(object):
         :param resource_amounts: The resource_amounts of this Reports.  # noqa: E501
         :type: dict(str, ResourceAmount)
         """
-        if resource_amounts is None:
-            raise ValueError("Invalid value for `resource_amounts`, must not be `None`")  # noqa: E501
 
         self._resource_amounts = resource_amounts
 
@@ -204,8 +202,6 @@ class Reports(object):
         :param scores: The scores of this Reports.  # noqa: E501
         :type: Score
         """
-        if scores is None:
-            raise ValueError("Invalid value for `scores`, must not be `None`")  # noqa: E501
 
         self._scores = scores
 
@@ -227,8 +223,6 @@ class Reports(object):
         :param season: The season of this Reports.  # noqa: E501
         :type: int
         """
-        if season is None:
-            raise ValueError("Invalid value for `season`, must not be `None`")  # noqa: E501
 
         self._season = season
 
@@ -250,8 +244,6 @@ class Reports(object):
         :param tick: The tick of this Reports.  # noqa: E501
         :type: int
         """
-        if tick is None:
-            raise ValueError("Invalid value for `tick`, must not be `None`")  # noqa: E501
 
         self._tick = tick
 

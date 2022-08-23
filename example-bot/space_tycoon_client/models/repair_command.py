@@ -35,11 +35,12 @@ class RepairCommand(object):
         'type': 'type'
     }
 
-    def __init__(self, type=None):  # noqa: E501
+    def __init__(self, type='repair'):  # noqa: E501
         """RepairCommand - a model defined in Swagger"""  # noqa: E501
         self._type = None
         self.discriminator = None
-        self.type = type
+        if type is not None:
+            self.type = type
 
     @property
     def type(self):
@@ -59,8 +60,6 @@ class RepairCommand(object):
         :param type: The type of this RepairCommand.  # noqa: E501
         :type: str
         """
-        if type is None:
-            raise ValueError("Invalid value for `type`, must not be `None`")  # noqa: E501
 
         self._type = type
 

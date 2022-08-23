@@ -10,16 +10,14 @@
 package stycoon
 
 type MoveCommand struct {
-
-	Type string `json:"type"`
-
 	Destination *Destination `json:"destination"`
+
+	Type string `json:"type,omitempty"`
 }
 
 // AssertMoveCommandRequired checks if the required fields are not zero-ed
 func AssertMoveCommandRequired(obj MoveCommand) error {
 	elements := map[string]interface{}{
-		"type": obj.Type,
 		"destination": obj.Destination,
 	}
 	for name, el := range elements {

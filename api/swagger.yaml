@@ -267,12 +267,12 @@ components:
     MoveCommand:
       type: object
       properties:
-        type:
-          type: string
         destination:
           $ref: "#/components/schemas/Destination"
+        type:
+          type: string
+          default: move
       required:
-        - type
         - destination
 
     StopCommand:
@@ -286,8 +286,8 @@ components:
           nullable: true
         type:
           type: string
+          default: construct
       required:
-        - type
         - ship-class
 
     DecommissionCommand:
@@ -295,38 +295,35 @@ components:
       properties:
         type:
           type: string
-      required:
-        - type
+          default: decommission
 
     RenameCommand:
       type: object
       properties:
-        type:
-          type: string
         name:
           type: string
           nullable: true
+        type:
+          type: string
+          default: rename
       required:
         - name
-        - type
 
     AttackCommand:
       type: object
       properties:
-        type:
-          type: string
         target:
           type: string
           nullable: true
+        type:
+          type: string
+          default: attack
       required:
         - target
-        - type
 
     TradeCommand:
       type: object
       properties:
-        type:
-          type: string
         amount:
           type: integer
           format: int64
@@ -339,19 +336,20 @@ components:
           type: string
           nullable: true
           description: Any planet or own ship.
+        type:
+          type: string
+          default: trade
       required:
         - amount
         - resource
         - target
-        - type
 
     RepairCommand:
       type: object
       properties:
         type:
           type: string
-      required:
-        - type
+          default: repair
 
     Destination:
       type: object

@@ -11,8 +11,6 @@ package stycoon
 
 type TradeCommand struct {
 
-	Type string `json:"type"`
-
 	// Positive value means buy, negative sell.
 	Amount *int64 `json:"amount"`
 
@@ -20,15 +18,16 @@ type TradeCommand struct {
 
 	// Any planet or own ship.
 	Target *string `json:"target"`
+
+	Type string `json:"type,omitempty"`
 }
 
 // AssertTradeCommandRequired checks if the required fields are not zero-ed
 func AssertTradeCommandRequired(obj TradeCommand) error {
 	elements := map[string]interface{}{
-		"type": obj.Type,
-		"amount": obj.Amount,
+		"amount":   obj.Amount,
 		"resource": obj.Resource,
-		"target": obj.Target,
+		"target":   obj.Target,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {
