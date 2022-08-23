@@ -399,8 +399,8 @@ function spawnKill(attacker, defender) {
 }
 
 function spawnText(pos, direction, color, text, classes) {
-	let x = pos[0] + direction[0] * 15
-	let y = pos[1] + direction[1] * 15
+	let x = pos[0] + direction[0] * 10
+	let y = pos[1] + direction[1] * 10
 	d3.select("#trades")
 	.append("text")
 	.text(text)

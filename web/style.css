@@ -88,13 +88,13 @@ form {
 }
 
 #themap .trade-price {
-	font-size: 30px;
+	font-size: 15px;
 	text-anchor: middle;
 	dominant-baseline: middle;
 }
 
 #themap .trade-name {
-	font-size: 15px;
+	font-size: 8px;
 	dominant-baseline: middle;
 }
 
