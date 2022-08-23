@@ -2038,8 +2038,8 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
-DROP TABLE IF EXISTS `d_history`;
-CREATE TABLE `d_history`
+DROP TABLE IF EXISTS `d_history_data`;
+CREATE TABLE `d_history_data`
 (
     `season`      int(11) NOT NULL,
     `tick`        int(11) NOT NULL,
@@ -2049,8 +2049,8 @@ CREATE TABLE `d_history`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3;
 
-DROP TABLE IF EXISTS `d_static_history`;
-CREATE TABLE `d_static_history`
+DROP TABLE IF EXISTS `d_history_static`;
+CREATE TABLE `d_history_static`
 (
     `season`      int(11) NOT NULL,
     `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),
@@ -2059,8 +2059,8 @@ CREATE TABLE `d_static_history`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb3;
 
-DROP TABLE IF EXISTS `d_reports_history`;
-CREATE TABLE `d_reports_history`
+DROP TABLE IF EXISTS `d_history_reports`;
+CREATE TABLE `d_history_reports`
 (
     `season`      int(11) NOT NULL,
     `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`reports`)),
