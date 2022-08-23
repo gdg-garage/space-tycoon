@@ -3111,7 +3111,7 @@ CREATE TABLE IF NOT EXISTS `t_player` (
   `user` int(11) NOT NULL,
   `name` tinytext NOT NULL,
   `money` bigint(20) NOT NULL DEFAULT 5000000,
-  `color` tinytext NOT NULL DEFAULT '[0,0,0]' CHECK (json_valid(`color`)),
+  `color` tinytext NOT NULL DEFAULT '[255,255,255]' CHECK (json_valid(`color`)),
   PRIMARY KEY (`id`),
   UNIQUE KEY `Index 3` (`name`(255)),
   KEY `FK_t_player_t_user` (`user`),
