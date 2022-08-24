@@ -60,6 +60,7 @@ function parseCookies() {
 }
 
 function last(p) {
+	// returns last element of an array
 	return p[Object.keys(p)[Object.keys(p).length - 1]]
 }
 
@@ -398,9 +399,8 @@ function spawnKill(attacker, defender) {
 }
 
 function spawnText(pos, direction, color, text, classes) {
-	text = text.toString()
-	let x = pos[0] + direction[0] * 15
-	let y = pos[1] + direction[1] * 15
+	let x = pos[0] + direction[0] * 10
+	let y = pos[1] + direction[1] * 10
 	d3.select("#trades")
 	.append("text")
 	.text(text)
@@ -430,8 +430,8 @@ function spawnTrade(data, tr) {
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
 	let rn = staticData["resource-names"][tr.resource]
-	spawnText(pos, [0, pl == p1 ? 1 : -1], c, tr.price, "trade-price")
-	spawnText(pos, [1, 0], c, rn, "trade-name")
+	spawnText(pos, [0, pl == p1 ? 1 : -1], c, (pl == p1 ? "-" : "+") + tr.price, "trade-price")
+	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
 
 function mapEvents(data) {
@@ -522,18 +522,44 @@ window.initializeMap = function() {
 // graphs
 //////////////////////////////////////////
 
+function graphsHandleZoom(e) {
+	d3.selectAll("#panzoom")
+	.attr("transform", e.transform)
+}
+
+function filterLinePoints(values) {
+	if (values.length < 10)
+		return values
+	let res = [ values[0] ]
+	let buf = []
+	for (let p of values) {
+		buf.push(p)
+		if (buf.length == 3) {
+			if (buf[0][1] != buf[1][1] || buf[1][1] != buf[2][1]) {
+				res.push(buf[1])
+			}
+			buf.shift()
+		}
+	}
+	res.push(buf[1])
+	return res
+}
+
 function multiLineGraph(lines, legends) {
+	for (let k of Object.keys(lines))
+		lines[k].values = filterLinePoints(lines[k].values)
+
 	let size = d3.select("#thegraph").node().getBoundingClientRect()
 
 	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
 	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 10])
 	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
 	d3.select("#xaxis").call(xAxis)
 
 	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
 	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([35, size.height - 10])
 	let yAxis = d3.axisRight().scale(yScale).ticks(10)
 	d3.select("#yaxis").call(yAxis)
 
@@ -557,7 +583,7 @@ function multiLineGraph(lines, legends) {
 		.classed("legend", true)
 		.text(d => d.name)
 		.attr("fill", d => d.color)
-		.attr("x", size.width - 20)
+		.attr("x", size.width - 15)
 		.transition()
 		.duration(1000)
 		.attr("y", d => yScale(d.value) - 3)
@@ -600,20 +626,28 @@ function graphsRedrawPlayers(data, enabled) {
 			lines.push(m)
 		}
 
-		if (enabled[0])
-			category("resources")
-		if (enabled[1])
-			category("ships")
-		if (enabled[2])
-			category("money")
-		if (enabled[3])
-			category("total")
-
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = last(s.total)
+
+		if (enabled[0]) {
+			l.value = last(s.resources)
+			category("resources")
+		}
+		if (enabled[1]) {
+			l.value = last(s.ships)
+			category("ships")
+		}
+		if (enabled[2]) {
+			l.value = last(s.money)
+			category("money")
+		}
+		if (enabled[3]) {
+			l.value = last(s.total)
+			category("total")
+		}
+
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
@@ -843,10 +877,9 @@ function graphsTimerLoop() {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
-				d3.select("#tickInfo").text("")
+				d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 				if (data.season != currentTick.season) {
 					staticData = undefined
-					playerData = undefined
 					currentTick.season = data.season
 				}
 				graphsRefresh(data)
@@ -857,11 +890,17 @@ function graphsTimerLoop() {
 
 function graphsStartLoop() {
 	d3.select("#tickInfo").text("Connecting...")
-	setTimeout(graphsTimerLoop, 0)
+
+	zoom = d3.zoom().on("zoom", mapHandleZoom)
+	d3.select("#thegraph").call(zoom)
+
 	graphsOptions.type = "players"
 	d3.select("#graphSelect").on("change", function(e) {
+		d3.select("#thegraph").call(zoom.transform, d3.zoomIdentity)
 		graphsOptions.type = e.target.value
 	})
+
+	setTimeout(graphsTimerLoop, 0)
 }
 
 window.initializeGraphs = function() {
