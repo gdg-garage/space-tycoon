@@ -70,9 +70,11 @@ form {
 	stroke: red;
 	stroke-width: 2.5;
 	stroke-linecap: round;
+	pointer-events: none;
 }
 #themap .particle {
 	stroke-width: 0.25;
+	pointer-events: none;
 }
 #themap .particle-0 {
 	stroke: yellow;
@@ -91,11 +93,13 @@ form {
 	font-size: 15px;
 	text-anchor: middle;
 	dominant-baseline: middle;
+	pointer-events: none;
 }
 
 #themap .trade-name {
 	font-size: 8px;
 	dominant-baseline: middle;
+	pointer-events: none;
 }
 
 #modalContainer {
