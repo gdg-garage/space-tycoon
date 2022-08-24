@@ -10,6 +10,7 @@
 package stycoon
 
 type RenameCommand struct {
+
 	Name *string `json:"name"`
 
 	Type string `json:"type,omitempty"`

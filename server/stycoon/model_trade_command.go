@@ -25,9 +25,9 @@ type TradeCommand struct {
 // AssertTradeCommandRequired checks if the required fields are not zero-ed
 func AssertTradeCommandRequired(obj TradeCommand) error {
 	elements := map[string]interface{}{
-		"amount":   obj.Amount,
+		"amount": obj.Amount,
 		"resource": obj.Resource,
-		"target":   obj.Target,
+		"target": obj.Target,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

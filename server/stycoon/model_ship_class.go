@@ -26,6 +26,12 @@ type ShipClass struct {
 	Damage int64 `json:"damage"`
 
 	Price int64 `json:"price"`
+
+	Regen int64 `json:"regen"`
+
+	RepairPrice int64 `json:"repairPrice"`
+
+	RepairLife int64 `json:"repairLife"`
 }
 
 // AssertShipClassRequired checks if the required fields are not zero-ed
@@ -38,6 +44,9 @@ func AssertShipClassRequired(obj ShipClass) error {
 		"life": obj.Life,
 		"damage": obj.Damage,
 		"price": obj.Price,
+		"regen": obj.Regen,
+		"repairPrice": obj.RepairPrice,
+		"repairLife": obj.RepairLife,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

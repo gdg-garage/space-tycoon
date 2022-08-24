@@ -10,6 +10,7 @@
 package stycoon
 
 type ConstructCommand struct {
+
 	ShipClass *string `json:"ship-class"`
 
 	Type string `json:"type,omitempty"`
