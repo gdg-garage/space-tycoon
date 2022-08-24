@@ -773,7 +773,111 @@ ApiClient.instance = new ApiClient();
 var _default = ApiClient;
 exports["default"] = _default;
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":46,"fs":45,"querystring":51,"superagent":38}],2:[function(require,module,exports){
+},{"buffer":47,"fs":46,"querystring":52,"superagent":39}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _ApiClient = _interopRequireDefault(require("../ApiClient"));
+
+var _Credentials = _interopRequireDefault(require("../model/Credentials"));
+
+var _Error = _interopRequireDefault(require("../model/Error"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+/**
+* Dev service.
+* @module api/DevApi
+* @version 1.0.0
+*/
+var DevApi = /*#__PURE__*/function () {
+  /**
+  * Constructs a new DevApi. 
+  * @alias module:api/DevApi
+  * @class
+  * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
+  * default to {@link module:ApiClient#instance} if unspecified.
+  */
+  function DevApi(apiClient) {
+    _classCallCheck(this, DevApi);
+
+    this.apiClient = apiClient || _ApiClient["default"].instance;
+  }
+  /**
+   * Callback function to receive the result of the createUserPost operation.
+   * @callback module:api/DevApi~createUserPostCallback
+   * @param {String} error Error message, if any.
+   * @param data This operation does not return a value.
+   * @param {String} response The complete HTTP response.
+   */
+
+  /**
+   * create user
+   * @param {Object} opts Optional parameters
+   * @param {module:model/Credentials} opts.credentials 
+   * @param {module:api/DevApi~createUserPostCallback} callback The callback function, accepting three arguments: error, data, response
+   */
+
+
+  _createClass(DevApi, [{
+    key: "createUserPost",
+    value: function createUserPost(opts, callback) {
+      opts = opts || {};
+      var postBody = opts['credentials'];
+      var pathParams = {};
+      var queryParams = {};
+      var headerParams = {};
+      var formParams = {};
+      var authNames = ['cookieAuth'];
+      var contentTypes = [];
+      var accepts = ['application/json'];
+      var returnType = null;
+      return this.apiClient.callApi('/create-user', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+    }
+    /**
+     * Callback function to receive the result of the resetGet operation.
+     * @callback module:api/DevApi~resetGetCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * start new season (call this after creating the users)
+     * @param {module:api/DevApi~resetGetCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+
+  }, {
+    key: "resetGet",
+    value: function resetGet(callback) {
+      var postBody = null;
+      var pathParams = {};
+      var queryParams = {};
+      var headerParams = {};
+      var formParams = {};
+      var authNames = ['cookieAuth'];
+      var contentTypes = [];
+      var accepts = [];
+      var returnType = null;
+      return this.apiClient.callApi('/reset', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
+    }
+  }]);
+
+  return DevApi;
+}();
+
+exports["default"] = DevApi;
+},{"../ApiClient":1,"../model/Credentials":9,"../model/Error":16}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1092,7 +1196,7 @@ var GameApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = GameApi;
-},{"../ApiClient":1,"../model/Command":6,"../model/Credentials":8,"../model/CurrentTick":9,"../model/Data":10,"../model/EndTurn":14,"../model/Error":15,"../model/PlayerId":20,"../model/Reports":24,"../model/StaticData":29}],3:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Command":7,"../model/Credentials":9,"../model/CurrentTick":10,"../model/Data":11,"../model/EndTurn":15,"../model/Error":16,"../model/PlayerId":21,"../model/Reports":25,"../model/StaticData":30}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1162,6 +1266,12 @@ Object.defineProperty(exports, "Destination", {
   enumerable: true,
   get: function get() {
     return _Destination["default"];
+  }
+});
+Object.defineProperty(exports, "DevApi", {
+  enumerable: true,
+  get: function get() {
+    return _DevApi["default"];
   }
 });
 Object.defineProperty(exports, "EndTurn", {
@@ -1361,10 +1471,12 @@ var _TradingResourceAllOf = _interopRequireDefault(require("./model/TradingResou
 
 var _Wreck = _interopRequireDefault(require("./model/Wreck"));
 
+var _DevApi = _interopRequireDefault(require("./api/DevApi"));
+
 var _GameApi = _interopRequireDefault(require("./api/GameApi"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-},{"./ApiClient":1,"./api/GameApi":2,"./model/AttackCommand":4,"./model/Combat":5,"./model/Command":6,"./model/ConstructCommand":7,"./model/Credentials":8,"./model/CurrentTick":9,"./model/Data":10,"./model/DataReports":11,"./model/DecommissionCommand":12,"./model/Destination":13,"./model/EndTurn":14,"./model/Error":15,"./model/MoveCommand":16,"./model/NetWorth":17,"./model/Planet":18,"./model/Player":19,"./model/PlayerId":20,"./model/Profiling":21,"./model/RenameCommand":22,"./model/RepairCommand":23,"./model/Reports":24,"./model/Resource":25,"./model/ScoreValue":26,"./model/Ship":27,"./model/ShipClass":28,"./model/StaticData":29,"./model/Trade":30,"./model/TradeCommand":31,"./model/TradingResource":32,"./model/TradingResourceAllOf":33,"./model/Wreck":34}],4:[function(require,module,exports){
+},{"./ApiClient":1,"./api/DevApi":2,"./api/GameApi":3,"./model/AttackCommand":5,"./model/Combat":6,"./model/Command":7,"./model/ConstructCommand":8,"./model/Credentials":9,"./model/CurrentTick":10,"./model/Data":11,"./model/DataReports":12,"./model/DecommissionCommand":13,"./model/Destination":14,"./model/EndTurn":15,"./model/Error":16,"./model/MoveCommand":17,"./model/NetWorth":18,"./model/Planet":19,"./model/Player":20,"./model/PlayerId":21,"./model/Profiling":22,"./model/RenameCommand":23,"./model/RepairCommand":24,"./model/Reports":25,"./model/Resource":26,"./model/ScoreValue":27,"./model/Ship":28,"./model/ShipClass":29,"./model/StaticData":30,"./model/Trade":31,"./model/TradeCommand":32,"./model/TradingResource":33,"./model/TradingResourceAllOf":34,"./model/Wreck":35}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1391,13 +1503,12 @@ var AttackCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>AttackCommand</code>.
    * @alias module:model/AttackCommand
-   * @param type {String} 
    * @param target {String} 
    */
-  function AttackCommand(type, target) {
+  function AttackCommand(target) {
     _classCallCheck(this, AttackCommand);
 
-    AttackCommand.initialize(this, type, target);
+    AttackCommand.initialize(this, target);
   }
   /**
    * Initializes the fields of this object.
@@ -1408,8 +1519,7 @@ var AttackCommand = /*#__PURE__*/function () {
 
   _createClass(AttackCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, target) {
-      obj['type'] = type;
+    value: function initialize(obj, target) {
       obj['target'] = target;
     }
     /**
@@ -1426,12 +1536,12 @@ var AttackCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new AttackCommand();
 
-        if (data.hasOwnProperty('type')) {
-          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
         if (data.hasOwnProperty('target')) {
           obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
+        }
+
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
       }
 
@@ -1442,19 +1552,20 @@ var AttackCommand = /*#__PURE__*/function () {
   return AttackCommand;
 }();
 /**
- * @member {String} type
- */
-
-
-AttackCommand.prototype['type'] = undefined;
-/**
  * @member {String} target
  */
 
+
 AttackCommand.prototype['target'] = undefined;
+/**
+ * @member {String} type
+ * @default 'attack'
+ */
+
+AttackCommand.prototype['type'] = 'attack';
 var _default = AttackCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],5:[function(require,module,exports){
+},{"../ApiClient":1}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1557,7 +1668,7 @@ Combat.prototype['defender'] = undefined;
 Combat.prototype['killed'] = undefined;
 var _default = Combat;
 exports["default"] = _default;
-},{"../ApiClient":1}],6:[function(require,module,exports){
+},{"../ApiClient":1}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1692,7 +1803,7 @@ Command.prototype['ship-class'] = undefined;
 Command.prototype['name'] = undefined;
 var _default = Command;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":13}],7:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":14}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1720,12 +1831,11 @@ var ConstructCommand = /*#__PURE__*/function () {
    * Constructs a new <code>ConstructCommand</code>.
    * @alias module:model/ConstructCommand
    * @param shipClass {String} 
-   * @param type {String} 
    */
-  function ConstructCommand(shipClass, type) {
+  function ConstructCommand(shipClass) {
     _classCallCheck(this, ConstructCommand);
 
-    ConstructCommand.initialize(this, shipClass, type);
+    ConstructCommand.initialize(this, shipClass);
   }
   /**
    * Initializes the fields of this object.
@@ -1736,9 +1846,8 @@ var ConstructCommand = /*#__PURE__*/function () {
 
   _createClass(ConstructCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, shipClass, type) {
+    value: function initialize(obj, shipClass) {
       obj['ship-class'] = shipClass;
-      obj['type'] = type;
     }
     /**
      * Constructs a <code>ConstructCommand</code> from a plain JavaScript object, optionally creating a new instance.
@@ -1777,12 +1886,13 @@ var ConstructCommand = /*#__PURE__*/function () {
 ConstructCommand.prototype['ship-class'] = undefined;
 /**
  * @member {String} type
+ * @default 'construct'
  */
 
-ConstructCommand.prototype['type'] = undefined;
+ConstructCommand.prototype['type'] = 'construct';
 var _default = ConstructCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],8:[function(require,module,exports){
+},{"../ApiClient":1}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1883,7 +1993,7 @@ Credentials.prototype['password'] = undefined;
 Credentials.prototype['player'] = undefined;
 var _default = Credentials;
 exports["default"] = _default;
-},{"../ApiClient":1}],9:[function(require,module,exports){
+},{"../ApiClient":1}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1984,7 +2094,7 @@ CurrentTick.prototype['min-time-left-ms'] = undefined;
 CurrentTick.prototype['season'] = undefined;
 var _default = CurrentTick;
 exports["default"] = _default;
-},{"../ApiClient":1}],10:[function(require,module,exports){
+},{"../ApiClient":1}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2143,7 +2253,7 @@ Data.prototype['wrecks'] = undefined;
 Data.prototype['reports'] = undefined;
 var _default = Data;
 exports["default"] = _default;
-},{"../ApiClient":1,"./CurrentTick":9,"./DataReports":11,"./Planet":18,"./Player":19,"./Ship":27,"./Wreck":34}],11:[function(require,module,exports){
+},{"../ApiClient":1,"./CurrentTick":10,"./DataReports":12,"./Planet":19,"./Player":20,"./Ship":28,"./Wreck":35}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2232,7 +2342,7 @@ DataReports.prototype['combat'] = undefined;
 DataReports.prototype['trade'] = undefined;
 var _default = DataReports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":5,"./Trade":30}],12:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":6,"./Trade":31}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2259,12 +2369,11 @@ var DecommissionCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>DecommissionCommand</code>.
    * @alias module:model/DecommissionCommand
-   * @param type {String} 
    */
-  function DecommissionCommand(type) {
+  function DecommissionCommand() {
     _classCallCheck(this, DecommissionCommand);
 
-    DecommissionCommand.initialize(this, type);
+    DecommissionCommand.initialize(this);
   }
   /**
    * Initializes the fields of this object.
@@ -2275,9 +2384,7 @@ var DecommissionCommand = /*#__PURE__*/function () {
 
   _createClass(DecommissionCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type) {
-      obj['type'] = type;
-    }
+    value: function initialize(obj) {}
     /**
      * Constructs a <code>DecommissionCommand</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
@@ -2305,13 +2412,14 @@ var DecommissionCommand = /*#__PURE__*/function () {
 }();
 /**
  * @member {String} type
+ * @default 'decommission'
  */
 
 
-DecommissionCommand.prototype['type'] = undefined;
+DecommissionCommand.prototype['type'] = 'decommission';
 var _default = DecommissionCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],13:[function(require,module,exports){
+},{"../ApiClient":1}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2396,7 +2504,7 @@ Destination.prototype['coordinates'] = undefined;
 Destination.prototype['target'] = undefined;
 var _default = Destination;
 exports["default"] = _default;
-},{"../ApiClient":1}],14:[function(require,module,exports){
+},{"../ApiClient":1}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2486,7 +2594,7 @@ EndTurn.prototype['tick'] = undefined;
 EndTurn.prototype['season'] = undefined;
 var _default = EndTurn;
 exports["default"] = _default;
-},{"../ApiClient":1}],15:[function(require,module,exports){
+},{"../ApiClient":1}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2565,7 +2673,7 @@ var Error = /*#__PURE__*/function () {
 Error.prototype['message'] = undefined;
 var _default = Error;
 exports["default"] = _default;
-},{"../ApiClient":1}],16:[function(require,module,exports){
+},{"../ApiClient":1}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2594,13 +2702,12 @@ var MoveCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>MoveCommand</code>.
    * @alias module:model/MoveCommand
-   * @param type {String} 
    * @param destination {module:model/Destination} 
    */
-  function MoveCommand(type, destination) {
+  function MoveCommand(destination) {
     _classCallCheck(this, MoveCommand);
 
-    MoveCommand.initialize(this, type, destination);
+    MoveCommand.initialize(this, destination);
   }
   /**
    * Initializes the fields of this object.
@@ -2611,8 +2718,7 @@ var MoveCommand = /*#__PURE__*/function () {
 
   _createClass(MoveCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, destination) {
-      obj['type'] = type;
+    value: function initialize(obj, destination) {
       obj['destination'] = destination;
     }
     /**
@@ -2629,12 +2735,12 @@ var MoveCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new MoveCommand();
 
-        if (data.hasOwnProperty('type')) {
-          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
         if (data.hasOwnProperty('destination')) {
           obj['destination'] = _Destination["default"].constructFromObject(data['destination']);
+        }
+
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
       }
 
@@ -2645,19 +2751,20 @@ var MoveCommand = /*#__PURE__*/function () {
   return MoveCommand;
 }();
 /**
- * @member {String} type
- */
-
-
-MoveCommand.prototype['type'] = undefined;
-/**
  * @member {module:model/Destination} destination
  */
 
+
 MoveCommand.prototype['destination'] = undefined;
+/**
+ * @member {String} type
+ * @default 'move'
+ */
+
+MoveCommand.prototype['type'] = 'move';
 var _default = MoveCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":13}],17:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":14}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2769,7 +2876,7 @@ NetWorth.prototype['ships'] = undefined;
 NetWorth.prototype['total'] = undefined;
 var _default = NetWorth;
 exports["default"] = _default;
-},{"../ApiClient":1}],18:[function(require,module,exports){
+},{"../ApiClient":1}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2885,7 +2992,7 @@ Planet.prototype['position'] = undefined;
 Planet.prototype['prev-position'] = undefined;
 var _default = Planet;
 exports["default"] = _default;
-},{"../ApiClient":1,"./TradingResource":32}],19:[function(require,module,exports){
+},{"../ApiClient":1,"./TradingResource":33}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2988,7 +3095,7 @@ Player.prototype['color'] = undefined;
 Player.prototype['net-worth'] = undefined;
 var _default = Player;
 exports["default"] = _default;
-},{"../ApiClient":1,"./NetWorth":17}],20:[function(require,module,exports){
+},{"../ApiClient":1,"./NetWorth":18}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3064,7 +3171,7 @@ var PlayerId = /*#__PURE__*/function () {
 PlayerId.prototype['id'] = undefined;
 var _default = PlayerId;
 exports["default"] = _default;
-},{"../ApiClient":1}],21:[function(require,module,exports){
+},{"../ApiClient":1}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3230,7 +3337,7 @@ Profiling.prototype['overall'] = undefined;
 Profiling.prototype['at'] = undefined;
 var _default = Profiling;
 exports["default"] = _default;
-},{"../ApiClient":1}],22:[function(require,module,exports){
+},{"../ApiClient":1}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3257,13 +3364,12 @@ var RenameCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>RenameCommand</code>.
    * @alias module:model/RenameCommand
-   * @param type {String} 
    * @param name {String} 
    */
-  function RenameCommand(type, name) {
+  function RenameCommand(name) {
     _classCallCheck(this, RenameCommand);
 
-    RenameCommand.initialize(this, type, name);
+    RenameCommand.initialize(this, name);
   }
   /**
    * Initializes the fields of this object.
@@ -3274,8 +3380,7 @@ var RenameCommand = /*#__PURE__*/function () {
 
   _createClass(RenameCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, name) {
-      obj['type'] = type;
+    value: function initialize(obj, name) {
       obj['name'] = name;
     }
     /**
@@ -3292,12 +3397,12 @@ var RenameCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new RenameCommand();
 
-        if (data.hasOwnProperty('type')) {
-          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
         if (data.hasOwnProperty('name')) {
           obj['name'] = _ApiClient["default"].convertToType(data['name'], 'String');
+        }
+
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
         }
       }
 
@@ -3308,19 +3413,20 @@ var RenameCommand = /*#__PURE__*/function () {
   return RenameCommand;
 }();
 /**
- * @member {String} type
- */
-
-
-RenameCommand.prototype['type'] = undefined;
-/**
  * @member {String} name
  */
 
+
 RenameCommand.prototype['name'] = undefined;
+/**
+ * @member {String} type
+ * @default 'rename'
+ */
+
+RenameCommand.prototype['type'] = 'rename';
 var _default = RenameCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],23:[function(require,module,exports){
+},{"../ApiClient":1}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3347,12 +3453,11 @@ var RepairCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>RepairCommand</code>.
    * @alias module:model/RepairCommand
-   * @param type {String} 
    */
-  function RepairCommand(type) {
+  function RepairCommand() {
     _classCallCheck(this, RepairCommand);
 
-    RepairCommand.initialize(this, type);
+    RepairCommand.initialize(this);
   }
   /**
    * Initializes the fields of this object.
@@ -3363,9 +3468,7 @@ var RepairCommand = /*#__PURE__*/function () {
 
   _createClass(RepairCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type) {
-      obj['type'] = type;
-    }
+    value: function initialize(obj) {}
     /**
      * Constructs a <code>RepairCommand</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
@@ -3393,13 +3496,14 @@ var RepairCommand = /*#__PURE__*/function () {
 }();
 /**
  * @member {String} type
+ * @default 'repair'
  */
 
 
-RepairCommand.prototype['type'] = undefined;
+RepairCommand.prototype['type'] = 'repair';
 var _default = RepairCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],24:[function(require,module,exports){
+},{"../ApiClient":1}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3573,7 +3677,7 @@ Reports.prototype['season'] = undefined;
 Reports.prototype['tick'] = undefined;
 var _default = Reports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":5,"./Profiling":21,"./ScoreValue":26,"./Trade":30}],25:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":6,"./Profiling":22,"./ScoreValue":27,"./Trade":31}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3652,7 +3756,7 @@ var Resource = /*#__PURE__*/function () {
 Resource.prototype['amount'] = undefined;
 var _default = Resource;
 exports["default"] = _default;
-},{"../ApiClient":1}],26:[function(require,module,exports){
+},{"../ApiClient":1}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3763,7 +3867,7 @@ ScoreValue.prototype['ships'] = undefined;
 ScoreValue.prototype['total'] = undefined;
 var _default = ScoreValue;
 exports["default"] = _default;
-},{"../ApiClient":1}],27:[function(require,module,exports){
+},{"../ApiClient":1}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3923,7 +4027,7 @@ Ship.prototype['resources'] = undefined;
 Ship.prototype['command'] = undefined;
 var _default = Ship;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":6,"./Resource":25}],28:[function(require,module,exports){
+},{"../ApiClient":1,"./Command":7,"./Resource":26}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4070,7 +4174,7 @@ ShipClass.prototype['damage'] = undefined;
 ShipClass.prototype['price'] = undefined;
 var _default = ShipClass;
 exports["default"] = _default;
-},{"../ApiClient":1}],29:[function(require,module,exports){
+},{"../ApiClient":1}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4161,7 +4265,7 @@ StaticData.prototype['ship-classes'] = undefined;
 StaticData.prototype['resource-names'] = undefined;
 var _default = StaticData;
 exports["default"] = _default;
-},{"../ApiClient":1,"./ShipClass":28}],30:[function(require,module,exports){
+},{"../ApiClient":1,"./ShipClass":29}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4282,7 +4386,7 @@ Trade.prototype['amount'] = undefined;
 Trade.prototype['price'] = undefined;
 var _default = Trade;
 exports["default"] = _default;
-},{"../ApiClient":1}],31:[function(require,module,exports){
+},{"../ApiClient":1}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4309,15 +4413,14 @@ var TradeCommand = /*#__PURE__*/function () {
   /**
    * Constructs a new <code>TradeCommand</code>.
    * @alias module:model/TradeCommand
-   * @param type {String} 
    * @param amount {Number} Positive value means buy, negative sell.
    * @param resource {String} 
    * @param target {String} Any planet or own ship.
    */
-  function TradeCommand(type, amount, resource, target) {
+  function TradeCommand(amount, resource, target) {
     _classCallCheck(this, TradeCommand);
 
-    TradeCommand.initialize(this, type, amount, resource, target);
+    TradeCommand.initialize(this, amount, resource, target);
   }
   /**
    * Initializes the fields of this object.
@@ -4328,8 +4431,7 @@ var TradeCommand = /*#__PURE__*/function () {
 
   _createClass(TradeCommand, null, [{
     key: "initialize",
-    value: function initialize(obj, type, amount, resource, target) {
-      obj['type'] = type;
+    value: function initialize(obj, amount, resource, target) {
       obj['amount'] = amount;
       obj['resource'] = resource;
       obj['target'] = target;
@@ -4348,10 +4450,6 @@ var TradeCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new TradeCommand();
 
-        if (data.hasOwnProperty('type')) {
-          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
-        }
-
         if (data.hasOwnProperty('amount')) {
           obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
         }
@@ -4363,6 +4461,10 @@ var TradeCommand = /*#__PURE__*/function () {
         if (data.hasOwnProperty('target')) {
           obj['target'] = _ApiClient["default"].convertToType(data['target'], 'String');
         }
+
+        if (data.hasOwnProperty('type')) {
+          obj['type'] = _ApiClient["default"].convertToType(data['type'], 'String');
+        }
       }
 
       return obj;
@@ -4372,15 +4474,10 @@ var TradeCommand = /*#__PURE__*/function () {
   return TradeCommand;
 }();
 /**
- * @member {String} type
- */
-
-
-TradeCommand.prototype['type'] = undefined;
-/**
  * Positive value means buy, negative sell.
  * @member {Number} amount
  */
+
 
 TradeCommand.prototype['amount'] = undefined;
 /**
@@ -4394,9 +4491,15 @@ TradeCommand.prototype['resource'] = undefined;
  */
 
 TradeCommand.prototype['target'] = undefined;
+/**
+ * @member {String} type
+ * @default 'trade'
+ */
+
+TradeCommand.prototype['type'] = 'trade';
 var _default = TradeCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],32:[function(require,module,exports){
+},{"../ApiClient":1}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4524,7 +4627,7 @@ _TradingResourceAllOf["default"].prototype['buy-price'] = undefined;
 _TradingResourceAllOf["default"].prototype['sell-price'] = undefined;
 var _default = TradingResource;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Resource":25,"./TradingResourceAllOf":33}],33:[function(require,module,exports){
+},{"../ApiClient":1,"./Resource":26,"./TradingResourceAllOf":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4609,7 +4712,7 @@ TradingResourceAllOf.prototype['buy-price'] = undefined;
 TradingResourceAllOf.prototype['sell-price'] = undefined;
 var _default = TradingResourceAllOf;
 exports["default"] = _default;
-},{"../ApiClient":1}],34:[function(require,module,exports){
+},{"../ApiClient":1}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4732,7 +4835,7 @@ Wreck.prototype['kill-tick'] = undefined;
 Wreck.prototype['position'] = undefined;
 var _default = Wreck;
 exports["default"] = _default;
-},{"../ApiClient":1}],35:[function(require,module,exports){
+},{"../ApiClient":1}],36:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -4909,7 +5012,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = stringify
 stringify.default = stringify
 stringify.stable = deterministicStringify
@@ -5140,7 +5243,7 @@ function replaceGetterValues (replacer) {
   }
 }
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -5183,7 +5286,7 @@ Agent.prototype._setDefaults = function (req) {
 
 module.exports = Agent;
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -6204,7 +6307,7 @@ request.put = function (url, data, fn) {
   return req;
 };
 
-},{"./agent-base":37,"./is-object":39,"./request-base":40,"./response-base":41,"component-emitter":35,"fast-safe-stringify":36}],39:[function(require,module,exports){
+},{"./agent-base":38,"./is-object":40,"./request-base":41,"./response-base":42,"component-emitter":36,"fast-safe-stringify":37}],40:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -6222,7 +6325,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -6980,7 +7083,7 @@ RequestBase.prototype._setTimeouts = function () {
   }
 };
 
-},{"./is-object":39}],41:[function(require,module,exports){
+},{"./is-object":40}],42:[function(require,module,exports){
 "use strict";
 
 /**
@@ -7112,7 +7215,7 @@ ResponseBase.prototype._setStatusProperties = function (status) {
   this.unprocessableEntity = status === 422;
 };
 
-},{"./utils":42}],42:[function(require,module,exports){
+},{"./utils":43}],43:[function(require,module,exports){
 "use strict";
 
 /**
@@ -7184,7 +7287,7 @@ exports.cleanHeader = function (header, changesOrigin) {
   return header;
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var STC = require("space_tycoon_client")
 var hashInt = require("hash-int")
 
@@ -7247,6 +7350,7 @@ function parseCookies() {
 }
 
 function last(p) {
+	// returns last element of an array
 	return p[Object.keys(p)[Object.keys(p).length - 1]]
 }
 
@@ -7585,9 +7689,8 @@ function spawnKill(attacker, defender) {
 }
 
 function spawnText(pos, direction, color, text, classes) {
-	text = text.toString()
-	let x = pos[0] + direction[0] * 15
-	let y = pos[1] + direction[1] * 15
+	let x = pos[0] + direction[0] * 10
+	let y = pos[1] + direction[1] * 10
 	d3.select("#trades")
 	.append("text")
 	.text(text)
@@ -7617,8 +7720,8 @@ function spawnTrade(data, tr) {
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
 	let rn = staticData["resource-names"][tr.resource]
-	spawnText(pos, [0, pl == p1 ? 1 : -1], c, tr.price, "trade-price")
-	spawnText(pos, [1, 0], c, rn, "trade-name")
+	spawnText(pos, [0, pl == p1 ? 1 : -1], c, (pl == p1 ? "-" : "+") + tr.price, "trade-price")
+	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
 
 function mapEvents(data) {
@@ -7709,18 +7812,44 @@ window.initializeMap = function() {
 // graphs
 //////////////////////////////////////////
 
+function graphsHandleZoom(e) {
+	d3.selectAll("#panzoom")
+	.attr("transform", e.transform)
+}
+
+function filterLinePoints(values) {
+	if (values.length < 10)
+		return values
+	let res = [ values[0] ]
+	let buf = []
+	for (let p of values) {
+		buf.push(p)
+		if (buf.length == 3) {
+			if (buf[0][1] != buf[1][1] || buf[1][1] != buf[2][1]) {
+				res.push(buf[1])
+			}
+			buf.shift()
+		}
+	}
+	res.push(buf[1])
+	return res
+}
+
 function multiLineGraph(lines, legends) {
+	for (let k of Object.keys(lines))
+		lines[k].values = filterLinePoints(lines[k].values)
+
 	let size = d3.select("#thegraph").node().getBoundingClientRect()
 
 	let xMin = d3.min(lines, l => d3.min(l.values, p => p[0]))
 	let xMax = d3.max(lines, l => d3.max(l.values, p => p[0]))
-	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 20])
+	let xScale = d3.scaleLinear().domain([xMin, xMax]).range([20, size.width - 10])
 	let xAxis = d3.axisBottom().scale(xScale).ticks(10)
 	d3.select("#xaxis").call(xAxis)
 
 	let yMin = d3.min(lines, l => d3.min(l.values, p => p[1]))
 	let yMax = d3.max(lines, l => d3.max(l.values, p => p[1]))
-	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([20, size.height - 20])
+	let yScale = d3.scaleLinear().domain([yMax, yMin]).range([35, size.height - 10])
 	let yAxis = d3.axisRight().scale(yScale).ticks(10)
 	d3.select("#yaxis").call(yAxis)
 
@@ -7744,7 +7873,7 @@ function multiLineGraph(lines, legends) {
 		.classed("legend", true)
 		.text(d => d.name)
 		.attr("fill", d => d.color)
-		.attr("x", size.width - 20)
+		.attr("x", size.width - 15)
 		.transition()
 		.duration(1000)
 		.attr("y", d => yScale(d.value) - 3)
@@ -7787,20 +7916,28 @@ function graphsRedrawPlayers(data, enabled) {
 			lines.push(m)
 		}
 
-		if (enabled[0])
-			category("resources")
-		if (enabled[1])
-			category("ships")
-		if (enabled[2])
-			category("money")
-		if (enabled[3])
-			category("total")
-
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = last(s.total)
+
+		if (enabled[0]) {
+			l.value = last(s.resources)
+			category("resources")
+		}
+		if (enabled[1]) {
+			l.value = last(s.ships)
+			category("ships")
+		}
+		if (enabled[2]) {
+			l.value = last(s.money)
+			category("money")
+		}
+		if (enabled[3]) {
+			l.value = last(s.total)
+			category("total")
+		}
+
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
@@ -8030,10 +8167,9 @@ function graphsTimerLoop() {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
-				d3.select("#tickInfo").text("")
+				d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 				if (data.season != currentTick.season) {
 					staticData = undefined
-					playerData = undefined
 					currentTick.season = data.season
 				}
 				graphsRefresh(data)
@@ -8044,18 +8180,24 @@ function graphsTimerLoop() {
 
 function graphsStartLoop() {
 	d3.select("#tickInfo").text("Connecting...")
-	setTimeout(graphsTimerLoop, 0)
+
+	zoom = d3.zoom().on("zoom", mapHandleZoom)
+	d3.select("#thegraph").call(zoom)
+
 	graphsOptions.type = "players"
 	d3.select("#graphSelect").on("change", function(e) {
+		d3.select("#thegraph").call(zoom.transform, d3.zoomIdentity)
 		graphsOptions.type = e.target.value
 	})
+
+	setTimeout(graphsTimerLoop, 0)
 }
 
 window.initializeGraphs = function() {
 	setTimeout(graphsStartLoop, 0)
 }
 
-},{"hash-int":47,"space_tycoon_client":3}],44:[function(require,module,exports){
+},{"hash-int":48,"space_tycoon_client":4}],45:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -8207,9 +8349,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],45:[function(require,module,exports){
-
 },{}],46:[function(require,module,exports){
+
+},{}],47:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -9990,7 +10132,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":44,"buffer":46,"ieee754":48}],47:[function(require,module,exports){
+},{"base64-js":45,"buffer":47,"ieee754":49}],48:[function(require,module,exports){
 "use strict"
 
 var A
@@ -10014,7 +10156,7 @@ function hashInt(x) {
 
 module.exports = hashInt
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -10101,7 +10243,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10187,7 +10329,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10274,10 +10416,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":49,"./encode":50}]},{},[43]);
+},{"./decode":50,"./encode":51}]},{},[44]);
