@@ -52,6 +52,43 @@ INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `rege
 	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000, 0);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
 
+-- Dumping structure for table space_tycoon.d_history_data
+DROP TABLE IF EXISTS `d_history_data`;
+CREATE TABLE IF NOT EXISTS `d_history_data` (
+  `season` int(11) NOT NULL,
+  `tick` int(11) NOT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
+  PRIMARY KEY (`season`,`tick`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.d_history_data: ~0 rows (approximately)
+/*!40000 ALTER TABLE `d_history_data` DISABLE KEYS */;
+/*!40000 ALTER TABLE `d_history_data` ENABLE KEYS */;
+
+-- Dumping structure for table space_tycoon.d_history_reports
+DROP TABLE IF EXISTS `d_history_reports`;
+CREATE TABLE IF NOT EXISTS `d_history_reports` (
+  `season` int(11) NOT NULL,
+  `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`reports`)),
+  PRIMARY KEY (`season`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.d_history_reports: ~0 rows (approximately)
+/*!40000 ALTER TABLE `d_history_reports` DISABLE KEYS */;
+/*!40000 ALTER TABLE `d_history_reports` ENABLE KEYS */;
+
+-- Dumping structure for table space_tycoon.d_history_static
+DROP TABLE IF EXISTS `d_history_static`;
+CREATE TABLE IF NOT EXISTS `d_history_static` (
+  `season` int(11) NOT NULL,
+  `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),
+  PRIMARY KEY (`season`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- Dumping data for table space_tycoon.d_history_static: ~0 rows (approximately)
+/*!40000 ALTER TABLE `d_history_static` DISABLE KEYS */;
+/*!40000 ALTER TABLE `d_history_static` ENABLE KEYS */;
+
 -- Dumping structure for table space_tycoon.d_names
 DROP TABLE IF EXISTS `d_names`;
 CREATE TABLE IF NOT EXISTS `d_names` (
@@ -2038,37 +2075,6 @@ CREATE TABLE IF NOT EXISTS `d_user_score` (
   CONSTRAINT `FK_d_user_score_d_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
-DROP TABLE IF EXISTS `d_history_data`;
-CREATE TABLE `d_history_data`
-(
-    `season`      int(11) NOT NULL,
-    `tick`        int(11) NOT NULL,
-    `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
-
-    PRIMARY KEY (`season`, `tick`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3;
-
-DROP TABLE IF EXISTS `d_history_static`;
-CREATE TABLE `d_history_static`
-(
-    `season`      int(11) NOT NULL,
-    `static-data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`static-data`)),
-
-    PRIMARY KEY (`season`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3;
-
-DROP TABLE IF EXISTS `d_history_reports`;
-CREATE TABLE `d_history_reports`
-(
-    `season`      int(11) NOT NULL,
-    `reports` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`reports`)),
-
-    PRIMARY KEY (`season`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb3;
-
 -- Dumping data for table space_tycoon.d_user_score: ~0 rows (approximately)
 /*!40000 ALTER TABLE `d_user_score` DISABLE KEYS */;
 /*!40000 ALTER TABLE `d_user_score` ENABLE KEYS */;
@@ -2837,6 +2843,9 @@ BEGIN
 
 CALL p_clear_all;
 
+DELETE FROM d_history_data;
+DELETE FROM d_history_reports;
+DELETE FROM d_history_static;
 DELETE FROM d_user_score;
 DELETE FROM d_user;
 ALTER TABLE d_user AUTO_INCREMENT = 1;
@@ -2993,13 +3002,12 @@ FROM t_planet
 JOIN t_recipe ON t_recipe.planet = t_planet.id
 left JOIN t_commodity ON t_commodity.object = t_recipe.planet AND t_commodity.resource = t_recipe.resource;
 
-UPDATE t_price SET buy = NULL, sell = null;
+DELETE FROM t_price;
 
-REPLACE INTO t_price (planet, resource, buy, sell)
+INSERT INTO t_price (planet, resource, buy, sell)
 SELECT planet, resource, if(surplus > 0, 1000 / SQRT(surplus + 10), NULL), if(lack > 0, (lack + 100) * (elapsed + 100) * 0.01, NULL)
-FROM t_recipe_stats;
-
-DELETE FROM t_price WHERE buy IS NULL AND sell IS NULL;
+FROM t_recipe_stats
+WHERE surplus > 0 OR lack > 0;
 
 END//
 DELIMITER ;
@@ -3284,6 +3292,16 @@ CREATE TABLE IF NOT EXISTS `t_wreck` (
 /*!40000 ALTER TABLE `t_wreck` DISABLE KEYS */;
 /*!40000 ALTER TABLE `t_wreck` ENABLE KEYS */;
 
+-- Dumping structure for view space_tycoon.v_planet_recipes
+DROP VIEW IF EXISTS `v_planet_recipes`;
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `v_planet_recipes` (
+	`planet` INT(11) NOT NULL,
+	`name` TINYTEXT NOT NULL COLLATE 'utf8mb3_general_ci',
+	`production` DECIMAL(22,0) NULL,
+	`consumption` DECIMAL(22,0) NULL
+) ENGINE=MyISAM;
+
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
 -- Creating temporary table to overcome VIEW dependency errors
@@ -3365,6 +3383,12 @@ CREATE TABLE `v_user_score` (
 	`total` BIGINT(23) NULL,
 	`score` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
+
+-- Dumping structure for view space_tycoon.v_planet_recipes
+DROP VIEW IF EXISTS `v_planet_recipes`;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `v_planet_recipes`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_planet_recipes` AS select `t_recipe`.`planet` AS `planet`,`t_object`.`name` AS `name`,sum(if(`t_recipe`.`production` > 0,1,0)) AS `production`,sum(if(`t_recipe`.`production` < 0,1,0)) AS `consumption` from (`t_recipe` join `t_object` on(`t_object`.`id` = `t_recipe`.`planet`)) group by `t_recipe`.`planet` ;
 
 -- Dumping structure for view space_tycoon.v_player_commodities_worth
 DROP VIEW IF EXISTS `v_player_commodities_worth`;
