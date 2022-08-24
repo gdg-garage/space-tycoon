@@ -15,23 +15,23 @@ from __future__ import absolute_import
 import unittest
 
 import space_tycoon_client
-from space_tycoon_client.api.logout_api import LogoutApi  # noqa: E501
+from space_tycoon_client.models.resource_amount import ResourceAmount  # noqa: E501
 from space_tycoon_client.rest import ApiException
 
 
-class TestLogoutApi(unittest.TestCase):
-    """LogoutApi unit test stubs"""
+class TestResourceAmount(unittest.TestCase):
+    """ResourceAmount unit test stubs"""
 
     def setUp(self):
-        self.api = LogoutApi()  # noqa: E501
+        pass
 
     def tearDown(self):
         pass
 
-    def test_logout_get(self):
-        """Test case for logout_get
-
-        """
+    def testResourceAmount(self):
+        """Test ResourceAmount"""
+        # FIXME: construct object with mandatory attributes with example values
+        # model = space_tycoon_client.models.resource_amount.ResourceAmount()  # noqa: E501
         pass
 
 

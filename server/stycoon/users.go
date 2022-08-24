@@ -3,6 +3,7 @@ package stycoon
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/sessions"
 	"github.com/rs/zerolog/log"
@@ -75,4 +76,20 @@ func SeasonChanged(game *Game, req *http.Request, sessionManager sessions.Store)
 		return true
 	}
 	return false
+}
+
+func MaybeGetLoggedPlayerId(req *http.Request, sessionManager sessions.Store) *string {
+	user, err := LoggedUserFromSession(req, sessionManager)
+	if err != nil {
+		return nil
+	}
+	// To be extra sure that none can get -1 (which is allowed to get everything)
+	playerIdInt, err := strconv.Atoi(user.PlayerId)
+	if err != nil {
+		return nil
+	}
+	if playerIdInt <= 0 {
+		return nil
+	}
+	return &user.PlayerId
 }

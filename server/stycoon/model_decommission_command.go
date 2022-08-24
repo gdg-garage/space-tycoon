@@ -10,21 +10,11 @@
 package stycoon
 
 type DecommissionCommand struct {
-
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 }
 
 // AssertDecommissionCommandRequired checks if the required fields are not zero-ed
 func AssertDecommissionCommandRequired(obj DecommissionCommand) error {
-	elements := map[string]interface{}{
-		"type": obj.Type,
-	}
-	for name, el := range elements {
-		if isZero := IsZeroValue(el); isZero {
-			return &RequiredError{Field: name}
-		}
-	}
-
 	return nil
 }
 

@@ -3,18 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -61,6 +61,13 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
+	dev := flag.Bool("dev", false, "should the server run in dev mode (for debug)")
+	flag.Parse()
+
+	if *dev {
+		log.Warn().Msg("RUNNING IN DEV MODE!")
+	}
+
 	db = database.ConnectDBWithRetries()
 	defer database.CloseDB(db)
 	sessionManager := sessions.NewFilesystemStore("./sessions", []byte(os.Getenv("SESSION_KEY")))
@@ -70,10 +77,14 @@ func main() {
 	}
 
 	http.HandleFunc("/", addDefaultHeaders(handlers.Root))
-	// TODO: disable based on config
-	http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
-		handlers.CreateUser(game, db, w, r)
-	}))
+	if *dev {
+		http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+			handlers.CreateUser(game, db, w, r)
+		}))
+		http.HandleFunc("/reset", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
+			handlers.Reset(game, w, r)
+		}))
+	}
 	http.HandleFunc("/login", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Login(game, db, w, r)
 	}))

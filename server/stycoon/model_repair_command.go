@@ -10,21 +10,11 @@
 package stycoon
 
 type RepairCommand struct {
-
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 }
 
 // AssertRepairCommandRequired checks if the required fields are not zero-ed
 func AssertRepairCommandRequired(obj RepairCommand) error {
-	elements := map[string]interface{}{
-		"type": obj.Type,
-	}
-	for name, el := range elements {
-		if isZero := IsZeroValue(el); isZero {
-			return &RequiredError{Field: name}
-		}
-	}
-
 	return nil
 }
 
