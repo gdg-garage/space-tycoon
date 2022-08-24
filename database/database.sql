@@ -44,10 +44,10 @@ CREATE TABLE IF NOT EXISTS `d_class` (
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
 INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`, `starting_count`) VALUES
 	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL, 1),
-	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000, 5),
+	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000, 0),
 	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000, 5),
-	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000, 3),
-	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000, 3),
+	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000, 0),
+	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000, 0),
 	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000, 0),
 	(7, 'shipyard', 'Y', 10, 200, 1000, 20, 200, 50000, 0, 5000000, 0);
 /*!40000 ALTER TABLE `d_class` ENABLE KEYS */;
@@ -2244,47 +2244,6 @@ UPDATE t_object SET pos_x_prev = pos_x, pos_y_prev = pos_y;
 END//
 DELIMITER ;
 
--- Dumping structure for procedure space_tycoon.p_generate_prices
-DROP PROCEDURE IF EXISTS `p_generate_prices`;
-DELIMITER //
-CREATE PROCEDURE `p_generate_prices`()
-    SQL SECURITY INVOKER
-BEGIN
-
-DELETE FROM t_price;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_supply_demand;
-CREATE TEMPORARY TABLE t_price_supply_demand
-(PRIMARY KEY(resource))
-SELECT resource, SUM(if(production > 0, production, 0)) AS supply, SUM(if(production < 0, -production, 0)) AS demand, SUM(ABS(production)) * 0.5 AS volume
-FROM t_recipe GROUP BY resource;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_supply_demand_avg;
-CREATE TEMPORARY TABLE t_price_supply_demand_avg
-SELECT AVG(supply) AS supply_avg, AVG(demand) AS demand_avg, AVG(volume) AS volume_avg
-FROM t_price_supply_demand;
-
-DROP TEMPORARY TABLE IF EXISTS t_price_planet_resource_weight;
-CREATE TEMPORARY TABLE t_price_planet_resource_weight
-(INDEX(planet), INDEX(resource), PRIMARY KEY(planet, resource))
-SELECT a.planet, a.resource,
-ABS(a.production) * SUM(SIGN(a.production) = SIGN(b.production)) / SUM(if(SIGN(a.production) = SIGN(b.production), ABS(b.production), 0)) AS weight
-FROM t_recipe AS a
-JOIN t_recipe AS b USING(planet)
-GROUP BY a.planet, a.resource;
-
-INSERT INTO t_price (planet, resource, buy, sell)
-SELECT planet, resource,
-if(production > 0, 100 * demand / supply / weight * demand_avg / supply_avg, NULL),
-if(production < 0, 100 * demand / supply * weight, NULL)
-FROM t_recipe
-JOIN t_price_planet_resource_weight USING(planet, resource)
-JOIN t_price_supply_demand USING(resource)
-JOIN t_price_supply_demand_avg;
-
-END//
-DELIMITER ;
-
 -- Dumping structure for procedure space_tycoon.p_generate_random_commands
 DROP PROCEDURE IF EXISTS `p_generate_random_commands`;
 DELIMITER //
@@ -2356,44 +2315,57 @@ CREATE PROCEDURE `p_generate_resources`()
     SQL SECURITY INVOKER
 BEGIN
 
-DROP TEMPORARY TABLE IF EXISTS t_factory;
-CREATE TEMPORARY TABLE t_factory
-(id INT NOT NULL AUTO_INCREMENT, PRIMARY KEY(id))
-SELECT NULL AS id
-FROM d_resource AS a
-JOIN d_resource AS b;
-
-DROP TEMPORARY TABLE IF EXISTS t_factory_recipe;
-CREATE TEMPORARY TABLE t_factory_recipe
-(factory INT NOT NULL, resource INT NOT NULL, production INT NOT NULL, INDEX(factory), INDEX(resource), PRIMARY KEY(factory, resource))
-SELECT t_factory.id AS factory, d_resource.id AS resource, (RAND() * RAND() * 100 + 5) * if(RAND() < 0.45, -1, 1) AS production
-FROM t_factory
-JOIN d_resource
-WHERE RAND() < 0.1;
-
-DELETE FROM t_factory
-WHERE id IN (
-SELECT t_factory.id
-FROM t_factory
-LEFT JOIN t_factory_recipe ON t_factory_recipe.factory = t_factory.id
-GROUP BY t_factory.id
-HAVING SUM(if(t_factory_recipe.production < 0, 1, 0)) = 0 OR SUM(if(t_factory_recipe.production > 0, 1, 0)) = 0
-);
-
-DROP TEMPORARY TABLE IF EXISTS t_planet_factory;
-CREATE TEMPORARY TABLE t_planet_factory
-(INDEX(planet), INDEX(factory))
-SELECT t_planet.id AS planet, (SELECT id FROM t_factory ORDER BY RAND() LIMIT 1) AS factory
+DROP TEMPORARY TABLE IF EXISTS t_recipe_counts;
+CREATE TEMPORARY TABLE t_recipe_counts
+(PRIMARY KEY(planet))
+SELECT t_planet.id AS planet, CAST(RAND() * 2 + 1 AS INTEGER) AS prod, CAST(RAND() * 2 + 1 AS INTEGER) AS cons
 FROM t_planet;
 
-INSERT INTO t_recipe (planet, resource, production)
-SELECT t_planet.id, t_factory_recipe.resource, t_factory_recipe.production * (RAND() + 1)
+DROP TEMPORARY TABLE IF EXISTS t_recipe_marks;
+CREATE TEMPORARY TABLE t_recipe_marks
+(PRIMARY KEY(planet, resource))
+SELECT t_planet.id AS planet, d_resource.id AS resource, RAND() AS mark
 FROM t_planet
-JOIN t_planet_factory ON t_planet_factory.planet = t_planet.id
-JOIN t_factory_recipe ON t_factory_recipe.factory = t_planet_factory.factory;
+JOIN d_resource;
+
+DROP TEMPORARY TABLE IF EXISTS t_recipe_orders;
+CREATE TEMPORARY TABLE t_recipe_orders
+(PRIMARY KEY(planet, resource))
+SELECT a.planet, a.resource, COUNT(*) AS ordr
+FROM t_recipe_marks AS a
+JOIN t_recipe_marks AS b ON b.planet = a.planet AND b.mark < a.mark
+GROUP BY a.planet, a.resource;
+
+DROP TEMPORARY TABLE IF EXISTS t_recipe_directions;
+CREATE TEMPORARY TABLE t_recipe_directions
+(PRIMARY KEY(planet, resource))
+SELECT o.planet, o.resource, if(o.ordr <= c.cons, -1 / c.cons, 1 / c.prod) AS direction
+FROM t_recipe_orders AS o
+JOIN t_recipe_counts AS c USING(planet)
+WHERE (o.ordr <= c.cons)
+OR (o.ordr > c.cons AND o.ordr <= c.cons + c.prod);
+
+DROP TEMPORARY TABLE IF EXISTS t_recipe_sums;
+CREATE TEMPORARY TABLE t_recipe_sums
+(PRIMARY KEY(resource))
+SELECT resource, SUM(GREATEST(direction, 0)) AS prod, SUM(GREATEST(-direction, 0)) AS cons
+FROM t_recipe_directions
+GROUP BY resource;
+
+DROP TEMPORARY TABLE IF EXISTS t_recipe_mult;
+CREATE TEMPORARY TABLE t_recipe_mult
+(PRIMARY KEY(resource))
+SELECT id AS resource, RAND() + 1 AS mult
+FROM d_resource;
+
+INSERT INTO t_recipe (planet, resource, production)
+SELECT d.planet, d.resource, (1000 * d.direction / (if(d.direction < 0, s.cons, s.prod))) * m.mult + RAND()
+FROM t_recipe_directions AS d
+JOIN t_recipe_sums AS s ON s.resource = d.resource
+JOIN t_recipe_mult AS m ON m.resource = d.resource;
 
 INSERT INTO t_commodity (object, resource, amount)
-SELECT t_planet.id, t_recipe.resource, t_recipe.production * (RAND() * 10 + 1)
+SELECT t_planet.id, t_recipe.resource, t_recipe.production * (RAND() * 2 + 1)
 FROM t_planet
 JOIN t_recipe ON t_recipe.planet = t_planet.id
 WHERE production > 0;
@@ -2449,6 +2421,7 @@ SELECT t_command.ship AS attacker, t_command.target AS defender
 FROM t_command
 JOIN t_object AS a ON a.id = t_command.ship
 JOIN t_object AS b ON b.id = t_command.target
+JOIN t_ship ON t_ship.id = t_command.target # ensure that only ships can be attacked
 WHERE t_command.type = 'attack' AND ((a.pos_x = b.pos_x AND a.pos_y = b.pos_y) OR (a.pos_x = b.pos_x_prev AND a.pos_y = b.pos_y_prev));
 
 DROP TEMPORARY TABLE IF EXISTS t_ship_damages;
@@ -2627,6 +2600,10 @@ REPLACE INTO t_commodity
 SELECT * FROM t_recipe_result;
 
 DELETE FROM t_commodity WHERE amount = 0;
+
+UPDATE t_planet AS p
+JOIN t_recipe_planets AS r ON r.planet = p.id
+SET recipe_count = recipe_count + 1, recipe_tick = (SELECT tick FROM t_game LIMIT 1);
 
 END//
 DELIMITER ;
@@ -2923,8 +2900,6 @@ UPDATE t_game SET season = season + 1, tick = 1;
 CALL p_clear_all;
 CALL p_generate_planets;
 CALL p_generate_resources;
-CALL p_process_recipes;
-CALL p_generate_prices;
 CALL p_update_prices;
 
 COMMIT;
@@ -3007,7 +2982,24 @@ CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
 BEGIN
 
-# TODO
+DROP TEMPORARY TABLE IF EXISTS t_recipe_stats;
+CREATE TEMPORARY TABLE t_recipe_stats
+(PRIMARY KEY(planet, resource))
+SELECT t_recipe.planet, t_recipe.resource,
+	if(production > 0, ifnull(amount, 0), 0) AS surplus,
+	if(production < 0, GREATEST(production * -2 - ifnull(amount, 0), 0), 0) AS lack,
+	(SELECT tick FROM t_game LIMIT 1) - t_planet.recipe_tick AS elapsed
+FROM t_planet
+JOIN t_recipe ON t_recipe.planet = t_planet.id
+left JOIN t_commodity ON t_commodity.object = t_recipe.planet AND t_commodity.resource = t_recipe.resource;
+
+UPDATE t_price SET buy = NULL, sell = null;
+
+REPLACE INTO t_price (planet, resource, buy, sell)
+SELECT planet, resource, if(surplus > 0, 1000 / SQRT(surplus + 10), NULL), if(lack > 0, (lack + 100) * (elapsed + 100) * 0.01, NULL)
+FROM t_recipe_stats;
+
+DELETE FROM t_price WHERE buy IS NULL AND sell IS NULL;
 
 END//
 DELIMITER ;
@@ -3096,6 +3088,8 @@ CREATE TABLE IF NOT EXISTS `t_object` (
 DROP TABLE IF EXISTS `t_planet`;
 CREATE TABLE IF NOT EXISTS `t_planet` (
   `id` int(11) NOT NULL,
+  `recipe_count` int(11) NOT NULL DEFAULT 0 COMMENT 'number of times the recipe has been processed on this planet',
+  `recipe_tick` int(11) NOT NULL DEFAULT 0 COMMENT 'tick when the recipe was last processed on this planet',
   PRIMARY KEY (`id`),
   CONSTRAINT `FK__object_id` FOREIGN KEY (`id`) REFERENCES `t_object` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
@@ -3335,6 +3329,17 @@ CREATE TABLE `v_resource_price` (
 	`sell` BIGINT(16) NOT NULL
 ) ENGINE=MyISAM;
 
+-- Dumping structure for view space_tycoon.v_resource_production
+DROP VIEW IF EXISTS `v_resource_production`;
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `v_resource_production` (
+	`resource` INT(11) NOT NULL,
+	`name` TINYTEXT NOT NULL COLLATE 'utf8mb3_general_ci',
+	`production` DECIMAL(32,0) NULL,
+	`consumption` DECIMAL(33,0) NULL,
+	`difference` DECIMAL(32,0) NULL
+) ENGINE=MyISAM;
+
 -- Dumping structure for view space_tycoon.v_ship_cargo
 DROP VIEW IF EXISTS `v_ship_cargo`;
 -- Creating temporary table to overcome VIEW dependency errors
@@ -3410,6 +3415,12 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_price` AS SELEC
 FROM d_resource
 LEFT JOIN t_price ON t_price.resource = d_resource.id
 GROUP BY d_resource.id ;
+
+-- Dumping structure for view space_tycoon.v_resource_production
+DROP VIEW IF EXISTS `v_resource_production`;
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `v_resource_production`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_resource_production` AS select `r`.`resource` AS `resource`,`d`.`name` AS `name`,sum(greatest(`r`.`production`,0)) AS `production`,-sum(least(`r`.`production`,0)) AS `consumption`,sum(`r`.`production`) AS `difference` from (`t_recipe` `r` join `d_resource` `d` on(`d`.`id` = `r`.`resource`)) group by `r`.`resource` ;
 
 -- Dumping structure for view space_tycoon.v_ship_cargo
 DROP VIEW IF EXISTS `v_ship_cargo`;
