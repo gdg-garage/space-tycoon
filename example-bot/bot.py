@@ -83,12 +83,12 @@ class Game:
         self.stuck_ships_id = {ship_id for ship_id, ship in my_ships.items() if ship.command is not None and
                                ship.command.type == "trade" and ship.position == ship.prev_position}
         ship_type_cnt = Counter(
-            (self.static_data.ship_classes[ship.shipClass].name for ship in my_ships.values()))
+            (self.static_data.ship_classes[ship.ship_class].name for ship in my_ships.values()))
         pretty_ship_type_cnt = ', '.join(
             f"{k}:{v}" for k, v in ship_type_cnt.most_common())
         print(f"I have {len(my_ships)} ships ({pretty_ship_type_cnt})")
         mothership_id = [ship_id for ship_id, ship in my_ships.items() if
-                         ship.shipClass == self.named_ship_classes["mothership"]]
+                         ship.ship_class == self.named_ship_classes["mothership"]]
         if len(mothership_id) != 1:
             print("mothership is gone :(")
             return
@@ -113,12 +113,12 @@ class Game:
         # commands[mothership_id] = MoveCommand(type="move", destination=Destination(coordinates=[0, 0]))
 
         ongoing_trades = {(ship.command.resource, ship.command.target) for ship_id, ship in my_ships.items() if
-                          ship.shipClass == shipper_class_id and
+                          ship.ship_class == shipper_class_id and
                           ship.command is not None and ship.command.type == "trade" and ship.command.amount > 0}
 
         # send shippers to buy something
         idle_shippers: List[Tuple[str, Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
-                                                 ship.shipClass == shipper_class_id and (
+                                                 ship.ship_class == shipper_class_id and (
                                                          ship.command is None or ship_id in self.stuck_ships_id)]
         # some shippers may be stuck because of some precondition
         idle_empty_shippers = list(
@@ -135,11 +135,11 @@ class Game:
             for planet_id, planet in self.data.planets.items():
                 for resource_id, resource in planet.resources.items():
                     # possible to buy?
-                    if resource.buyPrice is not None and resource.amount > 0:
+                    if resource.buy_price is not None and resource.amount > 0:
                         if resource_id not in buy_resources:
                             buy_resources[resource_id] = []
                         buy_resources[resource_id].append((planet_id, planet, resource))
-                    if resource.sellPrice is not None:
+                    if resource.sell_price is not None:
                         if resource_id not in sell_resources:
                             sell_resources[resource_id] = []
                         sell_resources[resource_id].append((planet_id, planet, resource))
@@ -154,7 +154,7 @@ class Game:
                         possible_trades.append({"resource_id": res_id,
                                                 "buy_planet_id": buy_planet_id,
                                                 "amount": buy_resource.amount,
-                                                "profit": (sell_resource.sellPrice - buy_resource.buyPrice) *
+                                                "profit": (sell_resource.sell_price - buy_resource.buy_price) *
                                                           min(self.static_data.ship_classes[
                                                                   shipper_class_id].cargo_capacity,
                                                               buy_resource.amount),
@@ -198,7 +198,7 @@ class Game:
                 if resource_id not in sell_resources:
                     continue
                 sell_planet_id, sell_planet, sell_resource = max(sell_resources[resource_id],
-                                                                 key=lambda x: x[2].sellPrice * (1 - (self.dist(
+                                                                 key=lambda x: x[2].sell_price * (1 - (self.dist(
                                                                      ship.position,
                                                                      self.data.planets[x[0]].position) / 2000)))
                 amount = ship.resources[resource_id]["amount"]
@@ -211,7 +211,7 @@ class Game:
         # be aggressive
         # use swarming (all attack to one)
         idle_attack_ships: List[Tuple[str, Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
-                                                     ship.shipClass in {fighter_class_id, bomber_class_id} and (
+                                                     ship.ship_class in {fighter_class_id, bomber_class_id} and (
                                                              ship.command is None or ship_id in self.stuck_ships_id)]
 
         enemy_ships = []
