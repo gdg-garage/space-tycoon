@@ -288,7 +288,7 @@ components:
           type: integer
           format: int64
           nullable: true
-        ship-class:
+        shipClass:
           type: string
           nullable: true
         name:
@@ -312,14 +312,14 @@ components:
     ConstructCommand:
       type: object
       properties:
-        ship-class:
+        shipClass:
           type: string
           nullable: true
         type:
           type: string
           default: construct
       required:
-        - ship-class
+        - shipClass
 
     DecommissionCommand:
       type: object
@@ -427,16 +427,16 @@ components:
     StaticData:
       type: object
       properties:
-        ship-classes:
+        shipClasses:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/ShipClass'
-        resource-names:
+        resourceNames:
           type: object
           additionalProperties:
             type: string
       example:
-        ship-classes: {
+        shipClasses: {
           "1": {
             name: "mothership",
             shipyard: true,
@@ -455,7 +455,7 @@ components:
             price: 500000
           }
         }
-        resource-names: {
+        resourceNames: {
           "1": "spice melange",
           "2": "pokeballs"
         }
@@ -477,7 +477,7 @@ components:
         - name
         - resources
         - position
-        - prev-position
+        - prevPosition
       properties:
         name:
           type: string
@@ -487,13 +487,13 @@ components:
             $ref: '#/components/schemas/TradingResource'
         position:
           $ref: '#/components/schemas/Coordinates'
-        prev-position:
+        prevPosition:
           $ref: '#/components/schemas/Coordinates'
       example:
         {
           name: Aldebaran,
           position: [ -13, 25 ],
-          prev-position: [ -13, 25 ],
+          prevPosition: [ -13, 25 ],
           resources: {
             1: {
               amount: 0,
@@ -766,31 +766,31 @@ components:
       required:
         - name
         - color
-        - net-worth
+        - netWorth
       properties:
         name:
           type: string
         color:
           $ref: '#/components/schemas/Color'
-        net-worth:
+        netWorth:
           $ref: '#/components/schemas/NetWorth'
 
     Wreck:
       type: object
       required:
-        - ship-class
+        - shipClass
         - name
         - player
-        - kill-tick
+        - killTick
         - position
       properties:
-        ship-class:
+        shipClass:
           type: string
         name:
           type: string
         player:
           type: string
-        kill-tick:
+        killTick:
           type: integer
           format: int64
         position:
@@ -799,15 +799,15 @@ components:
     Ship:
       type: object
       required:
-        - ship-class
+        - shipClass
         - life
         - name
         - player
         - position
-        - prev-position
+        - prevPosition
         - resources
       properties:
-        ship-class:
+        shipClass:
           type: string
         life:
           type: integer
@@ -818,7 +818,7 @@ components:
           type: string
         position:
           $ref: '#/components/schemas/Coordinates'
-        prev-position:
+        prevPosition:
           $ref: '#/components/schemas/Coordinates'
         resources:
           $ref: '#/components/schemas/Resources'
@@ -827,7 +827,7 @@ components:
       example: {
         name: Milenium Falcon,
         position: [ -13, 25 ],
-        prev-position: [ -12, 27 ],
+        prevPosition: [ -12, 27 ],
         resources: {
           1: {
             amount: 5
@@ -836,7 +836,7 @@ components:
             amount: 7
           },
         },
-        ship-class: 2,
+        shipClass: 2,
         player: 3,
         life: 189,
         command: {
@@ -878,18 +878,18 @@ components:
     Data:
       type: object
       required:
-        - current-tick
+        - currentTick
         - planets
         - players
         - ships
       properties:
-        current-tick:
+        currentTick:
           $ref: '#/components/schemas/CurrentTick'
         planets:
           type: object
           additionalProperties:
             $ref: '#/components/schemas/Planet'
-        player-id:
+        playerId:
           type: string
           nullable: true
         players:
@@ -911,7 +911,7 @@ components:
           10: {
             name: Aldebaran,
             position: [ -13, 25 ],
-            prev-position: [ -13, 25 ],
+            prevPosition: [ -13, 25 ],
             resources: {
               1: {
                 amount: 0,
@@ -928,7 +928,7 @@ components:
           12: {
             name: Milenium Falcon,
             position: [ -13, 25 ],
-            prev-position: [ -12, 27 ],
+            prevPosition: [ -12, 27 ],
             resources: {
               1: {
                 amount: 5
@@ -937,7 +937,7 @@ components:
                 amount: 7
               },
             },
-            ship-class: 2,
+            shipClass: 2,
             player: 3,
             life: 189,
             command: {
@@ -950,9 +950,9 @@ components:
           15: {
             name: Nostromo,
             position: [ -13, 25 ],
-            prev-position: [ -12, 27 ],
+            prevPosition: [ -12, 27 ],
             resources: { },
-            ship-class: 1,
+            shipClass: 1,
             player: 1,
             life: 1000,
           },
@@ -961,7 +961,7 @@ components:
             position: [ 10, 10 ],
             prevPos: [ 5, 5 ],
             resources: { },
-            ship-class: 2,
+            shipClass: 2,
             player: 3,
             life: 200,
             command: {
@@ -972,9 +972,9 @@ components:
           19: {
             name: Invisible Hand II,
             position: [ 5, 5 ],
-            prev-position: [ 0, 0 ],
+            prevPosition: [ 0, 0 ],
             resources: { },
-            ship-class: 2,
+            shipClass: 2,
             player: 3,
             life: 200,
             command: {
@@ -999,12 +999,12 @@ components:
           format: int64
       required:
         - tick
-        - min-time-left-ms
+        - minTimeLeftMs
         - season
       example:
         {
           tick: 165,
-          min-time-left-ms: 350,
+          minTimeLeftMs: 350,
           season: 13,
         }
 
@@ -1050,7 +1050,7 @@ components:
         - name
         - shipyard
         - speed
-        - cargo-capacity
+        - cargoCapacity
         - life
         - damage
         - price
@@ -1063,7 +1063,7 @@ components:
         speed:
           type: number
           format: double
-        cargo-capacity:
+        cargoCapacity:
           type: integer
           format: int64
           description: "maximum number of resources the ship can carry - sum over all types of resources"
@@ -1080,7 +1080,7 @@ components:
         name: "mothership",
         shipyard: true,
         speed: 10,
-        cargo-capacity: 100,
+        cargoCapacity: 100,
         life: 360,
         damage: 30,
       }

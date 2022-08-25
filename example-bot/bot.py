@@ -31,15 +31,15 @@ class Game:
         self.player_id = self.login()
         self.static_data: StaticData = self.client.static_data_get()
         self.data: Data = self.client.data_get()
-        self.season = self.data.current_tick.season
-        self.tick = self.data.current_tick.tick
+        self.season = self.data.currentTick.season
+        self.tick = self.data.currentTick.tick
         # this part is custom logic, feel free to edit / delete
         if self.player_id not in self.data.players:
             raise Exception("Logged as non-existent player")
         self.named_ship_classes = {}
         self.stuck_ships_id = set()
         self.named_ship_classes = {ship_cls.name: ship_cls_id for ship_cls_id, ship_cls in
-                                   self.static_data.ship_classes.items()}
+                                   self.static_data.shipClasses.items()}
         self.recreate_me()
         print(f"playing as [{self.me.name}] id: {self.player_id}")
 
@@ -52,7 +52,7 @@ class Game:
             try:
                 print(f"tick {self.tick} season {self.season}")
                 self.data: Data = self.client.data_get()
-                if self.data.player_id is None:
+                if self.data.playerId is None:
                     raise Exception("I am not correctly logged in. Bailing out")
                 self.game_logic()
                 current_tick: CurrentTick = self.client.end_turn_post(EndTurn(
@@ -83,12 +83,12 @@ class Game:
         self.stuck_ships_id = {ship_id for ship_id, ship in my_ships.items() if ship.command is not None and
                                ship.command.type == "trade" and ship.position == ship.prev_position}
         ship_type_cnt = Counter(
-            (self.static_data.ship_classes[ship.ship_class].name for ship in my_ships.values()))
+            (self.static_data.shipClasses[ship.shipClass].name for ship in my_ships.values()))
         pretty_ship_type_cnt = ', '.join(
             f"{k}:{v}" for k, v in ship_type_cnt.most_common())
         print(f"I have {len(my_ships)} ships ({pretty_ship_type_cnt})")
         mothership_id = [ship_id for ship_id, ship in my_ships.items() if
-                         ship.ship_class == self.named_ship_classes["mothership"]]
+                         ship.shipClass == self.named_ship_classes["mothership"]]
         if len(mothership_id) != 1:
             print("mothership is gone :(")
             return
@@ -101,8 +101,8 @@ class Game:
         current_money = self.me.net_worth.money
         print(f"I have {current_money}$")
         current_money_without_buffer = current_money - buffer
-        if current_money_without_buffer > self.static_data.ship_classes[shipper_class_id].price:
-            num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.ship_classes[
+        if current_money_without_buffer > self.static_data.shipClasses[shipper_class_id].price:
+            num_shippers_to_buy = math.floor(current_money_without_buffer / self.static_data.shipClasses[
                 shipper_class_id].price)
             print(f"I may buy {num_shippers_to_buy} shipper(s)")
             commands[mothership_id] = ConstructCommand(
@@ -113,12 +113,12 @@ class Game:
         # commands[mothership_id] = MoveCommand(type="move", destination=Destination(coordinates=[0, 0]))
 
         ongoing_trades = {(ship.command.resource, ship.command.target) for ship_id, ship in my_ships.items() if
-                          ship.ship_class == shipper_class_id and
+                          ship.shipClass == shipper_class_id and
                           ship.command is not None and ship.command.type == "trade" and ship.command.amount > 0}
 
         # send shippers to buy something
         idle_shippers: List[Tuple[str, Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
-                                                 ship.ship_class == shipper_class_id and (
+                                                 ship.shipClass == shipper_class_id and (
                                                          ship.command is None or ship_id in self.stuck_ships_id)]
         # some shippers may be stuck because of some precondition
         idle_empty_shippers = list(
@@ -155,7 +155,7 @@ class Game:
                                                 "buy_planet_id": buy_planet_id,
                                                 "amount": buy_resource.amount,
                                                 "profit": (sell_resource.sell_price - buy_resource.buy_price) *
-                                                          min(self.static_data.ship_classes[
+                                                          min(self.static_data.shipClasses[
                                                                   shipper_class_id].cargo_capacity,
                                                               buy_resource.amount),
                                                 "distance": self.dist(buy_planet.position, sell_planet.position)})
@@ -171,7 +171,7 @@ class Game:
                 best_trade_idx = 0
                 trade = ship_best_trades[best_trade_idx]
 
-                amount = min(trade["amount"], self.static_data.ship_classes[ship.ship_class].cargo_capacity)
+                amount = min(trade["amount"], self.static_data.shipClasses[ship.shipClass].cargo_capacity)
                 trade_id = (trade["resource_id"], trade["buy_planet_id"])
                 while trade_id in ongoing_trades:
                     best_trade_idx += 1
@@ -187,7 +187,7 @@ class Game:
                     amount=amount,
                     resource=trade["resource_id"], target=trade["buy_planet_id"])
                 print(
-                    f"buying {amount} of {self.static_data.resource_names[trade['resource_id']]}, distance {trade['distance']}, expected profit {trade['profit']}")
+                    f"buying {amount} of {self.static_data.resourceNames[trade['resource_id']]}, distance {trade['distance']}, expected profit {trade['profit']}")
                 ongoing_trades.add(trade_id)
 
         # sell
@@ -206,12 +206,12 @@ class Game:
                 commands[ship_id] = TradeCommand(amount=-amount, resource=resource_id,
                                                  target=sell_planet_id)
                 print(
-                    f"selling {amount} of [{self.static_data.resource_names[resource_id]}] distance {self.dist(ship.position, sell_planet.position)}")
+                    f"selling {amount} of [{self.static_data.resourceNames[resource_id]}] distance {self.dist(ship.position, sell_planet.position)}")
 
         # be aggressive
         # use swarming (all attack to one)
         idle_attack_ships: List[Tuple[str, Ship]] = [(ship_id, ship) for ship_id, ship in my_ships.items() if
-                                                     ship.ship_class in {fighter_class_id, bomber_class_id} and (
+                                                     ship.shipClass in {fighter_class_id, bomber_class_id} and (
                                                              ship.command is None or ship_id in self.stuck_ships_id)]
 
         enemy_ships = []
