@@ -2519,6 +2519,12 @@ DELETE t_command
 FROM t_command
 JOIN t_constructions ON t_constructions.ship = t_command.ship;
 
+# update names
+UPDATE t_object
+JOIN t_player ON t_player.id = t_object.owner
+SET t_object.name = CONCAT(t_player.name, " - ", t_object.id)
+WHERE t_object.name = "";
+
 END//
 DELIMITER ;
 
