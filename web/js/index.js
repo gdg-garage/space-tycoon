@@ -169,7 +169,7 @@ function clickInfo(e) {
 		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
-			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r["buy-price"]) || "") + "<td class=\"sell\">" + (bignum(r["sell-price"]) || "")
+			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r.buyPrice) || "") + "<td class=\"sell\">" + (bignum(r.sellPrice) || "")
 		}
 		t += "</table>"
 	}

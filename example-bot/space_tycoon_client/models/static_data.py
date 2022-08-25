@@ -33,8 +33,8 @@ class StaticData(object):
     }
 
     attribute_map = {
-        'ship_classes': 'ship-classes',
-        'resource_names': 'resource-names'
+        'ship_classes': 'shipClasses',
+        'resource_names': 'resourceNames'
     }
 
     def __init__(self, ship_classes=None, resource_names=None):  # noqa: E501

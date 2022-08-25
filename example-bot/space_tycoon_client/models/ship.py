@@ -39,12 +39,12 @@ class Ship(object):
     }
 
     attribute_map = {
-        'ship_class': 'ship-class',
+        'ship_class': 'shipClass',
         'life': 'life',
         'name': 'name',
         'player': 'player',
         'position': 'position',
-        'prev_position': 'prev-position',
+        'prev_position': 'prevPosition',
         'resources': 'resources',
         'command': 'command'
     }

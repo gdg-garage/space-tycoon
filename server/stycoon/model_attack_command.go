@@ -10,6 +10,7 @@
 package stycoon
 
 type AttackCommand struct {
+
 	Target *string `json:"target"`
 
 	Type string `json:"type,omitempty"`

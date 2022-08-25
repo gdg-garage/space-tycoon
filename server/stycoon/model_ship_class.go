@@ -19,7 +19,7 @@ type ShipClass struct {
 	Speed float64 `json:"speed"`
 
 	// maximum number of resources the ship can carry - sum over all types of resources
-	CargoCapacity int64 `json:"cargo-capacity"`
+	CargoCapacity int64 `json:"cargoCapacity"`
 
 	Life int64 `json:"life"`
 
@@ -34,7 +34,7 @@ func AssertShipClassRequired(obj ShipClass) error {
 		"name": obj.Name,
 		"shipyard": obj.Shipyard,
 		"speed": obj.Speed,
-		"cargo-capacity": obj.CargoCapacity,
+		"cargoCapacity": obj.CargoCapacity,
 		"life": obj.Life,
 		"damage": obj.Damage,
 		"price": obj.Price,

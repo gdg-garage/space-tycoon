@@ -11,7 +11,7 @@ package stycoon
 
 type Ship struct {
 
-	ShipClass string `json:"ship-class"`
+	ShipClass string `json:"shipClass"`
 
 	Life int64 `json:"life"`
 
@@ -21,7 +21,7 @@ type Ship struct {
 
 	Position *[]int64 `json:"position"`
 
-	PrevPosition *[]int64 `json:"prev-position"`
+	PrevPosition *[]int64 `json:"prevPosition"`
 
 	Resources map[string]Resource `json:"resources"`
 
@@ -31,12 +31,12 @@ type Ship struct {
 // AssertShipRequired checks if the required fields are not zero-ed
 func AssertShipRequired(obj Ship) error {
 	elements := map[string]interface{}{
-		"ship-class": obj.ShipClass,
+		"shipClass": obj.ShipClass,
 		"life": obj.Life,
 		"name": obj.Name,
 		"player": obj.Player,
 		"position": obj.Position,
-		"prev-position": obj.PrevPosition,
+		"prevPosition": obj.PrevPosition,
 		"resources": obj.Resources,
 	}
 	for name, el := range elements {

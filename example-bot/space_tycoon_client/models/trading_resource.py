@@ -36,8 +36,8 @@ class TradingResource(Resource):
         swagger_types.update(Resource.swagger_types)
 
     attribute_map = {
-        'buy_price': 'buy-price',
-        'sell_price': 'sell-price'
+        'buy_price': 'buyPrice',
+        'sell_price': 'sellPrice'
     }
     if hasattr(Resource, "attribute_map"):
         attribute_map.update(Resource.attribute_map)

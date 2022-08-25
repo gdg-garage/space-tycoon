@@ -21,7 +21,7 @@ type Command struct {
 
 	Amount *int64 `json:"amount,omitempty"`
 
-	ShipClass *string `json:"ship-class,omitempty"`
+	ShipClass *string `json:"shipClass,omitempty"`
 
 	Name *string `json:"name,omitempty"`
 }

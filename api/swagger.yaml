@@ -441,7 +441,7 @@ components:
             name: "mothership",
             shipyard: true,
             speed: 10,
-            cargo-capacity: 100,
+            cargoCapacity: 100,
             life: 360,
             damage: 30,
           },
@@ -449,7 +449,7 @@ components:
             name: "hauler",
             shipyard: false,
             speed: 13,
-            cargo-capacity: 200,
+            cargoCapacity: 200,
             life: 200,
             damage: 0,
             price: 500000
@@ -497,11 +497,11 @@ components:
           resources: {
             1: {
               amount: 0,
-              buy-price: 500
+              buyPrice: 500
             },
             5: {
               amount: 20,
-              sell-price: 230.5
+              sellPrice: 230.5
             }
           }
         }
@@ -749,10 +749,10 @@ components:
       allOf:
         - $ref: '#/components/schemas/Resource'
         - properties:
-            buy-price:
+            buyPrice:
               type: number
               format: double
-            sell-price:
+            sellPrice:
               type: number
               format: double
 
@@ -915,11 +915,11 @@ components:
             resources: {
               1: {
                 amount: 0,
-                buy-price: 500
+                buyPrice: 500
               },
               5: {
                 amount: 20,
-                sell-price: 230.5
+                sellPrice: 230.5
               }
             }
           }
@@ -991,7 +991,7 @@ components:
         tick:
           type: integer
           format: int64
-        min-time-left-ms:
+        minTimeLeftMs:
           type: integer
           format: int64
         season:

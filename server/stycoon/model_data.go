@@ -11,11 +11,11 @@ package stycoon
 
 type Data struct {
 
-	CurrentTick CurrentTick `json:"current-tick"`
+	CurrentTick CurrentTick `json:"currentTick"`
 
 	Planets map[string]Planet `json:"planets"`
 
-	PlayerId *string `json:"player-id,omitempty"`
+	PlayerId *string `json:"playerId,omitempty"`
 
 	Players map[string]Player `json:"players"`
 
@@ -29,7 +29,7 @@ type Data struct {
 // AssertDataRequired checks if the required fields are not zero-ed
 func AssertDataRequired(obj Data) error {
 	elements := map[string]interface{}{
-		"current-tick": obj.CurrentTick,
+		"currentTick": obj.CurrentTick,
 		"planets": obj.Planets,
 		"players": obj.Players,
 		"ships": obj.Ships,

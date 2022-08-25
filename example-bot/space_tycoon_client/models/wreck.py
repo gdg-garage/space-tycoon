@@ -36,10 +36,10 @@ class Wreck(object):
     }
 
     attribute_map = {
-        'ship_class': 'ship-class',
+        'ship_class': 'shipClass',
         'name': 'name',
         'player': 'player',
-        'kill_tick': 'kill-tick',
+        'kill_tick': 'killTick',
         'position': 'position'
     }
 
