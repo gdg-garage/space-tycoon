@@ -2142,19 +2142,19 @@ DELETE FROM t_player;
 END//
 DELIMITER ;
 
--- Dumping structure for function space_tycoon.p_create_player
-DROP FUNCTION IF EXISTS `p_create_player`;
+-- Dumping structure for procedure space_tycoon.p_create_player
+DROP PROCEDURE IF EXISTS `p_create_player`;
 DELIMITER //
-CREATE FUNCTION `p_create_player`(`user_id` INT,
-	`pos_x` INT,
-	`pos_y` INT,
-	`player_name` TINYTEXT,
-	`color` TINYTEXT
-) RETURNS int(11)
+CREATE PROCEDURE `p_create_player`(
+	IN `user_id` INT,
+	IN `pos_x` INT,
+	IN `pos_y` INT,
+	IN `color` TINYTEXT
+)
     SQL SECURITY INVOKER
 BEGIN
 
-DECLARE player_id INT;
+DECLARE player_name TINYTEXT;
 DECLARE ship_id INT;
 DECLARE ship_class INT;
 DECLARE ship_class_name TINYTEXT;
@@ -2166,8 +2166,8 @@ DECLARE cursor_done INT DEFAULT FALSE;
 DECLARE classes_cursor CURSOR FOR SELECT id, name, life, starting_count FROM d_class;
 DECLARE CONTINUE HANDLER FOR NOT FOUND SET cursor_done = TRUE;
 
-INSERT INTO t_player (user, name, color) VALUES(user_id, player_name, color);
-SET player_id = LAST_INSERT_ID();
+INSERT INTO t_player (id, color) VALUES(user_id, color);
+SELECT name INTO player_name FROM d_user WHERE id = user_id;
 
 OPEN classes_cursor;
 loop_through_classes: LOOP
@@ -2177,7 +2177,7 @@ loop_through_classes: LOOP
 	END IF;
 	SET ship_index = 0;
 	WHILE ship_index < ships_count DO
-		INSERT INTO t_object (owner, name, pos_x, pos_y, pos_x_prev, pos_y_prev) VALUES (player_id, CONCAT(player_name, ' - ', ship_index_total, ' ', ship_class_name), pos_x, pos_y, pos_x, pos_y);
+		INSERT INTO t_object (owner, name, pos_x, pos_y, pos_x_prev, pos_y_prev) VALUES (user_id, CONCAT(player_name, ' - ', ship_index_total, ' ', ship_class_name), pos_x, pos_y, pos_x, pos_y);
 		SET ship_id = LAST_INSERT_ID();
 		INSERT INTO t_ship (id, class, life) VALUES (ship_id, ship_class, ship_life);
 		SET ship_index = ship_index + 1;
@@ -2185,8 +2185,6 @@ loop_through_classes: LOOP
 	END WHILE;
 END LOOP;
 CLOSE classes_cursor;
-
-RETURN player_id;
 
 END//
 DELIMITER ;
@@ -2280,36 +2278,44 @@ CREATE PROCEDURE `p_generate_random_players`()
     SQL SECURITY INVOKER
 BEGIN
 
-DECLARE user_pass TINYTEXT DEFAULT "$2a$10$pvAWQjq/KAdZpnr4q51E3.RLE6AnPd8P92wRm8n5XsLd2tcjR1ePa"; # password: 123456
-DECLARE player_count INT DEFAULT RAND() * 5 + 5;
-DECLARE player_index INT DEFAULT 0;
-DECLARE player_offset INT;
+DECLARE player_id int;
 DECLARE start_a FLOAT;
 DECLARE start_d FLOAT;
 DECLARE start_x INT;
 DECLARE start_y INT;
-DECLARE user int;
-DECLARE name TINYTEXT;
 DECLARE color TINYTEXT;
+DECLARE cursor_done INT DEFAULT FALSE;
+DECLARE users_cursor CURSOR FOR SELECT id FROM d_user WHERE id NOT IN (SELECT id FROM t_player);
+DECLARE CONTINUE HANDLER FOR NOT FOUND SET cursor_done = TRUE;
 
-INSERT IGNORE INTO d_user (name, password) VALUES ("tamagochi", user_pass), ("the hu", user_pass), ("spaceman", user_pass), ("minecraft", user_pass), ("dragonborn", user_pass);
-
-SELECT COUNT(1) + 1 FROM t_player INTO player_offset;
-
-SET player_count = RAND() * 5 + 5;
-WHILE player_index < player_count DO
+OPEN users_cursor;
+loop_through_ids: LOOP
+	FETCH users_cursor INTO player_id;
+	IF cursor_done THEN
+		LEAVE loop_through_ids;
+	END IF;
 	SET start_a = RAND() * 2 * PI();
 	SET start_d = (1 - RAND() * RAND()) * 1000 + 250; # average at 1000
 	SET start_x = COS(start_a) * start_d;
 	SET start_y = SIN(start_a) * start_d;
-	SELECT id FROM d_user ORDER BY RAND() LIMIT 1 INTO user;
-	SET name = CONCAT('dummy ', player_index + player_offset);
 	SET color = CONCAT("[", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), ",", cast(RAND() * 256 AS INTEGER), "]");
-	SELECT p_create_player(user, start_x, start_y, name, color);
-	SET player_index = player_index + 1;
-END WHILE;
+	CALL p_create_player(player_id, start_x, start_y, color);
+END LOOP;
+CLOSE users_cursor;
 
-CALL p_generate_random_commands;
+END//
+DELIMITER ;
+
+-- Dumping structure for procedure space_tycoon.p_generate_random_users
+DROP PROCEDURE IF EXISTS `p_generate_random_users`;
+DELIMITER //
+CREATE PROCEDURE `p_generate_random_users`()
+    SQL SECURITY INVOKER
+BEGIN
+
+DECLARE user_pass TINYTEXT DEFAULT "$2a$10$pvAWQjq/KAdZpnr4q51E3.RLE6AnPd8P92wRm8n5XsLd2tcjR1ePa"; # password: 123456
+
+INSERT IGNORE INTO d_user (name, password) VALUES ("tamagochi", user_pass), ("the hu", user_pass), ("spaceman", user_pass), ("minecraft", user_pass), ("dragonborn", user_pass);
 
 END//
 DELIMITER ;
@@ -2521,8 +2527,8 @@ JOIN t_constructions ON t_constructions.ship = t_command.ship;
 
 # update names
 UPDATE t_object
-JOIN t_player ON t_player.id = t_object.owner
-SET t_object.name = CONCAT(t_player.name, " - ", t_object.id)
+JOIN d_user ON d_user.id = t_object.owner
+SET t_object.name = CONCAT(d_user.name, " - ", t_object.id)
 WHERE t_object.name = "";
 
 END//
@@ -2691,7 +2697,7 @@ BEGIN
 # create a temporary player to represent all the planets which allows to simplify the other queries related to money
 # it has A LOT of money from the beginning to ensure that the planets pass the 'available money' filter
 INSERT IGNORE INTO d_user (id, name) VALUES (-1, '<planets>');
-INSERT IGNORE INTO t_player (id, user, name, money) VALUES (-1, -1, '<planets>', 1000000000000000);
+INSERT IGNORE INTO t_player (id, money) VALUES (-1, 1000000000000000);
 
 # filter by commands
 
@@ -2869,7 +2875,6 @@ ALTER TABLE t_command AUTO_INCREMENT = 1;
 ALTER TABLE t_ship AUTO_INCREMENT = 1;
 ALTER TABLE t_wreck AUTO_INCREMENT = 1;
 ALTER TABLE t_object AUTO_INCREMENT = 1;
-ALTER TABLE t_player AUTO_INCREMENT = 1;
 UPDATE t_game SET season = 1, tick = 1;
 
 END//
@@ -2907,8 +2912,8 @@ BEGIN
 START TRANSACTION READ WRITE;
 
 INSERT INTO d_user_score (season, user, score)
-SELECT (SELECT season FROM t_game LIMIT 1), user, score
-FROM v_user_score;
+SELECT (SELECT season FROM t_game LIMIT 1), player, score
+FROM v_player_score;
 
 UPDATE t_game SET season = season + 1, tick = 1;
 
@@ -3115,15 +3120,11 @@ CREATE TABLE IF NOT EXISTS `t_planet` (
 -- Dumping structure for table space_tycoon.t_player
 DROP TABLE IF EXISTS `t_player`;
 CREATE TABLE IF NOT EXISTS `t_player` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` int(11) NOT NULL,
-  `name` tinytext NOT NULL,
+  `id` int(11) NOT NULL,
   `money` bigint(20) NOT NULL DEFAULT 5000000,
   `color` tinytext NOT NULL DEFAULT '[255,255,255]' CHECK (json_valid(`color`)),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `Index 3` (`name`(255)),
-  KEY `FK_t_player_t_user` (`user`),
-  CONSTRAINT `FK_t_player_t_user` FOREIGN KEY (`user`) REFERENCES `d_user` (`id`),
+  CONSTRAINT `FK_t_player_d_user` FOREIGN KEY (`id`) REFERENCES `d_user` (`id`),
   CONSTRAINT `money_are_not_negative` CHECK (`money` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -3373,23 +3374,6 @@ CREATE TABLE `v_ship_cargo` (
 	`used` BIGINT(21) NOT NULL
 ) ENGINE=MyISAM;
 
--- Dumping structure for view space_tycoon.v_user_best_worth
-DROP VIEW IF EXISTS `v_user_best_worth`;
--- Creating temporary table to overcome VIEW dependency errors
-CREATE TABLE `v_user_best_worth` (
-	`user` INT(11) NOT NULL,
-	`total` BIGINT(23) NULL
-) ENGINE=MyISAM;
-
--- Dumping structure for view space_tycoon.v_user_score
-DROP VIEW IF EXISTS `v_user_score`;
--- Creating temporary table to overcome VIEW dependency errors
-CREATE TABLE `v_user_score` (
-	`user` INT(11) NOT NULL,
-	`total` BIGINT(23) NULL,
-	`score` BIGINT(21) NOT NULL
-) ENGINE=MyISAM;
-
 -- Dumping structure for view space_tycoon.v_planet_recipes
 DROP VIEW IF EXISTS `v_planet_recipes`;
 -- Removing temporary table and create final VIEW structure
@@ -3461,26 +3445,6 @@ FROM t_ship
 JOIN d_class ON d_class.id = t_ship.class
 LEFT JOIN t_commodity ON t_commodity.object = t_ship.id
 GROUP BY t_ship.id ;
-
--- Dumping structure for view space_tycoon.v_user_best_worth
-DROP VIEW IF EXISTS `v_user_best_worth`;
--- Removing temporary table and create final VIEW structure
-DROP TABLE IF EXISTS `v_user_best_worth`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_best_worth` AS SELECT t_player.user, MAX(v_player_total_worth.total) AS total
-FROM v_player_total_worth
-JOIN t_player ON t_player.id = v_player_total_worth.player
-GROUP BY t_player.user
-ORDER BY total desc ;
-
--- Dumping structure for view space_tycoon.v_user_score
-DROP VIEW IF EXISTS `v_user_score`;
--- Removing temporary table and create final VIEW structure
-DROP TABLE IF EXISTS `v_user_score`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_user_score` AS SELECT a.user AS user, a.total AS total, COUNT(1) AS score
-FROM v_user_best_worth AS a
-JOIN v_user_best_worth AS b ON a.total >= b.total
-GROUP BY a.user
-ORDER BY a.total desc ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
