@@ -17,7 +17,7 @@ type Planet struct {
 
 	Position *[]int64 `json:"position"`
 
-	PrevPosition *[]int64 `json:"prev-position"`
+	PrevPosition *[]int64 `json:"prevPosition"`
 }
 
 // AssertPlanetRequired checks if the required fields are not zero-ed
@@ -26,7 +26,7 @@ func AssertPlanetRequired(obj Planet) error {
 		"name": obj.Name,
 		"resources": obj.Resources,
 		"position": obj.Position,
-		"prev-position": obj.PrevPosition,
+		"prevPosition": obj.PrevPosition,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

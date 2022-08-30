@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 
 # import apis into sdk package
+from space_tycoon_client.api.dev_api import DevApi
 from space_tycoon_client.api.game_api import GameApi
 # import ApiClient
 from space_tycoon_client.api_client import ApiClient

@@ -36,7 +36,7 @@ class Player(object):
     attribute_map = {
         'name': 'name',
         'color': 'color',
-        'net_worth': 'net-worth'
+        'net_worth': 'netWorth'
     }
 
     def __init__(self, name=None, color=None, net_worth=None):  # noqa: E501

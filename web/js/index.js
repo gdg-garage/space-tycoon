@@ -80,8 +80,8 @@ function generateObjects(data) {
 			w.id = wid
 			w.data = data
 			data.objects[wid] = w
-			if (typeof w["prev-position"] === "undefined") {
-				w["prev-position"] = w.position
+			if (typeof w.prevPosition === "undefined") {
+				w.prevPosition = w.position
 			}
 		}
 	}
@@ -125,8 +125,8 @@ function clickInfo(e) {
 	.html("<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>")
 
 	let t = ""
-	if (typeof d["ship-class"] !== "undefined") {
-		let c = staticData["ship-classes"][d["ship-class"]]
+	if (typeof d.shipClass !== "undefined") {
+		let c = staticData.shipClasses[d.shipClass]
 		t += "<hr>"
 		t += "<table>"
 		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
@@ -155,7 +155,7 @@ function clickInfo(e) {
 				t += "<tr><td>Amount:<td class=\"amount\">" + d.command.amount
 			}
 			if (typeof d.command["class"] !== "undefined") {
-				t += "<tr><td>Class:<td>" + staticData["ship-classes"][d.command["class"]].name
+				t += "<tr><td>Class:<td>" + staticData.shipClasses[d.command["class"]].name
 			}
 			t += "</table>"
 		}
@@ -164,12 +164,12 @@ function clickInfo(e) {
 	if (typeof d["resources"] !== "undefined" && Object.keys(d.resources).length > 0) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
-		if (!d["ship-class"]) {
+		if (!d.shipClass) {
 			t += "<tr><td><td>Available<td>Buy price<td>Sell price"
 		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
-			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r["buy-price"]) || "") + "<td class=\"sell\">" + (bignum(r["sell-price"]) || "")
+			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r.buyPrice) || "") + "<td class=\"sell\">" + (bignum(r.sellPrice) || "")
 		}
 		t += "</table>"
 	}
@@ -197,7 +197,7 @@ function shipColor(d) {
 }
 
 function shipHref(d) {
-	return "#class-" + staticData["ship-classes"][d["ship-class"]].name
+	return "#class-" + staticData.shipClasses[d.shipClass].name
 }
 
 function mapRedraw(data) {
@@ -305,8 +305,8 @@ function mapRedraw(data) {
 	.ease(d3.easeLinear)
 	.call(linesPositions)
 
-	if (typeof data["player-id"] !== "undefined") {
-		let ps = data.players[data["player-id"]]["net-worth"]
+	if (typeof data.playerId !== "undefined") {
+		let ps = data.players[data.playerId].netWorth
 		d3.select("#playerInfo")
 		.html("Ships: " + bignum(ps.ships) + ", Commodities: " + bignum(ps.resources) + ", Money: " + bignum(ps.money) + ", Total: " + bignum(ps.total))
 	} else {
@@ -320,13 +320,13 @@ function mapRedraw(data) {
 		p.id = pid
 		players.push(p)
 	}
-	players.sort((a, b) => d3.descending(a["net-worth"].total, b["net-worth"].total))
+	players.sort((a, b) => d3.descending(a.netWorth.total, b.netWorth.total))
 
 	d3.select("#playersOverlay")
 	.selectAll("tr")
 	.data(players, d => d.id)
 	.join("tr")
-	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
+	.html(d => "<td>" + d.name + "<td>" + bignum(d.netWorth.total))
 	.style("color", d => colorToRgb(d.color))
 }
 
@@ -334,10 +334,10 @@ function spawnBeam(attacker, defender) {
 	d3.select("#particles")
 	.append("line")
 	.classed("beam", true)
-	.attr("x1", attacker["prev-position"][0])
-	.attr("y1", attacker["prev-position"][1])
-	.attr("x2", defender["prev-position"][0] + (Math.random() - 0.5) * 3)
-	.attr("y2", defender["prev-position"][1] + (Math.random() - 0.5) * 3)
+	.attr("x1", attacker.prevPosition[0])
+	.attr("y1", attacker.prevPosition[1])
+	.attr("x2", defender.prevPosition[0] + (Math.random() - 0.5) * 3)
+	.attr("y2", defender.prevPosition[1] + (Math.random() - 0.5) * 3)
 	.attr("opacity", 0.7)
 	.transition()
 	.duration(500)
@@ -388,14 +388,14 @@ function spawnBloom(pos, radius, id) {
 
 function spawnAttack(attacker, defender) {
 	spawnBeam(attacker, defender)
-	spawnParticles(defender["prev-position"], 3)
-	spawnBloom(defender["prev-position"], 25, "attackBloomGrad")
+	spawnParticles(defender.prevPosition, 3)
+	spawnBloom(defender.prevPosition, 25, "attackBloomGrad")
 }
 
 function spawnKill(attacker, defender) {
 	spawnBeam(attacker, defender)
-	spawnParticles(defender["prev-position"], 20)
-	spawnBloom(defender["prev-position"], 80, "killBloomGrad")
+	spawnParticles(defender.prevPosition, 20)
+	spawnBloom(defender.prevPosition, 80, "killBloomGrad")
 }
 
 function spawnText(pos, direction, color, text, classes) {
@@ -466,8 +466,8 @@ function mapRefresh() {
 			d3.select("#tickInfo").text(error)
 		} else {
 			if (staticData) {
-				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
-					delete data["player-id"] // the supposedly logged-in player does not exist
+				if ((typeof data.playerId !== "undefined") && (typeof data.players[data.playerId] === "undefined")) {
+					delete data.playerId // the supposedly logged-in player does not exist
 				}
 				mapRedraw(data)
 				mapEvents(data)
@@ -483,7 +483,7 @@ function mapTimerLoop() {
 				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
 			} else {
-				setTimeout(mapTimerLoop, data["min-time-left-ms"] || 300)
+				setTimeout(mapTimerLoop, data.minTimeLeftMs || 300)
 				if (currentTick.tick != data.tick) {
 					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 					currentTick = data
@@ -505,7 +505,7 @@ function mapStartLoop() {
 	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
 
 	let cookies = parseCookies()
-	let playerid = cookies["player-id"] || -1
+	let playerid = cookies.playerId || -1
 	if (playerid > 0) {
 		d3.select("#userInfo").node().innerHTML = "<a href=\"logout.htm\">Log out</a> Player id: " + playerid + ", "
 	}
@@ -664,7 +664,7 @@ function graphsRedrawDamage(data, attackerMultiplier, defenderMultiplier) {
 		for (let c of Object.values(data.combat)) {
 			let a = data.world.objects[c.attacker]
 			let d = data.world.objects[c.defender]
-			let dmg = staticData["ship-classes"][a["ship-class"]].damage
+			let dmg = staticData.shipClasses[a.shipClass].damage
 			res[a.player][c.tick] += dmg * attackerMultiplier
 			res[d.player][c.tick] += dmg * defenderMultiplier
 		}

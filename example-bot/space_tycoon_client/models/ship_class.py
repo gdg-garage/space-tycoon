@@ -41,7 +41,7 @@ class ShipClass(object):
         'name': 'name',
         'shipyard': 'shipyard',
         'speed': 'speed',
-        'cargo_capacity': 'cargo-capacity',
+        'cargo_capacity': 'cargoCapacity',
         'life': 'life',
         'damage': 'damage',
         'price': 'price'

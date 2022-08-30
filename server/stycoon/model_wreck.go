@@ -11,13 +11,13 @@ package stycoon
 
 type Wreck struct {
 
-	ShipClass string `json:"ship-class"`
+	ShipClass string `json:"shipClass"`
 
 	Name string `json:"name"`
 
 	Player string `json:"player"`
 
-	KillTick int64 `json:"kill-tick"`
+	KillTick int64 `json:"killTick"`
 
 	Position *[]int64 `json:"position"`
 }
@@ -25,10 +25,10 @@ type Wreck struct {
 // AssertWreckRequired checks if the required fields are not zero-ed
 func AssertWreckRequired(obj Wreck) error {
 	elements := map[string]interface{}{
-		"ship-class": obj.ShipClass,
+		"shipClass": obj.ShipClass,
 		"name": obj.Name,
 		"player": obj.Player,
-		"kill-tick": obj.KillTick,
+		"killTick": obj.KillTick,
 		"position": obj.Position,
 	}
 	for name, el := range elements {

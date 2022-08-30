@@ -38,7 +38,7 @@ class Planet(object):
         'name': 'name',
         'resources': 'resources',
         'position': 'position',
-        'prev_position': 'prev-position'
+        'prev_position': 'prevPosition'
     }
 
     def __init__(self, name=None, resources=None, position=None, prev_position=None):  # noqa: E501

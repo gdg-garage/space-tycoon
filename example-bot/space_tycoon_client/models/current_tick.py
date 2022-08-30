@@ -35,7 +35,7 @@ class CurrentTick(object):
 
     attribute_map = {
         'tick': 'tick',
-        'min_time_left_ms': 'min-time-left-ms',
+        'min_time_left_ms': 'minTimeLeftMs',
         'season': 'season'
     }
 

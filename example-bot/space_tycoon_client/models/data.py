@@ -38,9 +38,9 @@ class Data(object):
     }
 
     attribute_map = {
-        'current_tick': 'current-tick',
+        'current_tick': 'currentTick',
         'planets': 'planets',
-        'player_id': 'player-id',
+        'player_id': 'playerId',
         'players': 'players',
         'ships': 'ships',
         'wrecks': 'wrecks',

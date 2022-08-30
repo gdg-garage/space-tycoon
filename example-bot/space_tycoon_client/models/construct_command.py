@@ -33,7 +33,7 @@ class ConstructCommand(object):
     }
 
     attribute_map = {
-        'ship_class': 'ship-class',
+        'ship_class': 'shipClass',
         'type': 'type'
     }
 

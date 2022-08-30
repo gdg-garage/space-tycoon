@@ -43,7 +43,7 @@ class Command(object):
         'destination': 'destination',
         'resource': 'resource',
         'amount': 'amount',
-        'ship_class': 'ship-class',
+        'ship_class': 'shipClass',
         'name': 'name'
     }
 
