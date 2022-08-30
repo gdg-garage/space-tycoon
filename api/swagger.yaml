@@ -16,8 +16,6 @@ servers:
 tags:
   - name: game
     description: Interact with the game
-  - name: dev
-    description: Interact with the game server in dev mode
 paths:
   /login:
     post:
