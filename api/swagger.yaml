@@ -1088,12 +1088,15 @@ components:
         regen:
           type: integer
           format: int64
+          description: "passive regeneration per tick"
         repairPrice:
           type: integer
           format: int64
+          description: "price for healing repairLife per tick (for repair command)"
         repairLife:
           type: integer
           format: int64
+          description: "how much is repaired per tick (for repair command)"
       example: {
         name: "mothership",
         shipyard: true,
