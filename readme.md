@@ -9,13 +9,14 @@
 ## Dev
 
 ```shell
-docker-compose up server adminer
+docker-compose up dev-server adminer
 ```
 This will also run container `db`.
 
 Containers:
 * `server` - App server listening on port 80.
+* `dev-server` - Server with extra commands for use during development.
 * `adminer` - Db interface running on port 8080.
 * `db` - (MariaDb) with password `secret` and database `space_tycoon` with all tables and procedures included from `database` directory.
 * `server-tidy` - `go mod tidy` = Update and cleanup go dependencies (go.mod) using the container. 
-* `client-gen` - generate code for example Python based client 
+* `client-gen` - Generate code for example Python based client.
