@@ -238,35 +238,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /reset:
-    get:
-      summary: start new season (call this after creating the users)
-      tags:
-        - dev
-      responses:
-        "200":
-          description: OK
-
-  /create-user:
-    post:
-      summary: create user
-      tags:
-        - dev
-      requestBody:
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/Credentials'
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
 components:
   securitySchemes:
     cookieAuth: # arbitrary name for the security scheme; will be used in the "security" key later
