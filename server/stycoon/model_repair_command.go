@@ -10,6 +10,7 @@
 package stycoon
 
 type RepairCommand struct {
+
 	Type string `json:"type,omitempty"`
 }
 

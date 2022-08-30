@@ -58,6 +58,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /logout:
     get:
       tags:
@@ -67,6 +68,7 @@ paths:
           description: OK
         "400":
           description: Invalid input
+
   /static-data:
     get:
       tags:
@@ -92,6 +94,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /data:
     get:
       summary: "Dynamic game data (scores, prices, spaceship positions)"
@@ -121,6 +124,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /commands:
     post:
       summary: Specify commands for your ships
@@ -148,6 +152,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /end-turn:
     post:
       summary: Signal that your turn is over for the current tick. Returns the current tick and the approximate time until the next tick.
@@ -198,6 +203,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /reports:
     get:
       summary: Fetch statistical data about all players.
@@ -1054,6 +1060,9 @@ components:
         - life
         - damage
         - price
+        - regen
+        - repairLife
+        - repairPrice
       properties:
         name:
           type: string
@@ -1076,6 +1085,18 @@ components:
         price:
           type: integer
           format: int64
+        regen:
+          type: integer
+          format: int64
+          description: "passive regeneration per tick"
+        repairPrice:
+          type: integer
+          format: int64
+          description: "price for healing repairLife per tick (for repair command)"
+        repairLife:
+          type: integer
+          format: int64
+          description: "how much is repaired per tick (for repair command)"
       example: {
         name: "mothership",
         shipyard: true,
