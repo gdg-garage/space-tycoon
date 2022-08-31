@@ -37,10 +37,10 @@ function hsvToRgb (h, s, b) {
 }
 
 function updateResourcesColors() {
-	let num = Object.keys(staticData["resource-names"]).length
+	let num = Object.keys(staticData.resourceNames).length
 	let index = 0
 	staticData.resourceColors = {}
-	for (let rid of Object.keys(staticData["resource-names"])) {
+	for (let rid of Object.keys(staticData.resourceNames)) {
 		staticData.resourceColors[rid] = colorToRgb(hsvToRgb(index * 360 / num, 100, 100))
 		index += 1
 	}
@@ -149,7 +149,7 @@ function clickInfo(e) {
 			}
 			// todo coordinates instead of target
 			if (typeof d.command.resource !== "undefined") {
-				t += "<tr><td>Resource:<td>" + staticData["resource-names"][d.command.resource]
+				t += "<tr><td>Resource:<td>" + staticData.resourceNames[d.command.resource]
 			}
 			if (typeof d.command.amount !== "undefined") {
 				t += "<tr><td>Amount:<td class=\"amount\">" + d.command.amount
@@ -169,7 +169,7 @@ function clickInfo(e) {
 		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
-			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r.buyPrice) || "") + "<td class=\"sell\">" + (bignum(r.sellPrice) || "")
+			t += "<tr><td>" + staticData.resourceNames[rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r.buyPrice) || "") + "<td class=\"sell\">" + (bignum(r.sellPrice) || "")
 		}
 		t += "</table>"
 	}
@@ -429,7 +429,7 @@ function spawnTrade(data, tr) {
 		return
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
-	let rn = staticData["resource-names"][tr.resource]
+	let rn = staticData.resourceNames[tr.resource]
 	spawnText(pos, [0, pl == p1 ? 1 : -1], c, (pl == p1 ? "-" : "+") + tr.price, "trade-price")
 	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
@@ -660,7 +660,7 @@ function graphsRedrawDamage(data, attackerMultiplier, defenderMultiplier) {
 		for (let k of Object.keys(data.scores[sid].total))
 			res[sid][k] = 0
 	}
-	if (typeof data["combat"] !== "undefined") {
+	if ((typeof data["combat"] !== "undefined") && data.combat) {
 		for (let c of Object.values(data.combat)) {
 			let a = data.world.objects[c.attacker]
 			let d = data.world.objects[c.defender]
@@ -703,7 +703,7 @@ function graphsRedrawResourcesPrices(data) {
 	let legends = []
 	for (let rid of Object.keys(data.prices)) {
 		let p = data.prices[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -731,7 +731,7 @@ function graphsRedrawResourcesAmounts(data) {
 	let legends = []
 	for (let rid of Object.keys(data.resourceAmounts)) {
 		let p = data.resourceAmounts[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -760,7 +760,7 @@ function graphsRedrawResourcesTotals(data) {
 	for (let rid of Object.keys(data.prices)) {
 		let p = data.prices[rid]
 		let a = data.resourceAmounts[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -801,7 +801,7 @@ function graphsRedrawResourcesVolumes(data) {
 	let legends = []
 	for (let rid of Object.keys(res)) {
 		let p = res[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
