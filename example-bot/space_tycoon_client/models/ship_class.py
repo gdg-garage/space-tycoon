@@ -34,7 +34,10 @@ class ShipClass(object):
         'cargo_capacity': 'int',
         'life': 'int',
         'damage': 'int',
-        'price': 'int'
+        'price': 'int',
+        'regen': 'int',
+        'repair_price': 'int',
+        'repair_life': 'int'
     }
 
     attribute_map = {
@@ -44,10 +47,13 @@ class ShipClass(object):
         'cargo_capacity': 'cargoCapacity',
         'life': 'life',
         'damage': 'damage',
-        'price': 'price'
+        'price': 'price',
+        'regen': 'regen',
+        'repair_price': 'repairPrice',
+        'repair_life': 'repairLife'
     }
 
-    def __init__(self, name=None, shipyard=None, speed=None, cargo_capacity=None, life=None, damage=None, price=None):  # noqa: E501
+    def __init__(self, name=None, shipyard=None, speed=None, cargo_capacity=None, life=None, damage=None, price=None, regen=None, repair_price=None, repair_life=None):  # noqa: E501
         """ShipClass - a model defined in Swagger"""  # noqa: E501
         self._name = None
         self._shipyard = None
@@ -56,6 +62,9 @@ class ShipClass(object):
         self._life = None
         self._damage = None
         self._price = None
+        self._regen = None
+        self._repair_price = None
+        self._repair_life = None
         self.discriminator = None
         self.name = name
         self.shipyard = shipyard
@@ -64,6 +73,9 @@ class ShipClass(object):
         self.life = life
         self.damage = damage
         self.price = price
+        self.regen = regen
+        self.repair_price = repair_price
+        self.repair_life = repair_life
 
     @property
     def name(self):
@@ -229,6 +241,81 @@ class ShipClass(object):
             raise ValueError("Invalid value for `price`, must not be `None`")  # noqa: E501
 
         self._price = price
+
+    @property
+    def regen(self):
+        """Gets the regen of this ShipClass.  # noqa: E501
+
+        passive regeneration per tick  # noqa: E501
+
+        :return: The regen of this ShipClass.  # noqa: E501
+        :rtype: int
+        """
+        return self._regen
+
+    @regen.setter
+    def regen(self, regen):
+        """Sets the regen of this ShipClass.
+
+        passive regeneration per tick  # noqa: E501
+
+        :param regen: The regen of this ShipClass.  # noqa: E501
+        :type: int
+        """
+        if regen is None:
+            raise ValueError("Invalid value for `regen`, must not be `None`")  # noqa: E501
+
+        self._regen = regen
+
+    @property
+    def repair_price(self):
+        """Gets the repair_price of this ShipClass.  # noqa: E501
+
+        price for healing repairLife per tick (for repair command)  # noqa: E501
+
+        :return: The repair_price of this ShipClass.  # noqa: E501
+        :rtype: int
+        """
+        return self._repair_price
+
+    @repair_price.setter
+    def repair_price(self, repair_price):
+        """Sets the repair_price of this ShipClass.
+
+        price for healing repairLife per tick (for repair command)  # noqa: E501
+
+        :param repair_price: The repair_price of this ShipClass.  # noqa: E501
+        :type: int
+        """
+        if repair_price is None:
+            raise ValueError("Invalid value for `repair_price`, must not be `None`")  # noqa: E501
+
+        self._repair_price = repair_price
+
+    @property
+    def repair_life(self):
+        """Gets the repair_life of this ShipClass.  # noqa: E501
+
+        how much is repaired per tick (for repair command)  # noqa: E501
+
+        :return: The repair_life of this ShipClass.  # noqa: E501
+        :rtype: int
+        """
+        return self._repair_life
+
+    @repair_life.setter
+    def repair_life(self, repair_life):
+        """Sets the repair_life of this ShipClass.
+
+        how much is repaired per tick (for repair command)  # noqa: E501
+
+        :param repair_life: The repair_life of this ShipClass.  # noqa: E501
+        :type: int
+        """
+        if repair_life is None:
+            raise ValueError("Invalid value for `repair_life`, must not be `None`")  # noqa: E501
+
+        self._repair_life = repair_life
 
     def to_dict(self):
         """Returns the model properties as a dict"""

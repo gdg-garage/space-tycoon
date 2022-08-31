@@ -16,8 +16,6 @@ servers:
 tags:
   - name: game
     description: Interact with the game
-  - name: dev
-    description: Interact with the game server in dev mode
 paths:
   /login:
     post:
@@ -233,35 +231,6 @@ paths:
                 $ref: '#/components/schemas/Error'
         "403":
           description: Please login again
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /reset:
-    get:
-      summary: start new season (call this after creating the users)
-      tags:
-        - dev
-      responses:
-        "200":
-          description: OK
-
-  /create-user:
-    post:
-      summary: create user
-      tags:
-        - dev
-      requestBody:
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/Credentials'
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Invalid input
           content:
             application/json:
               schema:

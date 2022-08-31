@@ -27,10 +27,13 @@ type ShipClass struct {
 
 	Price int64 `json:"price"`
 
+	// passive regeneration per tick
 	Regen int64 `json:"regen"`
 
+	// price for healing repairLife per tick (for repair command)
 	RepairPrice int64 `json:"repairPrice"`
 
+	// how much is repaired per tick (for repair command)
 	RepairLife int64 `json:"repairLife"`
 }
 
