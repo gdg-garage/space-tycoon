@@ -773,111 +773,7 @@ ApiClient.instance = new ApiClient();
 var _default = ApiClient;
 exports["default"] = _default;
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":47,"fs":46,"querystring":52,"superagent":39}],2:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ApiClient = _interopRequireDefault(require("../ApiClient"));
-
-var _Credentials = _interopRequireDefault(require("../model/Credentials"));
-
-var _Error = _interopRequireDefault(require("../model/Error"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-/**
-* Dev service.
-* @module api/DevApi
-* @version 1.0.0
-*/
-var DevApi = /*#__PURE__*/function () {
-  /**
-  * Constructs a new DevApi. 
-  * @alias module:api/DevApi
-  * @class
-  * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
-  * default to {@link module:ApiClient#instance} if unspecified.
-  */
-  function DevApi(apiClient) {
-    _classCallCheck(this, DevApi);
-
-    this.apiClient = apiClient || _ApiClient["default"].instance;
-  }
-  /**
-   * Callback function to receive the result of the createUserPost operation.
-   * @callback module:api/DevApi~createUserPostCallback
-   * @param {String} error Error message, if any.
-   * @param data This operation does not return a value.
-   * @param {String} response The complete HTTP response.
-   */
-
-  /**
-   * create user
-   * @param {Object} opts Optional parameters
-   * @param {module:model/Credentials} opts.credentials 
-   * @param {module:api/DevApi~createUserPostCallback} callback The callback function, accepting three arguments: error, data, response
-   */
-
-
-  _createClass(DevApi, [{
-    key: "createUserPost",
-    value: function createUserPost(opts, callback) {
-      opts = opts || {};
-      var postBody = opts['credentials'];
-      var pathParams = {};
-      var queryParams = {};
-      var headerParams = {};
-      var formParams = {};
-      var authNames = ['cookieAuth'];
-      var contentTypes = [];
-      var accepts = ['application/json'];
-      var returnType = null;
-      return this.apiClient.callApi('/create-user', 'POST', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
-    }
-    /**
-     * Callback function to receive the result of the resetGet operation.
-     * @callback module:api/DevApi~resetGetCallback
-     * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
-     * @param {String} response The complete HTTP response.
-     */
-
-    /**
-     * start new season (call this after creating the users)
-     * @param {module:api/DevApi~resetGetCallback} callback The callback function, accepting three arguments: error, data, response
-     */
-
-  }, {
-    key: "resetGet",
-    value: function resetGet(callback) {
-      var postBody = null;
-      var pathParams = {};
-      var queryParams = {};
-      var headerParams = {};
-      var formParams = {};
-      var authNames = ['cookieAuth'];
-      var contentTypes = [];
-      var accepts = [];
-      var returnType = null;
-      return this.apiClient.callApi('/reset', 'GET', pathParams, queryParams, headerParams, formParams, postBody, authNames, contentTypes, accepts, returnType, null, callback);
-    }
-  }]);
-
-  return DevApi;
-}();
-
-exports["default"] = DevApi;
-},{"../ApiClient":1,"../model/Credentials":9,"../model/Error":16}],3:[function(require,module,exports){
+},{"buffer":46,"fs":45,"querystring":51,"superagent":38}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1196,7 +1092,7 @@ var GameApi = /*#__PURE__*/function () {
 }();
 
 exports["default"] = GameApi;
-},{"../ApiClient":1,"../model/Command":7,"../model/Credentials":9,"../model/CurrentTick":10,"../model/Data":11,"../model/EndTurn":15,"../model/Error":16,"../model/PlayerId":21,"../model/Reports":25,"../model/StaticData":30}],4:[function(require,module,exports){
+},{"../ApiClient":1,"../model/Command":6,"../model/Credentials":8,"../model/CurrentTick":9,"../model/Data":10,"../model/EndTurn":14,"../model/Error":15,"../model/PlayerId":20,"../model/Reports":24,"../model/StaticData":29}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1266,12 +1162,6 @@ Object.defineProperty(exports, "Destination", {
   enumerable: true,
   get: function get() {
     return _Destination["default"];
-  }
-});
-Object.defineProperty(exports, "DevApi", {
-  enumerable: true,
-  get: function get() {
-    return _DevApi["default"];
   }
 });
 Object.defineProperty(exports, "EndTurn", {
@@ -1471,12 +1361,10 @@ var _TradingResourceAllOf = _interopRequireDefault(require("./model/TradingResou
 
 var _Wreck = _interopRequireDefault(require("./model/Wreck"));
 
-var _DevApi = _interopRequireDefault(require("./api/DevApi"));
-
 var _GameApi = _interopRequireDefault(require("./api/GameApi"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-},{"./ApiClient":1,"./api/DevApi":2,"./api/GameApi":3,"./model/AttackCommand":5,"./model/Combat":6,"./model/Command":7,"./model/ConstructCommand":8,"./model/Credentials":9,"./model/CurrentTick":10,"./model/Data":11,"./model/DataReports":12,"./model/DecommissionCommand":13,"./model/Destination":14,"./model/EndTurn":15,"./model/Error":16,"./model/MoveCommand":17,"./model/NetWorth":18,"./model/Planet":19,"./model/Player":20,"./model/PlayerId":21,"./model/Profiling":22,"./model/RenameCommand":23,"./model/RepairCommand":24,"./model/Reports":25,"./model/Resource":26,"./model/ScoreValue":27,"./model/Ship":28,"./model/ShipClass":29,"./model/StaticData":30,"./model/Trade":31,"./model/TradeCommand":32,"./model/TradingResource":33,"./model/TradingResourceAllOf":34,"./model/Wreck":35}],5:[function(require,module,exports){
+},{"./ApiClient":1,"./api/GameApi":2,"./model/AttackCommand":4,"./model/Combat":5,"./model/Command":6,"./model/ConstructCommand":7,"./model/Credentials":8,"./model/CurrentTick":9,"./model/Data":10,"./model/DataReports":11,"./model/DecommissionCommand":12,"./model/Destination":13,"./model/EndTurn":14,"./model/Error":15,"./model/MoveCommand":16,"./model/NetWorth":17,"./model/Planet":18,"./model/Player":19,"./model/PlayerId":20,"./model/Profiling":21,"./model/RenameCommand":22,"./model/RepairCommand":23,"./model/Reports":24,"./model/Resource":25,"./model/ScoreValue":26,"./model/Ship":27,"./model/ShipClass":28,"./model/StaticData":29,"./model/Trade":30,"./model/TradeCommand":31,"./model/TradingResource":32,"./model/TradingResourceAllOf":33,"./model/Wreck":34}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1565,7 +1453,7 @@ AttackCommand.prototype['target'] = undefined;
 AttackCommand.prototype['type'] = 'attack';
 var _default = AttackCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],6:[function(require,module,exports){
+},{"../ApiClient":1}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1668,7 +1556,7 @@ Combat.prototype['defender'] = undefined;
 Combat.prototype['killed'] = undefined;
 var _default = Combat;
 exports["default"] = _default;
-},{"../ApiClient":1}],7:[function(require,module,exports){
+},{"../ApiClient":1}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1750,8 +1638,8 @@ var Command = /*#__PURE__*/function () {
           obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
         }
 
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
+        if (data.hasOwnProperty('shipClass')) {
+          obj['shipClass'] = _ApiClient["default"].convertToType(data['shipClass'], 'String');
         }
 
         if (data.hasOwnProperty('name')) {
@@ -1792,10 +1680,10 @@ Command.prototype['resource'] = undefined;
 
 Command.prototype['amount'] = undefined;
 /**
- * @member {String} ship-class
+ * @member {String} shipClass
  */
 
-Command.prototype['ship-class'] = undefined;
+Command.prototype['shipClass'] = undefined;
 /**
  * @member {String} name
  */
@@ -1803,7 +1691,7 @@ Command.prototype['ship-class'] = undefined;
 Command.prototype['name'] = undefined;
 var _default = Command;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":14}],8:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":13}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1847,7 +1735,7 @@ var ConstructCommand = /*#__PURE__*/function () {
   _createClass(ConstructCommand, null, [{
     key: "initialize",
     value: function initialize(obj, shipClass) {
-      obj['ship-class'] = shipClass;
+      obj['shipClass'] = shipClass;
     }
     /**
      * Constructs a <code>ConstructCommand</code> from a plain JavaScript object, optionally creating a new instance.
@@ -1863,8 +1751,8 @@ var ConstructCommand = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new ConstructCommand();
 
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
+        if (data.hasOwnProperty('shipClass')) {
+          obj['shipClass'] = _ApiClient["default"].convertToType(data['shipClass'], 'String');
         }
 
         if (data.hasOwnProperty('type')) {
@@ -1879,11 +1767,11 @@ var ConstructCommand = /*#__PURE__*/function () {
   return ConstructCommand;
 }();
 /**
- * @member {String} ship-class
+ * @member {String} shipClass
  */
 
 
-ConstructCommand.prototype['ship-class'] = undefined;
+ConstructCommand.prototype['shipClass'] = undefined;
 /**
  * @member {String} type
  * @default 'construct'
@@ -1892,7 +1780,7 @@ ConstructCommand.prototype['ship-class'] = undefined;
 ConstructCommand.prototype['type'] = 'construct';
 var _default = ConstructCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],9:[function(require,module,exports){
+},{"../ApiClient":1}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1993,7 +1881,7 @@ Credentials.prototype['password'] = undefined;
 Credentials.prototype['player'] = undefined;
 var _default = Credentials;
 exports["default"] = _default;
-},{"../ApiClient":1}],10:[function(require,module,exports){
+},{"../ApiClient":1}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2040,7 +1928,7 @@ var CurrentTick = /*#__PURE__*/function () {
     key: "initialize",
     value: function initialize(obj, tick, minTimeLeftMs, season) {
       obj['tick'] = tick;
-      obj['min-time-left-ms'] = minTimeLeftMs;
+      obj['minTimeLeftMs'] = minTimeLeftMs;
       obj['season'] = season;
     }
     /**
@@ -2061,8 +1949,8 @@ var CurrentTick = /*#__PURE__*/function () {
           obj['tick'] = _ApiClient["default"].convertToType(data['tick'], 'Number');
         }
 
-        if (data.hasOwnProperty('min-time-left-ms')) {
-          obj['min-time-left-ms'] = _ApiClient["default"].convertToType(data['min-time-left-ms'], 'Number');
+        if (data.hasOwnProperty('minTimeLeftMs')) {
+          obj['minTimeLeftMs'] = _ApiClient["default"].convertToType(data['minTimeLeftMs'], 'Number');
         }
 
         if (data.hasOwnProperty('season')) {
@@ -2083,10 +1971,10 @@ var CurrentTick = /*#__PURE__*/function () {
 
 CurrentTick.prototype['tick'] = undefined;
 /**
- * @member {Number} min-time-left-ms
+ * @member {Number} minTimeLeftMs
  */
 
-CurrentTick.prototype['min-time-left-ms'] = undefined;
+CurrentTick.prototype['minTimeLeftMs'] = undefined;
 /**
  * @member {Number} season
  */
@@ -2094,7 +1982,7 @@ CurrentTick.prototype['min-time-left-ms'] = undefined;
 CurrentTick.prototype['season'] = undefined;
 var _default = CurrentTick;
 exports["default"] = _default;
-},{"../ApiClient":1}],11:[function(require,module,exports){
+},{"../ApiClient":1}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2153,7 +2041,7 @@ var Data = /*#__PURE__*/function () {
   _createClass(Data, null, [{
     key: "initialize",
     value: function initialize(obj, currentTick, planets, players, ships) {
-      obj['current-tick'] = currentTick;
+      obj['currentTick'] = currentTick;
       obj['planets'] = planets;
       obj['players'] = players;
       obj['ships'] = ships;
@@ -2172,8 +2060,8 @@ var Data = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new Data();
 
-        if (data.hasOwnProperty('current-tick')) {
-          obj['current-tick'] = _CurrentTick["default"].constructFromObject(data['current-tick']);
+        if (data.hasOwnProperty('currentTick')) {
+          obj['currentTick'] = _CurrentTick["default"].constructFromObject(data['currentTick']);
         }
 
         if (data.hasOwnProperty('planets')) {
@@ -2182,8 +2070,8 @@ var Data = /*#__PURE__*/function () {
           });
         }
 
-        if (data.hasOwnProperty('player-id')) {
-          obj['player-id'] = _ApiClient["default"].convertToType(data['player-id'], 'String');
+        if (data.hasOwnProperty('playerId')) {
+          obj['playerId'] = _ApiClient["default"].convertToType(data['playerId'], 'String');
         }
 
         if (data.hasOwnProperty('players')) {
@@ -2216,21 +2104,21 @@ var Data = /*#__PURE__*/function () {
   return Data;
 }();
 /**
- * @member {module:model/CurrentTick} current-tick
+ * @member {module:model/CurrentTick} currentTick
  */
 
 
-Data.prototype['current-tick'] = undefined;
+Data.prototype['currentTick'] = undefined;
 /**
  * @member {Object.<String, module:model/Planet>} planets
  */
 
 Data.prototype['planets'] = undefined;
 /**
- * @member {String} player-id
+ * @member {String} playerId
  */
 
-Data.prototype['player-id'] = undefined;
+Data.prototype['playerId'] = undefined;
 /**
  * @member {Object.<String, module:model/Player>} players
  */
@@ -2253,7 +2141,7 @@ Data.prototype['wrecks'] = undefined;
 Data.prototype['reports'] = undefined;
 var _default = Data;
 exports["default"] = _default;
-},{"../ApiClient":1,"./CurrentTick":10,"./DataReports":12,"./Planet":19,"./Player":20,"./Ship":28,"./Wreck":35}],12:[function(require,module,exports){
+},{"../ApiClient":1,"./CurrentTick":9,"./DataReports":11,"./Planet":18,"./Player":19,"./Ship":27,"./Wreck":34}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2342,7 +2230,7 @@ DataReports.prototype['combat'] = undefined;
 DataReports.prototype['trade'] = undefined;
 var _default = DataReports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":6,"./Trade":31}],13:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":5,"./Trade":30}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2419,7 +2307,7 @@ var DecommissionCommand = /*#__PURE__*/function () {
 DecommissionCommand.prototype['type'] = 'decommission';
 var _default = DecommissionCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],14:[function(require,module,exports){
+},{"../ApiClient":1}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2504,7 +2392,7 @@ Destination.prototype['coordinates'] = undefined;
 Destination.prototype['target'] = undefined;
 var _default = Destination;
 exports["default"] = _default;
-},{"../ApiClient":1}],15:[function(require,module,exports){
+},{"../ApiClient":1}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2594,7 +2482,7 @@ EndTurn.prototype['tick'] = undefined;
 EndTurn.prototype['season'] = undefined;
 var _default = EndTurn;
 exports["default"] = _default;
-},{"../ApiClient":1}],16:[function(require,module,exports){
+},{"../ApiClient":1}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2673,7 +2561,7 @@ var Error = /*#__PURE__*/function () {
 Error.prototype['message'] = undefined;
 var _default = Error;
 exports["default"] = _default;
-},{"../ApiClient":1}],17:[function(require,module,exports){
+},{"../ApiClient":1}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2764,7 +2652,7 @@ MoveCommand.prototype['destination'] = undefined;
 MoveCommand.prototype['type'] = 'move';
 var _default = MoveCommand;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Destination":14}],18:[function(require,module,exports){
+},{"../ApiClient":1,"./Destination":13}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2876,7 +2764,7 @@ NetWorth.prototype['ships'] = undefined;
 NetWorth.prototype['total'] = undefined;
 var _default = NetWorth;
 exports["default"] = _default;
-},{"../ApiClient":1}],19:[function(require,module,exports){
+},{"../ApiClient":1}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2928,7 +2816,7 @@ var Planet = /*#__PURE__*/function () {
       obj['name'] = name;
       obj['resources'] = resources;
       obj['position'] = position;
-      obj['prev-position'] = prevPosition;
+      obj['prevPosition'] = prevPosition;
     }
     /**
      * Constructs a <code>Planet</code> from a plain JavaScript object, optionally creating a new instance.
@@ -2958,8 +2846,8 @@ var Planet = /*#__PURE__*/function () {
           obj['position'] = _ApiClient["default"].convertToType(data['position'], ['Number']);
         }
 
-        if (data.hasOwnProperty('prev-position')) {
-          obj['prev-position'] = _ApiClient["default"].convertToType(data['prev-position'], ['Number']);
+        if (data.hasOwnProperty('prevPosition')) {
+          obj['prevPosition'] = _ApiClient["default"].convertToType(data['prevPosition'], ['Number']);
         }
       }
 
@@ -2986,13 +2874,13 @@ Planet.prototype['resources'] = undefined;
 
 Planet.prototype['position'] = undefined;
 /**
- * @member {Array.<Number>} prev-position
+ * @member {Array.<Number>} prevPosition
  */
 
-Planet.prototype['prev-position'] = undefined;
+Planet.prototype['prevPosition'] = undefined;
 var _default = Planet;
 exports["default"] = _default;
-},{"../ApiClient":1,"./TradingResource":33}],20:[function(require,module,exports){
+},{"../ApiClient":1,"./TradingResource":32}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3042,7 +2930,7 @@ var Player = /*#__PURE__*/function () {
     value: function initialize(obj, name, color, netWorth) {
       obj['name'] = name;
       obj['color'] = color;
-      obj['net-worth'] = netWorth;
+      obj['netWorth'] = netWorth;
     }
     /**
      * Constructs a <code>Player</code> from a plain JavaScript object, optionally creating a new instance.
@@ -3066,8 +2954,8 @@ var Player = /*#__PURE__*/function () {
           obj['color'] = _ApiClient["default"].convertToType(data['color'], ['Number']);
         }
 
-        if (data.hasOwnProperty('net-worth')) {
-          obj['net-worth'] = _NetWorth["default"].constructFromObject(data['net-worth']);
+        if (data.hasOwnProperty('netWorth')) {
+          obj['netWorth'] = _NetWorth["default"].constructFromObject(data['netWorth']);
         }
       }
 
@@ -3089,13 +2977,13 @@ Player.prototype['name'] = undefined;
 
 Player.prototype['color'] = undefined;
 /**
- * @member {module:model/NetWorth} net-worth
+ * @member {module:model/NetWorth} netWorth
  */
 
-Player.prototype['net-worth'] = undefined;
+Player.prototype['netWorth'] = undefined;
 var _default = Player;
 exports["default"] = _default;
-},{"../ApiClient":1,"./NetWorth":18}],21:[function(require,module,exports){
+},{"../ApiClient":1,"./NetWorth":17}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3171,7 +3059,7 @@ var PlayerId = /*#__PURE__*/function () {
 PlayerId.prototype['id'] = undefined;
 var _default = PlayerId;
 exports["default"] = _default;
-},{"../ApiClient":1}],22:[function(require,module,exports){
+},{"../ApiClient":1}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3337,7 +3225,7 @@ Profiling.prototype['overall'] = undefined;
 Profiling.prototype['at'] = undefined;
 var _default = Profiling;
 exports["default"] = _default;
-},{"../ApiClient":1}],23:[function(require,module,exports){
+},{"../ApiClient":1}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3426,7 +3314,7 @@ RenameCommand.prototype['name'] = undefined;
 RenameCommand.prototype['type'] = 'rename';
 var _default = RenameCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],24:[function(require,module,exports){
+},{"../ApiClient":1}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3503,7 +3391,7 @@ var RepairCommand = /*#__PURE__*/function () {
 RepairCommand.prototype['type'] = 'repair';
 var _default = RepairCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],25:[function(require,module,exports){
+},{"../ApiClient":1}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3677,7 +3565,7 @@ Reports.prototype['season'] = undefined;
 Reports.prototype['tick'] = undefined;
 var _default = Reports;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Combat":6,"./Profiling":22,"./ScoreValue":27,"./Trade":31}],26:[function(require,module,exports){
+},{"../ApiClient":1,"./Combat":5,"./Profiling":21,"./ScoreValue":26,"./Trade":30}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3756,7 +3644,7 @@ var Resource = /*#__PURE__*/function () {
 Resource.prototype['amount'] = undefined;
 var _default = Resource;
 exports["default"] = _default;
-},{"../ApiClient":1}],27:[function(require,module,exports){
+},{"../ApiClient":1}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3867,7 +3755,7 @@ ScoreValue.prototype['ships'] = undefined;
 ScoreValue.prototype['total'] = undefined;
 var _default = ScoreValue;
 exports["default"] = _default;
-},{"../ApiClient":1}],28:[function(require,module,exports){
+},{"../ApiClient":1}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3921,12 +3809,12 @@ var Ship = /*#__PURE__*/function () {
   _createClass(Ship, null, [{
     key: "initialize",
     value: function initialize(obj, shipClass, life, name, player, position, prevPosition, resources) {
-      obj['ship-class'] = shipClass;
+      obj['shipClass'] = shipClass;
       obj['life'] = life;
       obj['name'] = name;
       obj['player'] = player;
       obj['position'] = position;
-      obj['prev-position'] = prevPosition;
+      obj['prevPosition'] = prevPosition;
       obj['resources'] = resources;
     }
     /**
@@ -3943,8 +3831,8 @@ var Ship = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new Ship();
 
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
+        if (data.hasOwnProperty('shipClass')) {
+          obj['shipClass'] = _ApiClient["default"].convertToType(data['shipClass'], 'String');
         }
 
         if (data.hasOwnProperty('life')) {
@@ -3963,8 +3851,8 @@ var Ship = /*#__PURE__*/function () {
           obj['position'] = _ApiClient["default"].convertToType(data['position'], ['Number']);
         }
 
-        if (data.hasOwnProperty('prev-position')) {
-          obj['prev-position'] = _ApiClient["default"].convertToType(data['prev-position'], ['Number']);
+        if (data.hasOwnProperty('prevPosition')) {
+          obj['prevPosition'] = _ApiClient["default"].convertToType(data['prevPosition'], ['Number']);
         }
 
         if (data.hasOwnProperty('resources')) {
@@ -3985,11 +3873,11 @@ var Ship = /*#__PURE__*/function () {
   return Ship;
 }();
 /**
- * @member {String} ship-class
+ * @member {String} shipClass
  */
 
 
-Ship.prototype['ship-class'] = undefined;
+Ship.prototype['shipClass'] = undefined;
 /**
  * @member {Number} life
  */
@@ -4011,10 +3899,10 @@ Ship.prototype['player'] = undefined;
 
 Ship.prototype['position'] = undefined;
 /**
- * @member {Array.<Number>} prev-position
+ * @member {Array.<Number>} prevPosition
  */
 
-Ship.prototype['prev-position'] = undefined;
+Ship.prototype['prevPosition'] = undefined;
 /**
  * @member {Object.<String, module:model/Resource>} resources
  */
@@ -4027,7 +3915,7 @@ Ship.prototype['resources'] = undefined;
 Ship.prototype['command'] = undefined;
 var _default = Ship;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Command":7,"./Resource":26}],29:[function(require,module,exports){
+},{"../ApiClient":1,"./Command":6,"./Resource":25}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4061,11 +3949,14 @@ var ShipClass = /*#__PURE__*/function () {
    * @param life {Number} 
    * @param damage {Number} 
    * @param price {Number} 
+   * @param regen {Number} passive regeneration per tick
+   * @param repairPrice {Number} price for healing repairLife per tick (for repair command)
+   * @param repairLife {Number} how much is repaired per tick (for repair command)
    */
-  function ShipClass(name, shipyard, speed, cargoCapacity, life, damage, price) {
+  function ShipClass(name, shipyard, speed, cargoCapacity, life, damage, price, regen, repairPrice, repairLife) {
     _classCallCheck(this, ShipClass);
 
-    ShipClass.initialize(this, name, shipyard, speed, cargoCapacity, life, damage, price);
+    ShipClass.initialize(this, name, shipyard, speed, cargoCapacity, life, damage, price, regen, repairPrice, repairLife);
   }
   /**
    * Initializes the fields of this object.
@@ -4076,14 +3967,17 @@ var ShipClass = /*#__PURE__*/function () {
 
   _createClass(ShipClass, null, [{
     key: "initialize",
-    value: function initialize(obj, name, shipyard, speed, cargoCapacity, life, damage, price) {
+    value: function initialize(obj, name, shipyard, speed, cargoCapacity, life, damage, price, regen, repairPrice, repairLife) {
       obj['name'] = name;
       obj['shipyard'] = shipyard;
       obj['speed'] = speed;
-      obj['cargo-capacity'] = cargoCapacity;
+      obj['cargoCapacity'] = cargoCapacity;
       obj['life'] = life;
       obj['damage'] = damage;
       obj['price'] = price;
+      obj['regen'] = regen;
+      obj['repairPrice'] = repairPrice;
+      obj['repairLife'] = repairLife;
     }
     /**
      * Constructs a <code>ShipClass</code> from a plain JavaScript object, optionally creating a new instance.
@@ -4111,8 +4005,8 @@ var ShipClass = /*#__PURE__*/function () {
           obj['speed'] = _ApiClient["default"].convertToType(data['speed'], 'Number');
         }
 
-        if (data.hasOwnProperty('cargo-capacity')) {
-          obj['cargo-capacity'] = _ApiClient["default"].convertToType(data['cargo-capacity'], 'Number');
+        if (data.hasOwnProperty('cargoCapacity')) {
+          obj['cargoCapacity'] = _ApiClient["default"].convertToType(data['cargoCapacity'], 'Number');
         }
 
         if (data.hasOwnProperty('life')) {
@@ -4125,6 +4019,18 @@ var ShipClass = /*#__PURE__*/function () {
 
         if (data.hasOwnProperty('price')) {
           obj['price'] = _ApiClient["default"].convertToType(data['price'], 'Number');
+        }
+
+        if (data.hasOwnProperty('regen')) {
+          obj['regen'] = _ApiClient["default"].convertToType(data['regen'], 'Number');
+        }
+
+        if (data.hasOwnProperty('repairPrice')) {
+          obj['repairPrice'] = _ApiClient["default"].convertToType(data['repairPrice'], 'Number');
+        }
+
+        if (data.hasOwnProperty('repairLife')) {
+          obj['repairLife'] = _ApiClient["default"].convertToType(data['repairLife'], 'Number');
         }
       }
 
@@ -4153,10 +4059,10 @@ ShipClass.prototype['shipyard'] = undefined;
 ShipClass.prototype['speed'] = undefined;
 /**
  * maximum number of resources the ship can carry - sum over all types of resources
- * @member {Number} cargo-capacity
+ * @member {Number} cargoCapacity
  */
 
-ShipClass.prototype['cargo-capacity'] = undefined;
+ShipClass.prototype['cargoCapacity'] = undefined;
 /**
  * @member {Number} life
  */
@@ -4172,9 +4078,27 @@ ShipClass.prototype['damage'] = undefined;
  */
 
 ShipClass.prototype['price'] = undefined;
+/**
+ * passive regeneration per tick
+ * @member {Number} regen
+ */
+
+ShipClass.prototype['regen'] = undefined;
+/**
+ * price for healing repairLife per tick (for repair command)
+ * @member {Number} repairPrice
+ */
+
+ShipClass.prototype['repairPrice'] = undefined;
+/**
+ * how much is repaired per tick (for repair command)
+ * @member {Number} repairLife
+ */
+
+ShipClass.prototype['repairLife'] = undefined;
 var _default = ShipClass;
 exports["default"] = _default;
-},{"../ApiClient":1}],30:[function(require,module,exports){
+},{"../ApiClient":1}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4233,14 +4157,14 @@ var StaticData = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new StaticData();
 
-        if (data.hasOwnProperty('ship-classes')) {
-          obj['ship-classes'] = _ApiClient["default"].convertToType(data['ship-classes'], {
+        if (data.hasOwnProperty('shipClasses')) {
+          obj['shipClasses'] = _ApiClient["default"].convertToType(data['shipClasses'], {
             'String': _ShipClass["default"]
           });
         }
 
-        if (data.hasOwnProperty('resource-names')) {
-          obj['resource-names'] = _ApiClient["default"].convertToType(data['resource-names'], {
+        if (data.hasOwnProperty('resourceNames')) {
+          obj['resourceNames'] = _ApiClient["default"].convertToType(data['resourceNames'], {
             'String': 'String'
           });
         }
@@ -4253,19 +4177,19 @@ var StaticData = /*#__PURE__*/function () {
   return StaticData;
 }();
 /**
- * @member {Object.<String, module:model/ShipClass>} ship-classes
+ * @member {Object.<String, module:model/ShipClass>} shipClasses
  */
 
 
-StaticData.prototype['ship-classes'] = undefined;
+StaticData.prototype['shipClasses'] = undefined;
 /**
- * @member {Object.<String, String>} resource-names
+ * @member {Object.<String, String>} resourceNames
  */
 
-StaticData.prototype['resource-names'] = undefined;
+StaticData.prototype['resourceNames'] = undefined;
 var _default = StaticData;
 exports["default"] = _default;
-},{"../ApiClient":1,"./ShipClass":29}],31:[function(require,module,exports){
+},{"../ApiClient":1,"./ShipClass":28}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4386,7 +4310,7 @@ Trade.prototype['amount'] = undefined;
 Trade.prototype['price'] = undefined;
 var _default = Trade;
 exports["default"] = _default;
-},{"../ApiClient":1}],32:[function(require,module,exports){
+},{"../ApiClient":1}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4499,7 +4423,7 @@ TradeCommand.prototype['target'] = undefined;
 TradeCommand.prototype['type'] = 'trade';
 var _default = TradeCommand;
 exports["default"] = _default;
-},{"../ApiClient":1}],33:[function(require,module,exports){
+},{"../ApiClient":1}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4577,12 +4501,12 @@ var TradingResource = /*#__PURE__*/function () {
           obj['amount'] = _ApiClient["default"].convertToType(data['amount'], 'Number');
         }
 
-        if (data.hasOwnProperty('buy-price')) {
-          obj['buy-price'] = _ApiClient["default"].convertToType(data['buy-price'], 'Number');
+        if (data.hasOwnProperty('buyPrice')) {
+          obj['buyPrice'] = _ApiClient["default"].convertToType(data['buyPrice'], 'Number');
         }
 
-        if (data.hasOwnProperty('sell-price')) {
-          obj['sell-price'] = _ApiClient["default"].convertToType(data['sell-price'], 'Number');
+        if (data.hasOwnProperty('sellPrice')) {
+          obj['sellPrice'] = _ApiClient["default"].convertToType(data['sellPrice'], 'Number');
         }
       }
 
@@ -4599,15 +4523,15 @@ var TradingResource = /*#__PURE__*/function () {
 
 TradingResource.prototype['amount'] = undefined;
 /**
- * @member {Number} buy-price
+ * @member {Number} buyPrice
  */
 
-TradingResource.prototype['buy-price'] = undefined;
+TradingResource.prototype['buyPrice'] = undefined;
 /**
- * @member {Number} sell-price
+ * @member {Number} sellPrice
  */
 
-TradingResource.prototype['sell-price'] = undefined; // Implement Resource interface:
+TradingResource.prototype['sellPrice'] = undefined; // Implement Resource interface:
 
 /**
  * @member {Number} amount
@@ -4616,18 +4540,18 @@ TradingResource.prototype['sell-price'] = undefined; // Implement Resource inter
 _Resource["default"].prototype['amount'] = undefined; // Implement TradingResourceAllOf interface:
 
 /**
- * @member {Number} buy-price
+ * @member {Number} buyPrice
  */
 
-_TradingResourceAllOf["default"].prototype['buy-price'] = undefined;
+_TradingResourceAllOf["default"].prototype['buyPrice'] = undefined;
 /**
- * @member {Number} sell-price
+ * @member {Number} sellPrice
  */
 
-_TradingResourceAllOf["default"].prototype['sell-price'] = undefined;
+_TradingResourceAllOf["default"].prototype['sellPrice'] = undefined;
 var _default = TradingResource;
 exports["default"] = _default;
-},{"../ApiClient":1,"./Resource":26,"./TradingResourceAllOf":34}],34:[function(require,module,exports){
+},{"../ApiClient":1,"./Resource":25,"./TradingResourceAllOf":33}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4684,12 +4608,12 @@ var TradingResourceAllOf = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new TradingResourceAllOf();
 
-        if (data.hasOwnProperty('buy-price')) {
-          obj['buy-price'] = _ApiClient["default"].convertToType(data['buy-price'], 'Number');
+        if (data.hasOwnProperty('buyPrice')) {
+          obj['buyPrice'] = _ApiClient["default"].convertToType(data['buyPrice'], 'Number');
         }
 
-        if (data.hasOwnProperty('sell-price')) {
-          obj['sell-price'] = _ApiClient["default"].convertToType(data['sell-price'], 'Number');
+        if (data.hasOwnProperty('sellPrice')) {
+          obj['sellPrice'] = _ApiClient["default"].convertToType(data['sellPrice'], 'Number');
         }
       }
 
@@ -4700,19 +4624,19 @@ var TradingResourceAllOf = /*#__PURE__*/function () {
   return TradingResourceAllOf;
 }();
 /**
- * @member {Number} buy-price
+ * @member {Number} buyPrice
  */
 
 
-TradingResourceAllOf.prototype['buy-price'] = undefined;
+TradingResourceAllOf.prototype['buyPrice'] = undefined;
 /**
- * @member {Number} sell-price
+ * @member {Number} sellPrice
  */
 
-TradingResourceAllOf.prototype['sell-price'] = undefined;
+TradingResourceAllOf.prototype['sellPrice'] = undefined;
 var _default = TradingResourceAllOf;
 exports["default"] = _default;
-},{"../ApiClient":1}],35:[function(require,module,exports){
+},{"../ApiClient":1}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4760,10 +4684,10 @@ var Wreck = /*#__PURE__*/function () {
   _createClass(Wreck, null, [{
     key: "initialize",
     value: function initialize(obj, shipClass, name, player, killTick, position) {
-      obj['ship-class'] = shipClass;
+      obj['shipClass'] = shipClass;
       obj['name'] = name;
       obj['player'] = player;
-      obj['kill-tick'] = killTick;
+      obj['killTick'] = killTick;
       obj['position'] = position;
     }
     /**
@@ -4780,8 +4704,8 @@ var Wreck = /*#__PURE__*/function () {
       if (data) {
         obj = obj || new Wreck();
 
-        if (data.hasOwnProperty('ship-class')) {
-          obj['ship-class'] = _ApiClient["default"].convertToType(data['ship-class'], 'String');
+        if (data.hasOwnProperty('shipClass')) {
+          obj['shipClass'] = _ApiClient["default"].convertToType(data['shipClass'], 'String');
         }
 
         if (data.hasOwnProperty('name')) {
@@ -4792,8 +4716,8 @@ var Wreck = /*#__PURE__*/function () {
           obj['player'] = _ApiClient["default"].convertToType(data['player'], 'String');
         }
 
-        if (data.hasOwnProperty('kill-tick')) {
-          obj['kill-tick'] = _ApiClient["default"].convertToType(data['kill-tick'], 'Number');
+        if (data.hasOwnProperty('killTick')) {
+          obj['killTick'] = _ApiClient["default"].convertToType(data['killTick'], 'Number');
         }
 
         if (data.hasOwnProperty('position')) {
@@ -4808,11 +4732,11 @@ var Wreck = /*#__PURE__*/function () {
   return Wreck;
 }();
 /**
- * @member {String} ship-class
+ * @member {String} shipClass
  */
 
 
-Wreck.prototype['ship-class'] = undefined;
+Wreck.prototype['shipClass'] = undefined;
 /**
  * @member {String} name
  */
@@ -4824,10 +4748,10 @@ Wreck.prototype['name'] = undefined;
 
 Wreck.prototype['player'] = undefined;
 /**
- * @member {Number} kill-tick
+ * @member {Number} killTick
  */
 
-Wreck.prototype['kill-tick'] = undefined;
+Wreck.prototype['killTick'] = undefined;
 /**
  * @member {Array.<Number>} position
  */
@@ -4835,7 +4759,7 @@ Wreck.prototype['kill-tick'] = undefined;
 Wreck.prototype['position'] = undefined;
 var _default = Wreck;
 exports["default"] = _default;
-},{"../ApiClient":1}],36:[function(require,module,exports){
+},{"../ApiClient":1}],35:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -5012,7 +4936,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = stringify
 stringify.default = stringify
 stringify.stable = deterministicStringify
@@ -5243,7 +5167,7 @@ function replaceGetterValues (replacer) {
   }
 }
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 "use strict";
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -5286,7 +5210,7 @@ Agent.prototype._setDefaults = function (req) {
 
 module.exports = Agent;
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -6307,7 +6231,7 @@ request.put = function (url, data, fn) {
   return req;
 };
 
-},{"./agent-base":38,"./is-object":40,"./request-base":41,"./response-base":42,"component-emitter":36,"fast-safe-stringify":37}],40:[function(require,module,exports){
+},{"./agent-base":37,"./is-object":39,"./request-base":40,"./response-base":41,"component-emitter":35,"fast-safe-stringify":36}],39:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -6325,7 +6249,7 @@ function isObject(obj) {
 
 module.exports = isObject;
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -7083,7 +7007,7 @@ RequestBase.prototype._setTimeouts = function () {
   }
 };
 
-},{"./is-object":40}],42:[function(require,module,exports){
+},{"./is-object":39}],41:[function(require,module,exports){
 "use strict";
 
 /**
@@ -7215,7 +7139,7 @@ ResponseBase.prototype._setStatusProperties = function (status) {
   this.unprocessableEntity = status === 422;
 };
 
-},{"./utils":43}],43:[function(require,module,exports){
+},{"./utils":42}],42:[function(require,module,exports){
 "use strict";
 
 /**
@@ -7287,7 +7211,7 @@ exports.cleanHeader = function (header, changesOrigin) {
   return header;
 };
 
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 var STC = require("space_tycoon_client")
 var hashInt = require("hash-int")
 
@@ -7327,10 +7251,10 @@ function hsvToRgb (h, s, b) {
 }
 
 function updateResourcesColors() {
-	let num = Object.keys(staticData["resource-names"]).length
+	let num = Object.keys(staticData.resourceNames).length
 	let index = 0
 	staticData.resourceColors = {}
-	for (let rid of Object.keys(staticData["resource-names"])) {
+	for (let rid of Object.keys(staticData.resourceNames)) {
 		staticData.resourceColors[rid] = colorToRgb(hsvToRgb(index * 360 / num, 100, 100))
 		index += 1
 	}
@@ -7370,8 +7294,8 @@ function generateObjects(data) {
 			w.id = wid
 			w.data = data
 			data.objects[wid] = w
-			if (typeof w["prev-position"] === "undefined") {
-				w["prev-position"] = w.position
+			if (typeof w.prevPosition === "undefined") {
+				w.prevPosition = w.position
 			}
 		}
 	}
@@ -7415,8 +7339,8 @@ function clickInfo(e) {
 	.html("<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>")
 
 	let t = ""
-	if (typeof d["ship-class"] !== "undefined") {
-		let c = staticData["ship-classes"][d["ship-class"]]
+	if (typeof d.shipClass !== "undefined") {
+		let c = staticData.shipClasses[d.shipClass]
 		t += "<hr>"
 		t += "<table>"
 		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
@@ -7439,13 +7363,13 @@ function clickInfo(e) {
 			}
 			// todo coordinates instead of target
 			if (typeof d.command.resource !== "undefined") {
-				t += "<tr><td>Resource:<td>" + staticData["resource-names"][d.command.resource]
+				t += "<tr><td>Resource:<td>" + staticData.resourceNames[d.command.resource]
 			}
 			if (typeof d.command.amount !== "undefined") {
 				t += "<tr><td>Amount:<td class=\"amount\">" + d.command.amount
 			}
 			if (typeof d.command["class"] !== "undefined") {
-				t += "<tr><td>Class:<td>" + staticData["ship-classes"][d.command["class"]].name
+				t += "<tr><td>Class:<td>" + staticData.shipClasses[d.command["class"]].name
 			}
 			t += "</table>"
 		}
@@ -7454,12 +7378,12 @@ function clickInfo(e) {
 	if (typeof d["resources"] !== "undefined" && Object.keys(d.resources).length > 0) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
-		if (!d["ship-class"]) {
+		if (!d.shipClass) {
 			t += "<tr><td><td>Available<td>Buy price<td>Sell price"
 		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
-			t += "<tr><td>" + staticData["resource-names"][rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r["buy-price"]) || "") + "<td class=\"sell\">" + (bignum(r["sell-price"]) || "")
+			t += "<tr><td>" + staticData.resourceNames[rid] + ": <td class=\"amount\">" + (bignum(r.amount) || "") + "<td class=\"buy\">" + (bignum(r.buyPrice) || "") + "<td class=\"sell\">" + (bignum(r.sellPrice) || "")
 		}
 		t += "</table>"
 	}
@@ -7487,7 +7411,7 @@ function shipColor(d) {
 }
 
 function shipHref(d) {
-	return "#class-" + staticData["ship-classes"][d["ship-class"]].name
+	return "#class-" + staticData.shipClasses[d.shipClass].name
 }
 
 function mapRedraw(data) {
@@ -7595,8 +7519,8 @@ function mapRedraw(data) {
 	.ease(d3.easeLinear)
 	.call(linesPositions)
 
-	if (typeof data["player-id"] !== "undefined") {
-		let ps = data.players[data["player-id"]]["net-worth"]
+	if (typeof data.playerId !== "undefined") {
+		let ps = data.players[data.playerId].netWorth
 		d3.select("#playerInfo")
 		.html("Ships: " + bignum(ps.ships) + ", Commodities: " + bignum(ps.resources) + ", Money: " + bignum(ps.money) + ", Total: " + bignum(ps.total))
 	} else {
@@ -7610,13 +7534,13 @@ function mapRedraw(data) {
 		p.id = pid
 		players.push(p)
 	}
-	players.sort((a, b) => d3.descending(a["net-worth"].total, b["net-worth"].total))
+	players.sort((a, b) => d3.descending(a.netWorth.total, b.netWorth.total))
 
 	d3.select("#playersOverlay")
 	.selectAll("tr")
 	.data(players, d => d.id)
 	.join("tr")
-	.html(d => "<td>" + d.name + "<td>" + bignum(d["net-worth"].total))
+	.html(d => "<td>" + d.name + "<td>" + bignum(d.netWorth.total))
 	.style("color", d => colorToRgb(d.color))
 }
 
@@ -7624,10 +7548,10 @@ function spawnBeam(attacker, defender) {
 	d3.select("#particles")
 	.append("line")
 	.classed("beam", true)
-	.attr("x1", attacker["prev-position"][0])
-	.attr("y1", attacker["prev-position"][1])
-	.attr("x2", defender["prev-position"][0] + (Math.random() - 0.5) * 3)
-	.attr("y2", defender["prev-position"][1] + (Math.random() - 0.5) * 3)
+	.attr("x1", attacker.prevPosition[0])
+	.attr("y1", attacker.prevPosition[1])
+	.attr("x2", defender.prevPosition[0] + (Math.random() - 0.5) * 3)
+	.attr("y2", defender.prevPosition[1] + (Math.random() - 0.5) * 3)
 	.attr("opacity", 0.7)
 	.transition()
 	.duration(500)
@@ -7678,14 +7602,14 @@ function spawnBloom(pos, radius, id) {
 
 function spawnAttack(attacker, defender) {
 	spawnBeam(attacker, defender)
-	spawnParticles(defender["prev-position"], 3)
-	spawnBloom(defender["prev-position"], 25, "attackBloomGrad")
+	spawnParticles(defender.prevPosition, 3)
+	spawnBloom(defender.prevPosition, 25, "attackBloomGrad")
 }
 
 function spawnKill(attacker, defender) {
 	spawnBeam(attacker, defender)
-	spawnParticles(defender["prev-position"], 20)
-	spawnBloom(defender["prev-position"], 80, "killBloomGrad")
+	spawnParticles(defender.prevPosition, 20)
+	spawnBloom(defender.prevPosition, 80, "killBloomGrad")
 }
 
 function spawnText(pos, direction, color, text, classes) {
@@ -7719,7 +7643,7 @@ function spawnTrade(data, tr) {
 		return
 	let pos = data.objects[pl == p1 ? tr.buyer : tr.seller].position
 	let c = colorToRgb(data.players[pl].color)
-	let rn = staticData["resource-names"][tr.resource]
+	let rn = staticData.resourceNames[tr.resource]
 	spawnText(pos, [0, pl == p1 ? 1 : -1], c, (pl == p1 ? "-" : "+") + tr.price, "trade-price")
 	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
@@ -7756,8 +7680,8 @@ function mapRefresh() {
 			d3.select("#tickInfo").text(error)
 		} else {
 			if (staticData) {
-				if ((typeof data["player-id"] !== "undefined") && (typeof data.players[data["player-id"]] === "undefined")) {
-					delete data["player-id"] // the supposedly logged-in player does not exist
+				if ((typeof data.playerId !== "undefined") && (typeof data.players[data.playerId] === "undefined")) {
+					delete data.playerId // the supposedly logged-in player does not exist
 				}
 				mapRedraw(data)
 				mapEvents(data)
@@ -7773,7 +7697,7 @@ function mapTimerLoop() {
 				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
 			} else {
-				setTimeout(mapTimerLoop, data["min-time-left-ms"] || 300)
+				setTimeout(mapTimerLoop, data.minTimeLeftMs || 300)
 				if (currentTick.tick != data.tick) {
 					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
 					currentTick = data
@@ -7795,7 +7719,7 @@ function mapStartLoop() {
 	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
 
 	let cookies = parseCookies()
-	let playerid = cookies["player-id"] || -1
+	let playerid = cookies.playerId || -1
 	if (playerid > 0) {
 		d3.select("#userInfo").node().innerHTML = "<a href=\"logout.htm\">Log out</a> Player id: " + playerid + ", "
 	}
@@ -7950,11 +7874,11 @@ function graphsRedrawDamage(data, attackerMultiplier, defenderMultiplier) {
 		for (let k of Object.keys(data.scores[sid].total))
 			res[sid][k] = 0
 	}
-	if (typeof data["combat"] !== "undefined") {
+	if ((typeof data["combat"] !== "undefined") && data.combat) {
 		for (let c of Object.values(data.combat)) {
 			let a = data.world.objects[c.attacker]
 			let d = data.world.objects[c.defender]
-			let dmg = staticData["ship-classes"][a["ship-class"]].damage
+			let dmg = staticData.shipClasses[a.shipClass].damage
 			res[a.player][c.tick] += dmg * attackerMultiplier
 			res[d.player][c.tick] += dmg * defenderMultiplier
 		}
@@ -7993,7 +7917,7 @@ function graphsRedrawResourcesPrices(data) {
 	let legends = []
 	for (let rid of Object.keys(data.prices)) {
 		let p = data.prices[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -8021,7 +7945,7 @@ function graphsRedrawResourcesAmounts(data) {
 	let legends = []
 	for (let rid of Object.keys(data.resourceAmounts)) {
 		let p = data.resourceAmounts[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -8050,7 +7974,7 @@ function graphsRedrawResourcesTotals(data) {
 	for (let rid of Object.keys(data.prices)) {
 		let p = data.prices[rid]
 		let a = data.resourceAmounts[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -8091,7 +8015,7 @@ function graphsRedrawResourcesVolumes(data) {
 	let legends = []
 	for (let rid of Object.keys(res)) {
 		let p = res[rid]
-		let name = staticData["resource-names"][rid]
+		let name = staticData.resourceNames[rid]
 		let color = staticData.resourceColors[rid]
 
 		let m = {}
@@ -8197,7 +8121,7 @@ window.initializeGraphs = function() {
 	setTimeout(graphsStartLoop, 0)
 }
 
-},{"hash-int":48,"space_tycoon_client":4}],45:[function(require,module,exports){
+},{"hash-int":47,"space_tycoon_client":3}],44:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -8349,9 +8273,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -10132,7 +10056,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":45,"buffer":47,"ieee754":49}],48:[function(require,module,exports){
+},{"base64-js":44,"buffer":46,"ieee754":48}],47:[function(require,module,exports){
 "use strict"
 
 var A
@@ -10156,7 +10080,7 @@ function hashInt(x) {
 
 module.exports = hashInt
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -10243,7 +10167,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10329,7 +10253,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10416,10 +10340,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":50,"./encode":51}]},{},[44]);
+},{"./decode":49,"./encode":50}]},{},[43]);

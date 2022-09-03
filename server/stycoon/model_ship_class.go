@@ -19,7 +19,7 @@ type ShipClass struct {
 	Speed float64 `json:"speed"`
 
 	// maximum number of resources the ship can carry - sum over all types of resources
-	CargoCapacity int64 `json:"cargo-capacity"`
+	CargoCapacity int64 `json:"cargoCapacity"`
 
 	Life int64 `json:"life"`
 
@@ -27,10 +27,13 @@ type ShipClass struct {
 
 	Price int64 `json:"price"`
 
+	// passive regeneration per tick
 	Regen int64 `json:"regen"`
 
+	// price for healing repairLife per tick (for repair command)
 	RepairPrice int64 `json:"repairPrice"`
 
+	// how much is repaired per tick (for repair command)
 	RepairLife int64 `json:"repairLife"`
 }
 
@@ -40,7 +43,7 @@ func AssertShipClassRequired(obj ShipClass) error {
 		"name": obj.Name,
 		"shipyard": obj.Shipyard,
 		"speed": obj.Speed,
-		"cargo-capacity": obj.CargoCapacity,
+		"cargoCapacity": obj.CargoCapacity,
 		"life": obj.Life,
 		"damage": obj.Damage,
 		"price": obj.Price,
