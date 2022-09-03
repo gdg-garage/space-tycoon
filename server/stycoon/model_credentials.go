@@ -14,8 +14,6 @@ type Credentials struct {
 	Username string `json:"username"`
 
 	Password string `json:"password"`
-
-	Player string `json:"player"`
 }
 
 // AssertCredentialsRequired checks if the required fields are not zero-ed
@@ -23,7 +21,6 @@ func AssertCredentialsRequired(obj Credentials) error {
 	elements := map[string]interface{}{
 		"username": obj.Username,
 		"password": obj.Password,
-		"player": obj.Player,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

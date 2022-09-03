@@ -389,14 +389,11 @@ components:
       required:
         - username
         - password
-        - player
       type: object
       properties:
         username:
           type: string
         password:
-          type: string
-        player:
           type: string
 
     StaticData:

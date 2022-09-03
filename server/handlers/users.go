@@ -103,9 +103,9 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	}
 	session, _ := game.SessionManager.Get(req, stycoon.SessionKey)
 	session.Values[stycoon.UsernameField] = userCredentials.Username
-	playerId, err := database.GetPLayerIdForUser(db, userId, userCredentials.Player)
+	playerId, err := database.GetPLayerIdForUser(userId)
 	if err != nil {
-		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Player).Msg("Players fetch failed")
+		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Username).Msg("Players fetch failed")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -356,24 +356,22 @@ func (game *Game) getCommodityAmounts() (map[int]map[string]*TradingResource, er
 
 func (game *Game) setPlayers() error {
 	var players = make(map[string]Player)
-	rows, err := game.db.Query("select `id`, `name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player left join t_report_player_score as score on t_player.id = score.player and score.tick = ?", game.Tick.Tick-1)
+	rows, err := game.db.Query("select t_player.`id`, d_user.`name`, `color`, t_player.`money`, score.`commodities`, score.`ships`, score.`total` from t_player join d_user on t_player.id = d_user.id left join t_report_player_score as score on t_player.id = score.player and score.tick = ?", game.Tick.Tick-1)
 	if err != nil {
 		return fmt.Errorf("query failed %v", err)
 	}
 	for rows.Next() {
 		var id int
 		var player Player
-		var color sql.NullString
+		var color string
 		var commodities, ships, total sql.NullInt64
 		err = rows.Scan(&id, &player.Name, &color, &player.NetWorth.Money, &commodities, &ships, &total)
 		if err != nil {
 			return fmt.Errorf("row read failed %v", err)
 		}
-		if color.Valid {
-			err = json.Unmarshal([]byte(color.String), &player.Color)
-			if err != nil {
-				return err
-			}
+		err = json.Unmarshal([]byte(color), &player.Color)
+		if err != nil {
+			return err
 		}
 		if commodities.Valid {
 			player.NetWorth.Resources = commodities.Int64
@@ -395,7 +393,7 @@ func (game *Game) setPlayers() error {
 
 func (game *Game) getPlayersNr() (int, error) {
 	var playerNr int
-	err := game.db.QueryRow("select count(*) from d_user left join t_player as tp on d_user.id = tp.user where tp.`id` is null").Scan(&playerNr)
+	err := game.db.QueryRow("select count(*) from d_user left join t_player as tp on d_user.id = tp.id where tp.`id` is null").Scan(&playerNr)
 	if err != nil {
 		return 0, err
 	}
@@ -439,8 +437,12 @@ func (game *Game) generatePlayerColors(playerNr int) ([][]byte, error) {
 }
 
 func (game *Game) CreatePlayersForUsers() error {
-	rows, err := game.db.Query("select d_user.`id`, d_user.`name`, tp.`id` from d_user left join t_player as tp on d_user.id = tp.user")
+	rows, err := game.db.Query("select d_user.`id`, d_user.`name`, tp.`id` from d_user left join t_player as tp on d_user.id = tp.id")
 	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Info().Msg("No players to create")
+			return nil
+		}
 		return fmt.Errorf("query failed %v", err)
 	}
 	playerNr, err := game.getPlayersNr()
@@ -469,7 +471,7 @@ func (game *Game) CreatePlayersForUsers() error {
 		pos := playerPositions[counter]
 		color := playerColors[counter]
 		log.Info().Str("user", name).Msg("Creating player for user")
-		_, err = game.db.Exec("select p_create_player(?, ?, ?, ?, ?)", id, pos[0], pos[1], name, color)
+		_, err = game.db.Exec("call p_create_player(?, ?, ?, ?)", id, pos[0], pos[1], color)
 		if err != nil {
 			return err
 		}

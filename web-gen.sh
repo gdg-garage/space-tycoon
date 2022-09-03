@@ -1,5 +1,6 @@
 
-docker-compose up visualization-gen
+docker-compose run visualization-gen
+
 cd web/js/client
 npm install
 npm link
