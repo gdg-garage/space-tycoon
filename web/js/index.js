@@ -1,7 +1,7 @@
 var STC = require("space_tycoon_client")
 var hashInt = require("hash-int")
 
-STC.ApiClient.instance.basePath = "http://localhost" // for development
+STC.ApiClient.instance.basePath = "../" // for development
 STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 

@@ -11,6 +11,7 @@ services:
       - SESSION_KEY=thisisverysecret
     volumes:
       - ./sessions:/app/sessions
+      - ./web:/app/web
 
   dev-server:
     build: server
@@ -22,6 +23,7 @@ services:
       - SESSION_KEY=thisisverysecret
     volumes:
       - ./sessions:/app/sessions
+      - ./web:/app/web
     command:
       - "--dev"
 
