@@ -1,4 +1,4 @@
-version: "3.8"
+`version: "3.8"
 
 services:
   server:
@@ -73,30 +73,3 @@ services:
     volumes:
       - "./api:/api"
       - "./web/js/client:/web/js/client"
-
-  client-gen:
-    image: openapitools/openapi-generator-cli
-    command: >
-      generate
-      -i /api/swagger.yaml
-      -g python
-      -o /example-bot
-      --additional-properties=packageName=space_tycoon_client
-    volumes:
-      - "./api:/api"
-      - "./example-bot:/example-bot"
-
-  swagger-client-gen:
-    image: swaggerapi/swagger-codegen-cli-v3
-    ulimits:
-      nofile: 122880
-    command: >
-      generate
-      -i /api/swagger.yaml
-      -l python
-      -o /example-bot
-      -D packageName=space_tycoon_client
-      -v
-    volumes:
-      - "./api:/api"
-      - "./example-bot:/example-bot"
