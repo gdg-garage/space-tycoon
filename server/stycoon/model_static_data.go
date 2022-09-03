@@ -11,9 +11,9 @@ package stycoon
 
 type StaticData struct {
 
-	ShipClasses map[string]ShipClass `json:"ship-classes,omitempty"`
+	ShipClasses map[string]ShipClass `json:"shipClasses,omitempty"`
 
-	ResourceNames map[string]string `json:"resource-names,omitempty"`
+	ResourceNames map[string]string `json:"resourceNames,omitempty"`
 }
 
 // AssertStaticDataRequired checks if the required fields are not zero-ed

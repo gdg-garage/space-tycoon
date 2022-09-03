@@ -10,6 +10,7 @@
 package stycoon
 
 type MoveCommand struct {
+
 	Destination *Destination `json:"destination"`
 
 	Type string `json:"type,omitempty"`

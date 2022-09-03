@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS `d_class` (
 /*!40000 ALTER TABLE `d_class` DISABLE KEYS */;
 INSERT INTO `d_class` (`id`, `name`, `shipyard`, `speed`, `cargo`, `life`, `regen`, `repair_life`, `repair_price`, `damage`, `price`, `starting_count`) VALUES
 	(1, 'mothership', 'Y', 10, 0, 1000, 20, 200, 25000, 50, NULL, 1),
-	(2, 'hauler', 'N', 13, 200, 200, 3, 50, 25000, 0, 500000, 0),
-	(3, 'shipper', 'N', 18, 50, 100, 3, 50, 25000, 0, 300000, 5),
+	(2, 'hauler', 'N', 13, 40, 200, 3, 50, 25000, 0, 500000, 0),
+	(3, 'shipper', 'N', 18, 10, 100, 3, 50, 25000, 0, 300000, 5),
 	(4, 'fighter', 'N', 20, 0, 150, 3, 100, 50000, 15, 1500000, 0),
 	(5, 'bomber', 'N', 15, 0, 250, 3, 100, 50000, 30, 2000000, 0),
 	(6, 'destroyer', 'Y', 10, 0, 3000, 50, 500, 250000, 250, 42000000, 0),
@@ -2382,6 +2382,12 @@ FROM t_planet
 JOIN t_recipe ON t_recipe.planet = t_planet.id
 WHERE production > 0;
 
+DELETE FROM t_price;
+
+INSERT INTO t_price (planet, resource)
+SELECT planet, resource
+FROM t_recipe;
+
 END//
 DELIMITER ;
 
@@ -3002,6 +3008,20 @@ CREATE PROCEDURE `p_update_prices`()
     SQL SECURITY INVOKER
 BEGIN
 
+DROP TEMPORARY TABLE IF EXISTS t_resource_sums;
+CREATE TEMPORARY TABLE t_resource_sums
+(PRIMARY KEY(resource))
+SELECT resource, sum(amount) AS sm
+FROM t_commodity
+JOIN t_object ON t_object.id = t_commodity.object
+GROUP BY resource;
+
+DROP TEMPORARY TABLE IF EXISTS t_resource_ratios;
+CREATE TEMPORARY TABLE t_resource_ratios
+(PRIMARY KEY(resource))
+SELECT resource, POW(sm / (SELECT GREATEST(AVG(sm), 100) FROM t_resource_sums), 5) AS ratio
+FROM t_resource_sums;
+
 DROP TEMPORARY TABLE IF EXISTS t_recipe_stats;
 CREATE TEMPORARY TABLE t_recipe_stats
 (PRIMARY KEY(planet, resource))
@@ -3013,12 +3033,10 @@ FROM t_planet
 JOIN t_recipe ON t_recipe.planet = t_planet.id
 left JOIN t_commodity ON t_commodity.object = t_recipe.planet AND t_commodity.resource = t_recipe.resource;
 
-DELETE FROM t_price;
-
-INSERT INTO t_price (planet, resource, buy, sell)
-SELECT planet, resource, if(surplus > 0, 1000 / SQRT(surplus + 10), NULL), if(lack > 0, (lack + 100) * (elapsed + 100) * 0.01, NULL)
-FROM t_recipe_stats
-WHERE surplus > 0 OR lack > 0;
+UPDATE t_price
+JOIN t_recipe_stats USING (planet, resource)
+JOIN t_resource_ratios USING (resource)
+SET buy = if(surplus > 0, 1000 / SQRT(surplus + 10) * ratio, NULL), sell = if(lack > 0, (lack + 100) * (elapsed * 0.3 + 100) * 0.01 * ratio, NULL);
 
 END//
 DELIMITER ;

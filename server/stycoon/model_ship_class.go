@@ -19,13 +19,22 @@ type ShipClass struct {
 	Speed float64 `json:"speed"`
 
 	// maximum number of resources the ship can carry - sum over all types of resources
-	CargoCapacity int64 `json:"cargo-capacity"`
+	CargoCapacity int64 `json:"cargoCapacity"`
 
 	Life int64 `json:"life"`
 
 	Damage int64 `json:"damage"`
 
 	Price int64 `json:"price"`
+
+	// passive regeneration per tick
+	Regen int64 `json:"regen"`
+
+	// price for healing repairLife per tick (for repair command)
+	RepairPrice int64 `json:"repairPrice"`
+
+	// how much is repaired per tick (for repair command)
+	RepairLife int64 `json:"repairLife"`
 }
 
 // AssertShipClassRequired checks if the required fields are not zero-ed
@@ -34,10 +43,13 @@ func AssertShipClassRequired(obj ShipClass) error {
 		"name": obj.Name,
 		"shipyard": obj.Shipyard,
 		"speed": obj.Speed,
-		"cargo-capacity": obj.CargoCapacity,
+		"cargoCapacity": obj.CargoCapacity,
 		"life": obj.Life,
 		"damage": obj.Damage,
 		"price": obj.Price,
+		"regen": obj.Regen,
+		"repairPrice": obj.RepairPrice,
+		"repairLife": obj.RepairLife,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

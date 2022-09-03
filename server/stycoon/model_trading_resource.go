@@ -13,9 +13,9 @@ type TradingResource struct {
 
 	Amount int64 `json:"amount"`
 
-	BuyPrice float64 `json:"buy-price,omitempty"`
+	BuyPrice float64 `json:"buyPrice,omitempty"`
 
-	SellPrice float64 `json:"sell-price,omitempty"`
+	SellPrice float64 `json:"sellPrice,omitempty"`
 }
 
 // AssertTradingResourceRequired checks if the required fields are not zero-ed

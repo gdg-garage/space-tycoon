@@ -15,7 +15,7 @@ type Player struct {
 
 	Color []int32 `json:"color"`
 
-	NetWorth NetWorth `json:"net-worth"`
+	NetWorth NetWorth `json:"netWorth"`
 }
 
 // AssertPlayerRequired checks if the required fields are not zero-ed
@@ -23,7 +23,7 @@ func AssertPlayerRequired(obj Player) error {
 	elements := map[string]interface{}{
 		"name": obj.Name,
 		"color": obj.Color,
-		"net-worth": obj.NetWorth,
+		"netWorth": obj.NetWorth,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

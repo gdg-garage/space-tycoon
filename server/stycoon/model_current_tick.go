@@ -13,7 +13,7 @@ type CurrentTick struct {
 
 	Tick int64 `json:"tick"`
 
-	MinTimeLeftMs int64 `json:"min-time-left-ms"`
+	MinTimeLeftMs int64 `json:"minTimeLeftMs"`
 
 	Season int64 `json:"season"`
 }
@@ -22,7 +22,7 @@ type CurrentTick struct {
 func AssertCurrentTickRequired(obj CurrentTick) error {
 	elements := map[string]interface{}{
 		"tick": obj.Tick,
-		"min-time-left-ms": obj.MinTimeLeftMs,
+		"minTimeLeftMs": obj.MinTimeLeftMs,
 		"season": obj.Season,
 	}
 	for name, el := range elements {

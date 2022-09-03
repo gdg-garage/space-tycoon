@@ -11,9 +11,9 @@ package stycoon
 
 type TradingResourceAllOf struct {
 
-	BuyPrice float64 `json:"buy-price,omitempty"`
+	BuyPrice float64 `json:"buyPrice,omitempty"`
 
-	SellPrice float64 `json:"sell-price,omitempty"`
+	SellPrice float64 `json:"sellPrice,omitempty"`
 }
 
 // AssertTradingResourceAllOfRequired checks if the required fields are not zero-ed
