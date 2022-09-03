@@ -410,7 +410,7 @@ func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
 	}
 
 	segmentSize := 2 * math.Pi / float64(playerNr)
-	currDist := 0.0
+	currDist := rand.Float64() * rand.Float64() * 360
 	for i := 0; i < playerNr; i++ {
 		diameter := (1-rand.Float64()*rand.Float64())*1000 + 250
 		x := math.Cos(currDist) * diameter
@@ -418,6 +418,7 @@ func (game *Game) generatePlayerPositions(playerNr int) [][]float64 {
 		playerPositions = append(playerPositions, []float64{x, y})
 		currDist += segmentSize
 	}
+	rand.Shuffle(len(playerPositions), func(i, j int) { playerPositions[i], playerPositions[j] = playerPositions[j], playerPositions[i] })
 	return playerPositions
 }
 
