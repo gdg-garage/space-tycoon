@@ -12,6 +12,8 @@ import (
 	"net/http"
 )
 
+const persistentLoginParam = "persistent"
+
 func CreateUser(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
@@ -112,7 +114,11 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 		return
 	}
 	session.Values[stycoon.PlayerIdField] = playerId
-	session.Values[stycoon.SeasonField] = game.Tick.Season
+	if req.URL.Query().Has(persistentLoginParam) {
+		session.Values[stycoon.SeasonField] = -1
+	} else {
+		session.Values[stycoon.SeasonField] = game.Tick.Season
+	}
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
