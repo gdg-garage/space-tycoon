@@ -192,3 +192,7 @@ form {
 #thegraph .legend {
 	text-anchor: end;
 }
+
+#userPageContainer {
+	padding: 10px;
+}
