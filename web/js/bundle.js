@@ -8092,7 +8092,6 @@ function graphsRedrawResourcesVolumes(data) {
 }
 
 function graphsRedrawSeasons(data, weighted) {
-	console.log(data)
 	let lines = []
 	let legends = []
 	for (let sid of Object.keys(data.seasonScores)) {
@@ -8106,15 +8105,29 @@ function graphsRedrawSeasons(data, weighted) {
 		m.color = color
 		m.classes = "line"
 		m.values = []
-		for (let x of Object.keys(s))
-			m.values.push([ parseInt(x), s[x] ])
+		let lst = 0
+		if (weighted) {
+			let sum = 0
+			for (let x of Object.keys(s)) {
+				let k = parseInt(x)
+				sum += k * s[x]
+				let div = (k + 1) * k / 2
+				lst = sum / div
+				m.values.push([ k, lst ])
+			}
+		} else {
+			for (let x of Object.keys(s)) {
+				lst = s[x]
+				m.values.push([ parseInt(x), s[x] ])
+			}
+		}
 		lines.push(m)
 
 		let l = {}
 		l.id = sid
 		l.name = name
 		l.color = color
-		l.value = last(s)
+		l.value = lst
 		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
