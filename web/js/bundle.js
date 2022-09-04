@@ -3421,8 +3421,8 @@ var Reports = /*#__PURE__*/function () {
    * @param prices {Object.<String, Object.<String, Number>>} Prices are average across all planets.
    * @param resourceAmounts {Object.<String, Object.<String, Number>>} 
    * @param scores {Object.<String, module:model/ScoreValue>} 
-   * @param season {Number} 
-   * @param tick {Number} 
+   * @param season {Number} requested / last season
+   * @param tick {Number} requested / last tick in the season
    */
   function Reports(combat, trade, profiling, prices, resourceAmounts, scores, season, tick) {
     _classCallCheck(this, Reports);
@@ -3494,6 +3494,14 @@ var Reports = /*#__PURE__*/function () {
           });
         }
 
+        if (data.hasOwnProperty('seasonScores')) {
+          obj['seasonScores'] = _ApiClient["default"].convertToType(data['seasonScores'], {
+            'String': {
+              'String': 'Number'
+            }
+          });
+        }
+
         if (data.hasOwnProperty('season')) {
           obj['season'] = _ApiClient["default"].convertToType(data['season'], 'Number');
         }
@@ -3543,11 +3551,19 @@ Reports.prototype['resourceAmounts'] = undefined;
 
 Reports.prototype['scores'] = undefined;
 /**
+ * user
+ * @member {Object.<String, Object.<String, Number>>} seasonScores
+ */
+
+Reports.prototype['seasonScores'] = undefined;
+/**
+ * requested / last season
  * @member {Number} season
  */
 
 Reports.prototype['season'] = undefined;
 /**
+ * requested / last tick in the season
  * @member {Number} tick
  */
 
@@ -8075,6 +8091,35 @@ function graphsRedrawResourcesVolumes(data) {
 	multiLineGraph(lines, legends)
 }
 
+function graphsRedrawSeasons(data, weighted) {
+	console.log(data)
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(data.seasonScores)) {
+		let s = data.seasonScores[sid]
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
+
+		let m = {}
+		m.id = sid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(s))
+			m.values.push([ parseInt(x), s[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = last(s)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
 function graphsRefresh(data) {
 	if (!staticData) {
 		(new STC.GameApi()).staticDataGet({}, function(error, data, response) {
@@ -8116,6 +8161,10 @@ function graphsRefresh(data) {
 					graphsRedrawResourcesTotals(data)
 				else if (graphsOptions.type == "resources-volumes")
 					graphsRedrawResourcesVolumes(data)
+				else if (graphsOptions.type == "seasons-raw")
+					graphsRedrawSeasons(data, false)
+				else if (graphsOptions.type == "seasons-weigthed")
+					graphsRedrawSeasons(data, true)
 			}
 		}
 	})

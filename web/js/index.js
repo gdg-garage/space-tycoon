@@ -872,6 +872,35 @@ function graphsRedrawResourcesVolumes(data) {
 	multiLineGraph(lines, legends)
 }
 
+function graphsRedrawSeasons(data, weighted) {
+	console.log(data)
+	let lines = []
+	let legends = []
+	for (let sid of Object.keys(data.seasonScores)) {
+		let s = data.seasonScores[sid]
+		let name = data.world.players[sid].name
+		let color = colorToRgb(data.world.players[sid].color)
+
+		let m = {}
+		m.id = sid
+		m.name = name
+		m.color = color
+		m.classes = "line"
+		m.values = []
+		for (let x of Object.keys(s))
+			m.values.push([ parseInt(x), s[x] ])
+		lines.push(m)
+
+		let l = {}
+		l.id = sid
+		l.name = name
+		l.color = color
+		l.value = last(s)
+		legends.push(l)
+	}
+	multiLineGraph(lines, legends)
+}
+
 function graphsRefresh(data) {
 	if (!staticData) {
 		(new STC.GameApi()).staticDataGet({}, function(error, data, response) {
@@ -913,6 +942,10 @@ function graphsRefresh(data) {
 					graphsRedrawResourcesTotals(data)
 				else if (graphsOptions.type == "resources-volumes")
 					graphsRedrawResourcesVolumes(data)
+				else if (graphsOptions.type == "seasons-raw")
+					graphsRedrawSeasons(data, false)
+				else if (graphsOptions.type == "seasons-weigthed")
+					graphsRedrawSeasons(data, true)
 			}
 		}
 	})
