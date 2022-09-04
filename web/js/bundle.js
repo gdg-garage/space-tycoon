@@ -8057,7 +8057,7 @@ function graphsRedrawResourcesVolumes(data) {
 		for (let k of Object.keys(data.prices[rid]))
 			res[rid][k] = 0
 	}
-	if (typeof data["trade"] !== "undefined") {
+	if (typeof data["trade"] !== "undefined" && data.trade) {
 		for (let tr of Object.values(data.trade)) {
 			res[tr.resource][tr.tick] += tr.amount
 		}
@@ -8094,41 +8094,43 @@ function graphsRedrawResourcesVolumes(data) {
 function graphsRedrawSeasons(data, weighted) {
 	let lines = []
 	let legends = []
-	for (let sid of Object.keys(data.seasonScores)) {
-		let s = data.seasonScores[sid]
-		let name = data.world.players[sid].name
-		let color = colorToRgb(data.world.players[sid].color)
+	if (typeof data["seasonScores"] !== "undefined") {
+		for (let sid of Object.keys(data.seasonScores)) {
+			let s = data.seasonScores[sid]
+			let name = data.world.players[sid].name
+			let color = colorToRgb(data.world.players[sid].color)
 
-		let m = {}
-		m.id = sid
-		m.name = name
-		m.color = color
-		m.classes = "line"
-		m.values = []
-		let lst = 0
-		if (weighted) {
-			let sum = 0
-			for (let x of Object.keys(s)) {
-				let k = parseInt(x)
-				sum += k * s[x]
-				let div = (k + 1) * k / 2
-				lst = sum / div
-				m.values.push([ k, lst ])
+			let m = {}
+			m.id = sid
+			m.name = name
+			m.color = color
+			m.classes = "line"
+			m.values = []
+			let lst = 0
+			if (weighted) {
+				let sum = 0
+				for (let x of Object.keys(s)) {
+					let k = parseInt(x)
+					sum += k * s[x]
+					let div = (k + 1) * k / 2
+					lst = sum / div
+					m.values.push([ k, lst ])
+				}
+			} else {
+				for (let x of Object.keys(s)) {
+					lst = s[x]
+					m.values.push([ parseInt(x), s[x] ])
+				}
 			}
-		} else {
-			for (let x of Object.keys(s)) {
-				lst = s[x]
-				m.values.push([ parseInt(x), s[x] ])
-			}
+			lines.push(m)
+
+			let l = {}
+			l.id = sid
+			l.name = name
+			l.color = color
+			l.value = lst
+			legends.push(l)
 		}
-		lines.push(m)
-
-		let l = {}
-		l.id = sid
-		l.name = name
-		l.color = color
-		l.value = lst
-		legends.push(l)
 	}
 	multiLineGraph(lines, legends)
 }

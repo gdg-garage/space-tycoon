@@ -114,9 +114,13 @@ form {
 	min-width: 20em;
 	padding: 0.3em;
 	border: 1px solid lightgray;
-	border-radius: 0px 10px 10px 10px;
+	border-radius: 10px;
 	background-color: rgba(0, 0, 0, 0.8);
 	color: lightgray;
+}
+
+.modalWindowItem:first-child {
+	border-radius: 0px 10px 10px 10px;
 }
 
 #playersContainer {
