@@ -110,7 +110,7 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	playerId, err := database.GetPLayerIdForUser(userId)
 	if err != nil {
 		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Username).Msg("Players fetch failed")
-		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": "%s"}`, err.Error()), http.StatusInternalServerError)
 		return
 	}
 	session.Values[stycoon.PlayerIdField] = playerId
@@ -122,7 +122,7 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
-		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": "%s"}`, err.Error()), http.StatusInternalServerError)
 		return
 	}
 	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
@@ -151,7 +151,7 @@ func Logout(sessionManager sessions.Store, w http.ResponseWriter, req *http.Requ
 	err := session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
-		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": "%s"}`, err.Error()), http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write([]byte(`{"message": "OK"}`))
