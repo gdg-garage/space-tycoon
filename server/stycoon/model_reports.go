@@ -25,8 +25,13 @@ type Reports struct {
 
 	Scores map[string]ScoreValue `json:"scores"`
 
+	// user
+	SeasonScores map[string]map[string]int64 `json:"seasonScores,omitempty"`
+
+	// requested / last season
 	Season int64 `json:"season"`
 
+	// requested / last tick in the season
 	Tick int64 `json:"tick"`
 }
 

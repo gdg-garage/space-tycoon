@@ -63,7 +63,7 @@ func filterCommands(playerId *string, ships *map[string]Ship) {
 	}
 }
 
-func FilterReportsUpToTick(fullReports *Reports, tick int64) Reports {
+func FilterReportsUpToTick(fullReports *Reports, season int64, tick int64) Reports {
 	reports := Reports{}
 	reports.Combat = make([]Combat, 0, len(fullReports.Combat))
 	for _, combat := range fullReports.Combat {
@@ -167,6 +167,21 @@ func FilterReportsUpToTick(fullReports *Reports, tick int64) Reports {
 		}
 	}
 
+	reports.SeasonScores = make(map[string]map[string]int64, len(fullReports.SeasonScores))
+	for userId, scores := range fullReports.SeasonScores {
+		reports.SeasonScores[userId] = make(map[string]int64, len(scores))
+		for reportSeasonStr, value := range scores {
+			reportSeason, err := strconv.ParseInt(reportSeasonStr, 10, 64)
+			if err != nil {
+				continue
+			}
+			if reportSeason > season {
+				break
+			}
+			reports.SeasonScores[userId][reportSeasonStr] = value
+		}
+	}
+
 	reports.Season = fullReports.Season
 	reports.Tick = tick
 	return reports
@@ -208,6 +223,6 @@ func (game *Game) GetHistoryReports(season int64, tick int64) (Reports, error) {
 	if err != nil {
 		return entry, err
 	}
-	entry = FilterReportsUpToTick(&entry, tick)
+	entry = FilterReportsUpToTick(&entry, season, tick)
 	return entry, nil
 }
