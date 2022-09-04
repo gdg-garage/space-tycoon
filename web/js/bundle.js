@@ -8285,7 +8285,7 @@ function loginValidate(which) {
 function loginSubmit() {
 	if (!loginValidate(-1))
 		return
-	d3.json(STC.ApiClient.instance.basePath + "login", {
+	d3.json(STC.ApiClient.instance.basePath + "login?persistent=1", {
 		method: "POST",
 		body: JSON.stringify({
 			username: d3.select("#login_username").node().value,
