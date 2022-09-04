@@ -665,6 +665,7 @@ components:
         - prices
         - resourceAmounts
         - scores
+        - overallScores
         - season
         - tick
       properties:
@@ -689,10 +690,21 @@ components:
             $ref: '#/components/schemas/ResourceAmount'
         scores:
           $ref: '#/components/schemas/Score'
+        seasonScores:
+          type: object
+          description: user
+          additionalProperties:
+            type: object
+            description: season to score
+            additionalProperties:
+              type: integer
+              format: int64
         season:
+          description: requested / last season
           type: integer
           format: int64
         tick:
+          description: requested / last tick in the season
           type: integer
           format: int64
 

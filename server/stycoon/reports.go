@@ -194,6 +194,27 @@ func (game *Game) fillTrades(tick *int64) error {
 	return nil
 }
 
+func (game *Game) fillSeasonScores() error {
+	rows, err := game.db.Query("select `season`, `user`, `score` from d_user_score")
+	if err != nil {
+		return err
+	}
+	game.Reports.SeasonScores = make(map[string]map[string]int64)
+	var season, user, score int64
+	for rows.Next() {
+		err = rows.Scan(&season, &user, &score)
+		if err != nil {
+			return err
+		}
+		userIdStr := strconv.FormatInt(user, 10)
+		if _, ok := game.Reports.SeasonScores[userIdStr]; !ok {
+			game.Reports.SeasonScores[userIdStr] = make(map[string]int64)
+		}
+		game.Reports.SeasonScores[userIdStr][strconv.FormatInt(season, 10)] = score
+	}
+	return nil
+}
+
 func (game *Game) fillSeasonAndTick() {
 	game.Reports.Tick = game.Tick.Tick
 	game.Reports.Season = game.Tick.Season
@@ -231,6 +252,13 @@ func (game *Game) updateReports(previousTick *int64) {
 	if err != nil {
 		log.Error().Err(err).Msg("Get reports failed - error fetching t_report_player_score")
 		return
+	}
+	if len(game.Reports.SeasonScores) == 0 {
+		err = game.fillSeasonScores()
+		if err != nil {
+			log.Error().Err(err).Msg("Get reports failed - error fetching d_user_score")
+			return
+		}
 	}
 
 	game.fillSeasonAndTick()
