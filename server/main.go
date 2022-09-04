@@ -111,6 +111,9 @@ func main() {
 		handlers.Reports(game, w, r)
 	}))
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("./web/"))))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/web", 302)
+	})
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()
