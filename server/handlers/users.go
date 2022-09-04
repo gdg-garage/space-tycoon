@@ -115,7 +115,7 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	}
 	session.Values[stycoon.PlayerIdField] = playerId
 	if req.URL.Query().Has(persistentLoginParam) {
-		session.Values[stycoon.SeasonField] = -1
+		session.Values[stycoon.SeasonField] = int64(-1)
 	} else {
 		session.Values[stycoon.SeasonField] = game.Tick.Season
 	}

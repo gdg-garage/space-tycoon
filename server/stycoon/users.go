@@ -62,11 +62,11 @@ func SeasonChanged(game *Game, req *http.Request, sessionManager sessions.Store)
 		return false
 	}
 	if maybeSeason, ok := session.Values[SeasonField]; ok {
-		if season, ok := maybeSeason.(int); ok {
+		if season, ok := maybeSeason.(int64); ok {
 			if season == -1 {
 				return false
 			}
-			if game.Tick.Season != int64(season) {
+			if game.Tick.Season != season {
 				log.Info().Msgf("season changed for user [%v]", session.Values[UsernameField])
 				return true
 			}
