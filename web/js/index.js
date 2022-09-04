@@ -1,7 +1,7 @@
 var STC = require("space_tycoon_client")
 var hashInt = require("hash-int")
 
-STC.ApiClient.instance.basePath = "../" // for development
+STC.ApiClient.instance.basePath = "../"
 STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 
@@ -953,4 +953,133 @@ function graphsStartLoop() {
 
 window.initializeGraphs = function() {
 	setTimeout(graphsStartLoop, 0)
+}
+
+//////////////////////////////////////////
+// user
+//////////////////////////////////////////
+
+function registrationValidate(which) {
+	let u = d3.select("#reg_username").node().value
+	let p1 = d3.select("#reg_password").node().value
+	let p2 = d3.select("#reg_password2").node().value
+	if (u.length <= 2 || u.length >= 30) {
+		d3.select("#response").text("invalid user name")
+		return false
+	}
+	if (p1.length <= 2 || p1.length >= 100) {
+		d3.select("#response").text("invalid password")
+		return false
+	}
+	if (p1 != p2) {
+		d3.select("#response").text("passwords do not match")
+		return false
+	}
+	d3.select("#response").text("")
+	return true
+}
+
+function registrationSubmit() {
+	if (!registrationValidate(-1))
+		return
+	d3.json(STC.ApiClient.instance.basePath + "create-user", {
+		method: "POST",
+		body: JSON.stringify({
+			username: d3.select("#reg_username").node().value,
+			password: d3.select("#reg_password").node().value
+		}),
+		headers: {
+			"Content-type": "application/json; charset=UTF-8"
+		}
+	})
+	.then(json => {
+		d3.select("#response").text(JSON.stringify(json))
+	})
+	.catch(err => {
+		d3.select("#response").text(err)
+	})
+}
+
+function loginValidate(which) {
+	let u = d3.select("#login_username").node().value
+	let ps = d3.select("#login_password").node().value
+	if (u.length == 0) {
+		d3.select("#response").text("invalid user name")
+		return false
+	}
+	if (ps.length == 0) {
+		d3.select("#response").text("invalid password")
+		return false
+	}
+	d3.select("#response").text("")
+	return true
+}
+
+function loginSubmit() {
+	if (!loginValidate(-1))
+		return
+	d3.json(STC.ApiClient.instance.basePath + "login", {
+		method: "POST",
+		body: JSON.stringify({
+			username: d3.select("#login_username").node().value,
+			password: d3.select("#login_password").node().value
+		}),
+		headers: {
+			"Content-type": "application/json; charset=UTF-8"
+		},
+		credentials: "include"
+	})
+	.then(json => {
+		d3.select("#response").text(JSON.stringify(json))
+		document.cookie = "player-id=" + json.id + "; path=/";
+	})
+	.catch(err => {
+		d3.select("#response").text(err)
+	})
+}
+
+function logoutSubmit() {
+	document.cookie = "player-id=; expires= Thu, 21 Aug 2014 20:00:00 UTC; path=/"
+	d3.json(STC.ApiClient.instance.basePath + "logout", { credentials: "include" })
+	.then(json => {
+		d3.select("#response").text(JSON.stringify(json))
+	})
+	.catch(err => {
+		d3.select("#response").text(err)
+	})
+}
+
+function resetSubmit() {
+	d3.json(STC.ApiClient.instance.basePath + "reset", { credentials: "include" })
+	.then(json => {
+		d3.select("#response").text(JSON.stringify(json))
+	})
+	.catch(err => {
+		d3.select("#response").text(err)
+	})
+}
+
+function usersPageChange(type) {
+	d3.select("#response").text("")
+	d3.selectAll(".userDiv").style("display", "none")
+	d3.select("#" + type + "Div").style("display", "block")
+}
+
+window.initializeUserPage = function() {
+	d3.select("#reg_username").on("input", e => registrationValidate(0))
+	d3.select("#reg_password").on("input", e => registrationValidate(1))
+	d3.select("#reg_password2").on("input", e => registrationValidate(2))
+	d3.select("#reg_button").on("click", registrationSubmit)
+
+	d3.select("#login_username").on("input", e => loginValidate(0))
+	d3.select("#login_password").on("input", e => loginValidate(1))
+	d3.select("#login_button").on("click", loginSubmit)
+
+	d3.select("#logout_button").on("click", logoutSubmit)
+	d3.select("#reset_button").on("click", resetSubmit)
+
+	d3.select("#userSelect").on("change", function(e) {
+		usersPageChange(e.target.value)
+	})
+	usersPageChange("login")
 }

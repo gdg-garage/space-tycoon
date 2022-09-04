@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Space Tycoon</title>
+		<link rel="stylesheet" href="style.css">
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="js/bundle.js"></script>
+	</head>
+	<body>
+		<nav>
+			<a href="index.html">Home</a>
+			<select id="userSelect">
+				<option value="login">Login</option>
+				<option value="logout">Logout</option>
+				<option value="register">Register</option>
+				<option value="reset">Next Season</option>
+			</select>
+		</nav>
+		<hr>
+		<div id="registerDiv" class="userDiv">
+			<h2>Register</h2>
+			<form>
+				<table>
+					<tr>
+						<td>
+							<label for="reg_username">User name:</label>
+						<td>
+							<input type="text" id="reg_username" name="reg_username">
+					</tr>
+					<tr>
+						<td>
+							<label for="reg_password">Password:</label>
+						<td>
+							<input type="password" id="reg_password" name="reg_password">
+					</tr>
+					<tr>
+						<td>
+							<label for="reg_password2">Again:</label>
+						<td>
+							<input type="password" id="reg_password2" name="reg_password2">
+					</tr>
+					<tr>
+						<td>
+						<td>
+							<input type="button" value="Register" id="reg_button">
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="loginDiv" class="userDiv">
+			<h2>Login</h2>
+			<form>
+				<table>
+					<tr>
+						<td>
+							<label for="login_username">User name:</label>
+						<td>
+							<input type="text" id="login_username" name="login_username">
+					</tr>
+					<tr>
+						<td>
+							<label for="login_password">Password:</label>
+						<td>
+							<input type="password" id="login_password" name="login_password">
+					</tr>
+					<tr>
+						<td>
+						<td>
+							<input type="button" value="Log in" id="login_button">
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="logoutDiv" class="userDiv">
+			<h2>Log out</h2>
+			<input type="button" value="Log out" id="logout_button">
+		</div>
+		<div id="resetDiv" class="userDiv">
+			<h2>Next Season</h2>
+			<input type="button" value="Next Season" id="reset_button">
+		</div>
+		<div id="response">
+		</div>
+	</body>
+	<script>
+		window.initializeUserPage()
+	</script>
+</html>
