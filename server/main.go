@@ -4,17 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"github.com/gdg-garage/space-tycoon/server/database"
-	"github.com/gdg-garage/space-tycoon/server/handlers"
-	"github.com/gdg-garage/space-tycoon/server/stycoon"
-	"github.com/gorilla/sessions"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/gdg-garage/space-tycoon/server/database"
+	"github.com/gdg-garage/space-tycoon/server/handlers"
+	"github.com/gdg-garage/space-tycoon/server/stycoon"
+	"github.com/gorilla/sessions"
+	"github.com/rs/zerolog/log"
 )
 
 var db *sql.DB
@@ -76,7 +77,6 @@ func main() {
 		log.Fatal().Err(err).Msg("Game object init failed")
 	}
 
-	http.HandleFunc("/", addDefaultHeaders(handlers.Root))
 	if *dev {
 		http.HandleFunc("/create-user", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 			handlers.CreateUser(game, db, w, r)
@@ -109,6 +109,7 @@ func main() {
 	http.HandleFunc("/reports", addDefaultHeaders(func(w http.ResponseWriter, r *http.Request) {
 		handlers.Reports(game, w, r)
 	}))
+	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("./web/"))))
 
 	wg := &sync.WaitGroup{}
 	ctx := context.Background()

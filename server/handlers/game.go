@@ -16,13 +16,6 @@ import (
 const querySeasonParam = "season"
 const queryTickParam = "tick"
 
-func Root(w http.ResponseWriter, req *http.Request) {
-	if req.Method != http.MethodGet {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-}
-
 func checkTickAndSeasonQueryParams(w http.ResponseWriter, req *http.Request) (int64, int64, bool, error) {
 	if req.URL.Query().Has(querySeasonParam) || req.URL.Query().Has(queryTickParam) {
 		if req.URL.Query().Has(querySeasonParam) && !req.URL.Query().Has(queryTickParam) {
