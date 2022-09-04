@@ -37,7 +37,7 @@ func checkTickAndSeasonQueryParams(w http.ResponseWriter, req *http.Request) (in
 			return 0, 0, true, errors.New("invalid user data")
 		}
 		if requestedSeason <= 0 || requestedTick <= 0 {
-			http.Error(w, `{"message": "param hasto be >0"}`, http.StatusBadRequest)
+			http.Error(w, `{"message": "param has to be >0"}`, http.StatusBadRequest)
 			return 0, 0, true, errors.New("invalid user data")
 		}
 		return requestedSeason, requestedTick, true, nil
@@ -48,7 +48,7 @@ func checkTickAndSeasonQueryParams(w http.ResponseWriter, req *http.Request) (in
 func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only GET method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	// history
@@ -57,23 +57,23 @@ func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Warn().Err(err).Int64("tick", requestedTick).Int64("session", requestedSeason).Msg("history entry not found")
-				w.WriteHeader(http.StatusNotFound)
+				http.Error(w, `{"message": "not found"}`, http.StatusNotFound)
 				return
 			}
 			log.Warn().Err(err).Msg("history fetch failed")
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, `{"message": "data read failed"}`, http.StatusInternalServerError)
 			return
 		}
 		serializedGameData, err := json.Marshal(historyEntry)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
-			http.Error(w, "response failed", http.StatusInternalServerError)
+			http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(serializedGameData)
 		if err != nil {
 			log.Warn().Err(err).Msg("response write failed")
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 			return
 		}
 		return
@@ -91,26 +91,26 @@ func Data(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	gameData, err := game.GetData(stycoon.MaybeGetLoggedPlayerId(req, game.SessionManager))
 	if err != nil {
 		log.Warn().Err(err).Msg("game data fetch failed")
-		http.Error(w, "db call failed", http.StatusInternalServerError)
+		http.Error(w, `{"message": "data read failed"}`, http.StatusInternalServerError)
 		return
 	}
 	serializedGameData, err := json.Marshal(gameData)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
+		http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(serializedGameData)
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 	}
 }
 
 func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only POST method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	game.Ready.RLock()
@@ -123,38 +123,38 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
-		http.Error(w, "can't read request body", http.StatusBadRequest)
+		http.Error(w, `{"error": "can't read request body"}`, http.StatusBadRequest)
 		return
 	}
 	// parse
 	commands, err := stycoon.ParseCommands(string(body))
 	if err != nil {
 		log.Warn().Err(err).Msg("Command parsing failed")
-		http.Error(w, "parsing failed", http.StatusBadRequest)
+		http.Error(w, `{"error": "parsing failed"}`, http.StatusBadRequest)
 		return
 	}
 	// process
 	user, err := stycoon.LoggedUserFromSession(req, game.SessionManager)
 	if err != nil {
 		log.Warn().Err(err).Msg("User is not logged in")
-		http.Error(w, "only for logged users", http.StatusForbidden)
+		http.Error(w, `{"error": "only for logged users"}`, http.StatusForbidden)
 		return
 	}
 	errs, processingErr := game.ProcessCommands(commands, user)
 	if processingErr != nil {
 		log.Warn().Err(processingErr).Msg("Command processing failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "command processing failed"}`, http.StatusInternalServerError)
 	} else if len(errs) > 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		b, err := json.Marshal(errs)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 		}
 		_, err = w.Write(b)
 		if err != nil {
 			log.Warn().Err(err).Msg("response write failed")
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 		}
 	}
 }
@@ -162,7 +162,7 @@ func Commands(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only GET method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	// history
@@ -171,7 +171,7 @@ func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Warn().Err(err).Int64("tick", requestedTick).Int64("session", requestedSeason).Msg("reports history entry not found")
-				w.WriteHeader(http.StatusNotFound)
+				http.Error(w, `{"message": "not found"}`, http.StatusNotFound)
 				return
 			}
 			log.Warn().Err(err).Msg("report history fetch failed")
@@ -181,13 +181,13 @@ func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 		serializedGameData, err := json.Marshal(historyEntry)
 		if err != nil {
 			log.Warn().Err(err).Msg("Json marshall failed")
-			http.Error(w, "response failed", http.StatusInternalServerError)
+			http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 			return
 		}
 		_, err = w.Write(serializedGameData)
 		if err != nil {
 			log.Warn().Err(err).Msg("response write failed")
-			w.WriteHeader(http.StatusInternalServerError)
+			http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 			return
 		}
 		return
@@ -207,20 +207,26 @@ func Reports(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	reports, err := json.Marshal(game.Reports)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
+		http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(reports)
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 	}
 }
 
 func Reset(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only GET method is supported""}`, http.StatusBadRequest)
+		return
+	}
+	_, err := w.Write([]byte(`{"message": "OK"}`))
+	if err != nil {
+		log.Warn().Err(err).Msg("response write failed")
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 		return
 	}
 	game.NextSeason()

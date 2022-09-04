@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/gdg-garage/space-tycoon/server/database"
 	"github.com/gdg-garage/space-tycoon/server/stycoon"
 	"github.com/gorilla/sessions"
@@ -14,50 +15,51 @@ import (
 func CreateUser(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only POST method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
-		http.Error(w, "can't read request body", http.StatusBadRequest)
+		http.Error(w, `{"message": "can't read request body"}`, http.StatusBadRequest)
 		return
 	}
 	var createUser stycoon.Credentials
 	err = json.Unmarshal(body, &createUser)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
-		http.Error(w, "can't parse json", http.StatusBadRequest)
+		http.Error(w, `{"message": "can't parse json"}`, http.StatusBadRequest)
 		return
 	}
 	passwordHash, err := stycoon.HashPassword(createUser.Password)
 	if err != nil {
 		log.Warn().Err(err).Msg("hashing password failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "creating user failed"}`, http.StatusInternalServerError)
 		return
 	}
 	err = database.InsertUser(db, createUser.Username, passwordHash)
 	if err != nil {
 		log.Warn().Err(err).Msg("Insert user into DB failed")
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, `{"message": "creating user failed"}`, http.StatusInternalServerError)
 		return
 	}
 	err = game.CreatePlayersForUsers()
 	if err != nil {
 		log.Warn().Err(err).Msg("Creating player for user failed")
 		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, `{"message": "creating user failed"}`, http.StatusInternalServerError)
 		return
 	}
 	r, err := json.Marshal(map[string]string{"status": "ok"})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
+		http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(r)
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 		return
 	}
 }
@@ -65,7 +67,7 @@ func CreateUser(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http
 func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodPost {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only POST method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only POST method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	game.Ready.RLock()
@@ -73,32 +75,32 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Warn().Err(err).Msg("Error reading body")
-		http.Error(w, "can't read request body", http.StatusBadRequest)
+		http.Error(w, `{"message": "can't read request body"}`, http.StatusBadRequest)
 		return
 	}
 	var userCredentials stycoon.Credentials
 	err = json.Unmarshal(body, &userCredentials)
 	if err != nil {
 		log.Warn().Err(err).Msg("Json unmarshall failed")
-		http.Error(w, "can't parse json", http.StatusBadRequest)
+		http.Error(w, `{"message": "can't parse json"}`, http.StatusBadRequest)
 		return
 	}
 	err = stycoon.AssertCredentialsRequired(userCredentials)
 	if err != nil {
 		log.Warn().Err(err).Msg("credentials object is invalid")
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, `{"message": "invalid credentials"}`, http.StatusBadRequest)
 		return
 	}
 	userId, hash, err := database.GetUserPassword(db, userCredentials.Username)
 	if err != nil {
 		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("user search failed")
-		w.WriteHeader(http.StatusForbidden)
+		http.Error(w, `{"message": "bad credentials"}`, http.StatusForbidden)
 		return
 	}
 	err = stycoon.IsPasswordValid(hash, userCredentials.Password)
 	if err != nil {
 		log.Warn().Err(err).Str("username", userCredentials.Username).Msg("invalid password")
-		w.WriteHeader(http.StatusForbidden)
+		http.Error(w, `{"message": "bad credentials"}`, http.StatusForbidden)
 		return
 	}
 	session, _ := game.SessionManager.Get(req, stycoon.SessionKey)
@@ -106,7 +108,7 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	playerId, err := database.GetPLayerIdForUser(userId)
 	if err != nil {
 		log.Warn().Err(err).Int64("userId", userId).Str("player", userCredentials.Username).Msg("Players fetch failed")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
 		return
 	}
 	session.Values[stycoon.PlayerIdField] = playerId
@@ -114,20 +116,20 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 	err = session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
 		return
 	}
 	log.Info().Err(err).Msgf("User logged in - session value: %v", session.Values)
 	r, err := json.Marshal(stycoon.PlayerId{Id: playerId})
 	if err != nil {
 		log.Warn().Err(err).Msg("Json marshall failed")
-		http.Error(w, "response failed", http.StatusInternalServerError)
+		http.Error(w, `{"message": "response marshal failed"}`, http.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(r)
 	if err != nil {
 		log.Warn().Err(err).Msg("response write failed")
-		w.WriteHeader(http.StatusInternalServerError)
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 		return
 	}
 }
@@ -135,7 +137,7 @@ func Login(game *stycoon.Game, db *sql.DB, w http.ResponseWriter, req *http.Requ
 func Logout(sessionManager sessions.Store, w http.ResponseWriter, req *http.Request) {
 	if req.Method != http.MethodGet {
 		log.Warn().Str("method", req.Method).Msg("Unsupported method")
-		http.Error(w, "only GET method is supported", http.StatusBadRequest)
+		http.Error(w, `{"message": "only GET method is supported""}`, http.StatusBadRequest)
 		return
 	}
 	session, _ := sessionManager.Get(req, stycoon.SessionKey)
@@ -143,7 +145,13 @@ func Logout(sessionManager sessions.Store, w http.ResponseWriter, req *http.Requ
 	err := session.Save(req, w)
 	if err != nil {
 		log.Warn().Err(err).Msg("Session store failed")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf(`{"message": %s}`, err.Error()), http.StatusInternalServerError)
+		return
+	}
+	_, err = w.Write([]byte(`{"message": "OK"}`))
+	if err != nil {
+		log.Warn().Err(err).Msg("response write failed")
+		http.Error(w, `{"message": "response write failed"}`, http.StatusInternalServerError)
 		return
 	}
 }
