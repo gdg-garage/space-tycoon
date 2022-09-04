@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,8 +21,7 @@ import (
 
 var db *sql.DB
 
-func serve(ctx context.Context, wg *sync.WaitGroup) {
-	address := ":80"
+func serve(ctx context.Context, wg *sync.WaitGroup, address string) {
 	log.Info().Msgf("Listening on %s", address)
 	server := &http.Server{Addr: address, Handler: nil}
 
@@ -63,6 +63,7 @@ func addDefaultHeaders(fn http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	dev := flag.Bool("dev", false, "should the server run in dev mode (for debug)")
+	var port = flag.Int("p", 80, "Port")
 	flag.Parse()
 
 	if *dev {
@@ -119,7 +120,7 @@ func main() {
 	wg.Add(1)
 	go game.MainLoop(ctx, wg)
 
-	serve(ctx, wg)
+	serve(ctx, wg, fmt.Sprintf(":%d", *port))
 
 	wg.Wait()
 }
