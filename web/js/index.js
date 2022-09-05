@@ -5,6 +5,7 @@ STC.ApiClient.instance.basePath = "../"
 STC.ApiClient.instance.enableCookies = true
 console.log(STC)
 
+var gameApi = new STC.GameApi()
 var currentTick = new STC.CurrentTick()
 var staticData
 var zoom
@@ -505,7 +506,7 @@ function mapEvents(data) {
 
 function mapRefresh() {
 	if (!staticData) {
-		(new STC.GameApi()).staticDataGet({}, function(error, data, response) {
+		gameApi.staticDataGet({}, function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -514,7 +515,7 @@ function mapRefresh() {
 		})
 	}
 
-	(new STC.GameApi()).dataGet({}, function(error, data, response) {
+	gameApi.dataGet({}, function(error, data, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
@@ -531,7 +532,7 @@ function mapRefresh() {
 
 function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
-		(new STC.GameApi()).currentTickGet(function(error, data, response) {
+		gameApi.currentTickGet(function(error, data, response) {
 			if (error) {
 				setTimeout(mapTimerLoop, 1000)
 				d3.select("#tickInfo").text(error)
@@ -917,7 +918,7 @@ function graphsRedrawSeasons(data, weighted) {
 
 function graphsRefresh(data) {
 	if (!staticData) {
-		(new STC.GameApi()).staticDataGet({}, function(error, data, response) {
+		gameApi.staticDataGet({}, function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -927,7 +928,7 @@ function graphsRefresh(data) {
 		})
 	}
 
-	(new STC.GameApi()).dataGet({}, function(error, world, response) {
+	gameApi.dataGet({}, function(error, world, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
 		} else {
@@ -970,7 +971,7 @@ function graphsRefresh(data) {
 function graphsTimerLoop() {
 	setTimeout(graphsTimerLoop, 1000)
 	if (document.visibilityState === "visible") {
-		(new STC.GameApi()).reportsGet({}, function(error, data, response) {
+		gameApi.reportsGet({}, function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
 			} else {
@@ -1108,6 +1109,24 @@ function resetSubmit() {
 	})
 }
 
+function replayStornoSubmit() {
+	let reset = function(name) { document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;" }
+	reset("replay_season")
+	reset("replay_tick")
+	reset("replay_continuous")
+	reset("replay_fastest")
+	d3.select("#response").text("replay storno-ed")
+}
+
+function replayStartSubmit() {
+	let update = function(name) { document.cookie = name + "=" + d3.select("#" + name).node().value + "; path=/" }
+	update("replay_season")
+	update("replay_tick")
+	update("replay_continuous")
+	update("replay_fastest")
+	d3.select("#response").text("replay started")
+}
+
 function usersPageChange(type) {
 	d3.select("#response").text("")
 	d3.selectAll(".userDiv").style("display", "none")
@@ -1125,7 +1144,11 @@ window.initializeUserPage = function() {
 	d3.select("#login_button").on("click", loginSubmit)
 
 	d3.select("#logout_button").on("click", logoutSubmit)
+
 	d3.select("#reset_button").on("click", resetSubmit)
+
+	d3.select("#replay_button_storno").on("click", replayStornoSubmit)
+	d3.select("#replay_button_start").on("click", replayStartSubmit)
 
 	d3.select("#userSelect").on("change", function(e) {
 		usersPageChange(e.target.value)
