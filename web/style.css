@@ -115,6 +115,7 @@ form {
 	padding: 0.3em;
 	border: 1px solid lightgray;
 	border-radius: 10px;
+	margin-bottom: -1px;
 	background-color: rgba(0, 0, 0, 0.8);
 	color: lightgray;
 }

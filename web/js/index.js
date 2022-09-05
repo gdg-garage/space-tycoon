@@ -143,16 +143,18 @@ function modalClose() {
 
 function drawModal(e, d) {
 	let t = ""
+	t += "<hr>"
+	t += "Id: " + d.id
+	t += ", Position: &lt;" + d.position + "&gt";
+
 	if (typeof d.shipClass !== "undefined") {
 		let c = staticData.shipClasses[d.shipClass]
 		t += "<hr>"
-		t += "<table>"
-		t += "<tr><td>Owner:<td>" + d.data.players[d.player].name
-		t += "<tr><td>Class:<td>" + c.name
 		if (typeof d["life"] !== "undefined") {
-			t += "<tr><td>Life:<td>" + d.life + " / " + c.life
+			t += "Life: " + d.life + " / " + c.life + ", "
 		}
-		t += "</table>"
+		t += "Class: " + c.name + ", "
+		t += "Owner: " + d.data.players[d.player].name
 		if (typeof d.command !== "undefined") {
 			t += "<hr>"
 			t += "<table>"
@@ -193,8 +195,7 @@ function drawModal(e, d) {
 	}
 
 	// window contents
-	let titleHtml = "<span style=\"float: left\">" + d.name + "</span><span style=\"float: right\">&lt;" + d.position + "&gt;</span><div style=\"clear: both\"></div>"
-	let title = "<div class=\"modalTitle\">" + titleHtml + "</div>"
+	let title = "<div class=\"modalTitle\">" + d.name + "</div>"
 	let info = "<div class=\"modalInfo\">" + t + "</div>"
 
 	// window itself
@@ -217,7 +218,7 @@ function clickInfo(e) {
 		}
 		html += drawModal(e, objects[i])
 	}
-	let style = "left: " + e.x + "px; top: " + e.y + "px;"
+	let style = "left: " + (e.x + 1) + "px; top: " + (e.y + 1) + "px;"
 	let finalHtml = "<div class=\"modalWindow\" style=\"" + style + "\">" + html + "</div>"
 
 	d3.select("#modalContainer")
