@@ -283,6 +283,10 @@ components:
 
     StopCommand:
       type: object
+      properties:
+        type:
+          type: string
+          default: stop
 
     ConstructCommand:
       type: object
