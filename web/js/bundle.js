@@ -7771,12 +7771,6 @@ function mapStartLoop() {
 	.call(zoom)
 	.call(zoom.transform, d3.zoomIdentity.translate(size.width / 2, size.height / 2).scale(Math.min(size.width, size.height) / 3000))
 
-	let cookies = parseCookies()
-	let playerid = cookies.playerId || -1
-	if (playerid > 0) {
-		d3.select("#userInfo").node().innerHTML = "<a href=\"logout.htm\">Log out</a> Player id: " + playerid + ", "
-	}
-
 	d3.select("#tickInfo").text("Connecting...")
 	setTimeout(mapTimerLoop, 0)
 }
