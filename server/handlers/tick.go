@@ -44,6 +44,7 @@ func EndTurn(game *stycoon.Game, w http.ResponseWriter, req *http.Request) {
 	game.Ready.RLock()
 	if stycoon.SeasonChanged(game, req, game.SessionManager) {
 		http.Error(w, `{"message": "season changed"}`, http.StatusForbidden)
+		game.Ready.RUnlock()
 		return
 	}
 	game.Ready.RUnlock()
