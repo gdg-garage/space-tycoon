@@ -534,7 +534,7 @@ function mapTimerLoop() {
 			} else {
 				setTimeout(mapTimerLoop, data.minTimeLeftMs || 300)
 				if (currentTick.tick != data.tick) {
-					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick)
+					d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick + " (" + Math.floor(data.tick / 60) + ":" + ((data.tick % 60) < 10 ? "0" : "") + (data.tick % 60) + ")")
 					currentTick = data
 					mapRefresh()
 				}
