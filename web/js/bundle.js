@@ -8152,6 +8152,8 @@ function graphsRefresh(data) {
 					graphsRedrawPlayers(data, [true, true, true, true])
 				else if (graphsOptions.type == "players-total")
 					graphsRedrawPlayers(data, [false, false, false, true])
+				else if (graphsOptions.type == "players-ships")
+					graphsRedrawPlayers(data, [false, true, false, false])
 				else if (graphsOptions.type == "players-money")
 					graphsRedrawPlayers(data, [false, false, true, false])
 				else if (graphsOptions.type == "players-resources")
