@@ -1136,19 +1136,30 @@ function replayStornoSubmit() {
 }
 
 function replayStartSubmit() {
-	let update = function(name) { document.cookie = name + "=" + d3.select("#" + name).node().value + "; path=/" }
-	update("replay_season")
-	update("replay_tick")
-	update("replay_continuous")
-	update("replay_faster")
-	document.cookie = "replay_enabled=1; path=/"
+	replayStornoSubmit()
+	document.cookie = "replay_season=" + d3.select("#replay_season").node().value + "; path=/"
+	if (d3.select("#replay_continuous").node().checked) {
+		document.cookie = "replay_continuous=1; path=/"
+		if (d3.select("#replay_faster").node().checked)
+			document.cookie = "replay_faster=1; path=/"
+		document.cookie = "replay_tick=2; path=/"
+	} else {
+		document.cookie = "replay_tick=" + d3.select("#replay_tick").node().value + "; path=/"
+	}
+	document.cookie = "replay_enabled=true; path=/"
 	d3.select("#response").text("replay started")
+}
+
+function replayUpdateDisabled() {
+	d3.select("#replay_tick").node().disabled = d3.select("#replay_continuous").node().checked
+	d3.select("#replay_faster").node().disabled = !d3.select("#replay_continuous").node().checked
 }
 
 function usersPageChange(type) {
 	d3.select("#response").text("")
 	d3.selectAll(".userDiv").style("display", "none")
 	d3.select("#" + type + "Div").style("display", "block")
+	replayUpdateDisabled()
 }
 
 window.initializeUserPage = function() {
@@ -1167,6 +1178,7 @@ window.initializeUserPage = function() {
 
 	d3.select("#replay_button_storno").on("click", replayStornoSubmit)
 	d3.select("#replay_button_start").on("click", replayStartSubmit)
+	d3.select("#replay_continuous").on("change", replayUpdateDisabled)
 
 	d3.select("#userSelect").on("change", function(e) {
 		usersPageChange(e.target.value)
