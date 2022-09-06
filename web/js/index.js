@@ -48,7 +48,8 @@ function updateResourcesColors() {
 }
 
 function updateTickInfo(data) {
-	d3.select("#tickInfo").text("Season: " + data.season + ", Tick: " + data.tick + " (" + Math.floor(data.tick / 60) + ":" + ((data.tick % 60) < 10 ? "0" : "") + (data.tick % 60) + ")")
+	let replay = parseCookies()["replay_enabled"]
+	d3.select("#tickInfo").text((replay ? "REPLAY, " : "") + "Season: " + data.season + ", Tick: " + data.tick + " (" + Math.floor(data.tick / 60) + ":" + ((data.tick % 60) < 10 ? "0" : "") + (data.tick % 60) + ")")
 }
 
 function parseCookies() {
@@ -504,20 +505,22 @@ function mapEvents(data) {
 	}
 }
 
-function mapRefresh() {
+function mapRefresh(queryParams) {
 	if (!staticData) {
-		gameApi.staticDataGet({}, function(error, data, response) {
+		gameApi.staticDataGet(queryParams, function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
+				replayStornoSubmit()
 			} else {
 				staticData = data
 			}
 		})
 	}
 
-	gameApi.dataGet({}, function(error, data, response) {
+	gameApi.dataGet(queryParams, function(error, data, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
+			replayStornoSubmit()
 		} else {
 			if (staticData) {
 				if ((typeof data.playerId !== "undefined") && (typeof data.players[data.playerId] === "undefined")) {
@@ -532,19 +535,32 @@ function mapRefresh() {
 
 function mapTimerLoop() {
 	if (document.visibilityState === "visible") {
-		gameApi.currentTickGet(function(error, data, response) {
-			if (error) {
-				setTimeout(mapTimerLoop, 1000)
-				d3.select("#tickInfo").text(error)
-			} else {
-				setTimeout(mapTimerLoop, data.minTimeLeftMs || 300)
-				if (currentTick.tick != data.tick) {
-					updateTickInfo(data)
-					currentTick = data
-					mapRefresh()
-				}
+		let cookies = parseCookies()
+		if (cookies["replay_enabled"]) {
+			currentTick = { season: cookies["replay_season"], tick: cookies["replay_tick"] }
+			updateTickInfo(currentTick)
+			mapRefresh({ season: currentTick.season, tick: currentTick.tick })
+			if (cookies["replay_continuous"]) {
+				let t = parseInt(currentTick.tick) + 1
+				document.cookie = "replay_tick=" + t + "; path=/"
 			}
-		})
+			setTimeout(mapTimerLoop, cookies["replay_faster"] ? 100 : 1000)
+		} else {
+			gameApi.currentTickGet(function(error, data, response) {
+				if (error) {
+					setTimeout(mapTimerLoop, 1000)
+					d3.select("#tickInfo").text(error)
+					replayStornoSubmit()
+				} else {
+					setTimeout(mapTimerLoop, data.minTimeLeftMs || 300)
+					if (currentTick.tick != data.tick) {
+						currentTick = data
+						updateTickInfo(currentTick)
+						mapRefresh({ season: currentTick.season, tick: currentTick.tick })
+					}
+				}
+			})
+		}
 	} else {
 		setTimeout(mapTimerLoop, 1000)
 	}
@@ -1114,7 +1130,8 @@ function replayStornoSubmit() {
 	reset("replay_season")
 	reset("replay_tick")
 	reset("replay_continuous")
-	reset("replay_fastest")
+	reset("replay_faster")
+	reset("replay_enabled")
 	d3.select("#response").text("replay storno-ed")
 }
 
@@ -1123,7 +1140,8 @@ function replayStartSubmit() {
 	update("replay_season")
 	update("replay_tick")
 	update("replay_continuous")
-	update("replay_fastest")
+	update("replay_faster")
+	document.cookie = "replay_enabled=1; path=/"
 	d3.select("#response").text("replay started")
 }
 
