@@ -932,11 +932,12 @@ function graphsRedrawSeasons(data, weighted) {
 	multiLineGraph(lines, legends)
 }
 
-function graphsRefresh(data) {
+function graphsRefresh(data, queryParams) {
 	if (!staticData) {
-		gameApi.staticDataGet({}, function(error, data, response) {
+		gameApi.staticDataGet(queryParams, function(error, data, response) {
 			if (error) {
 				d3.select("#tickInfo").text(error)
+				replayStornoSubmit()
 			} else {
 				staticData = data
 				updateResourcesColors()
@@ -944,9 +945,10 @@ function graphsRefresh(data) {
 		})
 	}
 
-	gameApi.dataGet({}, function(error, world, response) {
+	gameApi.dataGet(queryParams, function(error, world, response) {
 		if (error) {
 			d3.select("#tickInfo").text(error)
+			replayStornoSubmit()
 		} else {
 			generateObjects(world)
 			data.world = world
@@ -985,20 +987,41 @@ function graphsRefresh(data) {
 }
 
 function graphsTimerLoop() {
-	setTimeout(graphsTimerLoop, 1000)
+	let cookies = parseCookies()
 	if (document.visibilityState === "visible") {
-		gameApi.reportsGet({}, function(error, data, response) {
-			if (error) {
-				d3.select("#tickInfo").text(error)
-			} else {
-				updateTickInfo(data)
-				if (data.season != currentTick.season) {
-					staticData = undefined
+		setTimeout(graphsTimerLoop, cookies["replay_faster"] ? 100 : 1000)
+		if (cookies["replay_enabled"]) {
+			let queryParams = { season: cookies["replay_season"], tick: cookies["replay_tick"] }
+			gameApi.reportsGet(queryParams, function(error, data, response) {
+				if (error) {
+					d3.select("#tickInfo").text(error)
+					replayStornoSubmit()
+				} else {
+					updateTickInfo(data)
 					currentTick.season = data.season
+					graphsRefresh(data, queryParams)
+					if (cookies["replay_continuous"]) {
+						let t = parseInt(queryParams.tick) + 1
+						document.cookie = "replay_tick=" + t + "; path=/"
+					}
 				}
-				graphsRefresh(data)
-			}
-		})
+			})
+		} else {
+			gameApi.reportsGet({}, function(error, data, response) {
+				if (error) {
+					d3.select("#tickInfo").text(error)
+				} else {
+					updateTickInfo(data)
+					if (data.season != currentTick.season) {
+						staticData = undefined
+						currentTick.season = data.season
+					}
+					graphsRefresh(data)
+				}
+			})
+		}
+	} else {
+		setTimeout(graphsTimerLoop, 1000)
 	}
 }
 
