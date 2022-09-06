@@ -7314,6 +7314,7 @@ var currentTick = new STC.CurrentTick()
 var staticData
 var zoom
 var graphsOptions = {}
+var previousNames = {}
 
 function bignum(n) {
 	if (!n)
@@ -7495,7 +7496,7 @@ function drawModal(e, d) {
 		t += "<hr>"
 		t += "<table class=\"commodities\">"
 		if (!d.shipClass) {
-			t += "<tr><td><td>Available<td>Buy price<td>Sell price"
+			t += "<tr><td><td>Amount<td>Buy price<td>Sell price"
 		}
 		for (let rid of Object.keys(d.resources)) {
 			let r = d.resources[rid]
@@ -7793,6 +7794,11 @@ function spawnTrade(data, tr) {
 	spawnText(pos, [1, 0], c, (pl == p1 ? "+" : "-") + rn, "trade-name")
 }
 
+function spawnRename(data, ship) {
+	let c = colorToRgb(data.players[ship.player].color)
+	spawnText(ship.position, [0, -1], c, ship.name, "rename")
+}
+
 function mapEvents(data) {
 	if (typeof data.reports["combat"] !== "undefined") {
 		for (let c of data.reports.combat) {
@@ -7802,9 +7808,18 @@ function mapEvents(data) {
 				spawnAttack(data.objects[c.attacker], data.objects[c.defender])
 		}
 	}
+
 	if (typeof data.reports["trade"] !== "undefined") {
 		for (let tr of data.reports.trade) {
 			spawnTrade(data, tr)
+		}
+	}
+
+	for (let sid of Object.keys(data.ships)) {
+		let s = data.ships[sid]
+		if (s.name != previousNames[sid]) {
+			previousNames[sid] = s.name
+			spawnRename(data, s)
 		}
 	}
 }

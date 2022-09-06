@@ -98,6 +98,12 @@ form {
 	dominant-baseline: middle;
 }
 
+#themap .rename {
+	font-size: 15px;
+	text-anchor: middle;
+	dominant-baseline: middle;
+}
+
 #lines *, #particles *, #trades *, #blooms * {
 	pointer-events: none;
 }
