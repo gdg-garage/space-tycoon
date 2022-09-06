@@ -19,6 +19,7 @@
 				<option value="logout">Logout</option>
 				<option value="register">Register</option>
 				<option value="reset">Next Season</option>
+				<option value="replay">Replay</option>
 			</select>
 		</nav>
 		<hr>
@@ -84,6 +85,41 @@
 			<div id="resetDiv" class="userDiv">
 				<h2>Next Season</h2>
 				<input type="button" value="Next Season" id="reset_button">
+			</div>
+			<div id="replayDiv" class="userDiv">
+				<h2>Replay</h2>
+				<form>
+					<table>
+						<tr>
+							<td>
+								<label for="replay_season">Season:</label>
+							<td>
+								<input type="number" min="2" step="1" id="replay_season" name="replay_season" value="2">
+						</tr>
+						<tr>
+							<td>
+							<td>
+								<input type="checkbox" id="replay_continuous" name="replay_continuous" checked>
+								<label for="replay_continuous">Continuous</label>
+								<br>
+								<input type="checkbox" id="replay_faster" name="replay_faster" checked>
+								<label for="replay_faster">Faster</label>
+						</tr>
+						<tr>
+							<td>
+								<label for="replay_tick">Tick:</label>
+							<td>
+								<input type="number" min="2" step="1" id="replay_tick" name="replay_tick" value="2">
+							<td>
+						</tr>
+						<tr>
+							<td>
+								<input type="button" value="Storno" id="replay_button_storno">
+							<td>
+								<input type="button" value="Start" id="replay_button_start">
+						</tr>
+					</table>
+				</form>
 			</div>
 			<div id="response">
 			</div>
