@@ -7875,7 +7875,7 @@ function mapTimerLoop() {
 					if (currentTick.tick != data.tick) {
 						currentTick = data
 						updateTickInfo(currentTick)
-						mapRefresh({ season: currentTick.season, tick: currentTick.tick })
+						mapRefresh({})
 					}
 				}
 			})
@@ -8335,7 +8335,7 @@ function graphsTimerLoop() {
 						staticData = undefined
 						currentTick.season = data.season
 					}
-					graphsRefresh(data)
+					graphsRefresh(data, {})
 				}
 			})
 		}
