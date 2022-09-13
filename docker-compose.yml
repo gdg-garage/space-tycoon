@@ -3,29 +3,89 @@ version: "3.8"
 services:
   server:
     build: server
-    ports:
-      - "80:80"
     depends_on:
       - db
     environment:
-      - SESSION_KEY=thisisverysecret
-    volumes:
-      - ./sessions:/app/sessions
-      - ./web:/app/web
-
-  dev-server:
-    build: server
-    ports:
-      - "80:80"
-    depends_on:
-      - db
-    environment:
-      - SESSION_KEY=thisisverysecret
+      - SESSION_KEY=fsadjklfjsdfljklsjfklsjla8789234798fjkhuwekrhu4uy23489uyerohf9834ysdafkjahr37291y49uhfoqwhf3791247y892ohfoufh893qy98bdskajfasjknasjbvalsh3489yr5892y
     volumes:
       - ./sessions:/app/sessions
       - ./web:/app/web
     command:
       - "--dev"
+      - "-p"
+      - "80"
+    expose:
+      - 80
+    labels:
+      - traefik.http.routers.server.rule=Host(`space-tycoon.garage-trip.cz`)
+      - traefik.http.routers.server.tls=true
+      - traefik.http.routers.server.entrypoints=websecure
+      - traefik.http.routers.server.tls.certresolver=le
+      - "traefik.http.middlewares.server_compress.compress=true"
+      - "traefik.http.routers.server.middlewares=server_compress"
+      - traefik.port=80
+  
+  adminer:
+    image: adminer
+    ports:
+      - "8000:8080"
+    depends_on:
+      - db
+
+  dev-server:
+    build: server
+    depends_on:
+      - db
+    environment:
+      - SESSION_KEY=sadfio34uiouroi5408973uh
+    volumes:
+      - ./sessions:/app/sessions
+      - ./web:/app/web
+    command:
+      - "--dev"
+      - "-p"
+      - "80"
+    expose:
+      - 80
+    labels:
+      - traefik.http.routers.server.rule=Host(`space-tycoon.garage-trip.cz`)
+      - traefik.http.routers.server.tls=true
+      - traefik.http.routers.server.entrypoints=websecure
+      - traefik.http.routers.server.tls.certresolver=lei
+
+      - traefik.port=80
+  
+  traefik:
+    image: traefik
+    command:
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"      
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=tivvitmail@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik.garage-trip.cz`)"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls.certresolver=le"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls=true"
+      #- "traefik.http.routers.traefik.middlewares=auth"
+      #- "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      #- "traefik.http.middlewares.auth.basicauth.users=tivvit:$$2y$$05$$z/mluGv2PG.GUFsGhqpwyev92TByrgoVswWejzpzQDKqhxB59IJgm"
+      #expose:
+      #- 8080
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: always
 
   server-tidy:
     image: golang:1.18-alpine
@@ -44,12 +104,14 @@ services:
   db:
     image: mariadb:10
     environment:
-      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: sRgXiCGo7Crfp2Z
       MYSQL_DATABASE: space_tycoon
     volumes:
       - ./database:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
+    volumes:
+      - 19b568afe2b9456b0b7226f089631d0fc3e01907110723f717025f704b2e8702:/var/lib/mysql/
 
   server-gen:
     image: openapitools/openapi-generator-cli
@@ -75,3 +137,6 @@ services:
     volumes:
       - "./api:/api"
       - "./web/js/client:/web/js/client"
+
+volumes:
+  19b568afe2b9456b0b7226f089631d0fc3e01907110723f717025f704b2e8702:

@@ -34,7 +34,7 @@ func ConnectDBWithRetries() *sql.DB {
 	retryBackoff := 500 * time.Millisecond
 	cfg := mysql.Config{
 		User:                 "root",
-		Passwd:               "secret", // TODO load config
+		Passwd:               "sRgXiCGo7Crfp2Z", // TODO load config
 		Net:                  "tcp",
 		Addr:                 "db:3306",
 		DBName:               "space_tycoon",

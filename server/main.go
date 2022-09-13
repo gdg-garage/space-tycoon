@@ -121,7 +121,7 @@ func main() {
 	defer stop()
 
 	wg.Add(1)
-	go game.MainLoop(ctx, wg)
+	// go game.MainLoop(ctx, wg)
 
 	serve(ctx, wg, fmt.Sprintf(":%d", *port))
 

@@ -11,7 +11,7 @@ COPY handlers/ ./handlers
 COPY stycoon ./stycoon
 COPY *.go ./
 
-RUN go build -o space-tycoon
+RUN go build -o space-tycoon -ldflags=-w
 
 FROM alpine
 
